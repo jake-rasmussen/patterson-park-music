@@ -10,9 +10,11 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "dev": "next dev",
+    "ngrok": "ngrok http --domain=good-civet-beloved.ngrok-free.app 3000",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "sync:messages": "tsx scripts/syncMessages.ts"
   },
   "dependencies": {
     "@next/font": "^14.2.15",
@@ -40,6 +42,7 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "superjson": "^2.2.1",
+    "tsx": "^4.19.2",
     "twilio": "^5.3.5",
     "zod": "^3.23.8"
   },

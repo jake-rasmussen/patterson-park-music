@@ -118,6 +118,35 @@ export const smsRouter = createTRPCRouter({
         throw new Error("Failed to retrieve SMS conversation");
       }
     }),
+  storeSMS: publicProcedure
+    .input(
+      z.object({
+        messageSid: z.string(),
+        from: z.string(),
+        to: z.string(),
+        body: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { messageSid, from, to, body } = input;
+
+      try {
+        // Save the incoming SMS message to the database
+        const newMessage = await ctx.db.sMSMessage.create({
+          data: {
+            messageSid,
+            from,
+            to,
+            body,
+          },
+        });
+
+        return { success: true, message: newMessage };
+      } catch (error) {
+        console.error("Error saving SMS message:", error);
+        throw new Error("Failed to save SMS message");
+      }
+    }),
 });
 
 
