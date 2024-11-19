@@ -7,17 +7,18 @@ type PropType = {
   dateSent: Date;
   contact: Contact;
   imageUrls: string[] | null; // Optional prop for the image URL
+  type: "email" | "sms"
 }
 
 const MessageBubble = (props: PropType) => {
-  const { status, body, dateSent, contact, imageUrls } = props;
+  const { status, body, dateSent, contact, imageUrls, type } = props;
 
   return (
     <>
       {status === "received" ? (
         <div className="w-full flex items-end justify-end text-right">
           <div className="flex items-start gap-2.5 shadow-xl">
-            <div className="flex flex-col w-full max-w-[20rem] leading-1.5 p-4 rounded-l-xl rounded-br-xl bg-gray-800">
+            <div className={`flex flex-col w-full leading-1.5 p-4 rounded-l-xl rounded-br-xl bg-gray-800 ${type === "email" ? "max-w-[40rem] " : "max-w-[20rem] "}`}>
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-semibold text-white w-full">
                   {contact.firstName} {contact.lastName}
@@ -44,7 +45,7 @@ const MessageBubble = (props: PropType) => {
         </div>
       ) : (
         <div className="flex items-start gap-2.5">
-          <div className="flex flex-col w-full max-w-[20rem] leading-1.5 p-4 rounded-e-xl rounded-es-xl bg-gray-800 shadow-xl">
+          <div className={`flex flex-col w-full leading-1.5 p-4 rounded-e-xl rounded-es-xl bg-gray-800 shadow-xl ${type === "email" ? "max-w-[40rem] " : "max-w-[20rem] "}`}>
             <div className="flex items-center space-x-2">
               <span className="text-sm font-semibold text-white">Patterson Park Music</span>
               <span className="text-sm font-normal text-gray-400 text-nowrap">

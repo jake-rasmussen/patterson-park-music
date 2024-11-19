@@ -7,7 +7,7 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
-const myNumber = process.env.TWILIO_PHONE_NUMBER; // Your Twilio number from .env
+const myNumber = process.env.TWILIO_PHONE_NUMBER!;
 
 export const smsRouter = createTRPCRouter({
   sendSMS: publicProcedure
@@ -15,23 +15,37 @@ export const smsRouter = createTRPCRouter({
       z.object({
         to: z.string().min(10, "Phone number is required"),
         message: z.string().min(1, "Message cannot be empty"),
-        mediaUrl: z.array(z.string()).optional(), // Optional media URLs for attachments
+        mediaUrls: z.array(z.string()).optional(), // Optional media URLs for attachments
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const { to, message, mediaUrls } = input;
+
       try {
         const response = await client.messages.create({
-          body: input.message,
-          from: process.env.TWILIO_PHONE_NUMBER, // Replace with your Twilio phone number
-          to: input.to,
-          mediaUrl: input.mediaUrl, // Include media URLs if present
+          body: message,
+          from: myNumber,
+          to: to,
+          mediaUrl: mediaUrls, // Include media URLs if present
         });
+
+        const storedSMS = await ctx.db.sMSMessage.create({
+          data: {
+            messageSid: response.sid,
+            from: myNumber,
+            to: input.to,
+            body: message,
+            mediaUrls: mediaUrls || [],
+          }
+        })
 
         return {
           success: true,
           sid: response.sid,
           status: response.status,
           message: "SMS sent successfully",
+          sms: storedSMS,
+          mediaUrls: input.mediaUrls || [],
         };
       } catch (error) {
         console.error("Error sending SMS:", error);
@@ -64,58 +78,32 @@ export const smsRouter = createTRPCRouter({
         throw new Error("Failed to retrieve SMS messages");
       }
     }),
-  // Get a conversation with a specific number, including media if present
-  getConversationWithNumber: publicProcedure
+  getSMSConversations: publicProcedure
     .input(
       z.object({
-        otherNumber: z.string().min(1),                // The requested number for conversation
-        limit: z.number().min(1).max(50).default(10), // Number of messages per page
-        lastMessageId: z.string().optional(),         // Cursor for pagination
+        phoneNumber: z.string()
       })
     )
-    .query(async ({ input }) => {
-      const { limit, otherNumber, lastMessageId } = input;
+    .query(async ({ input, ctx }) => {
+      const { phoneNumber } = input;
 
       try {
-        // Fetch messages in both directions (sent to and from the other number)
-        const messagesToMe = await client.messages.list({
-          limit,
-          to: myNumber,
-          from: otherNumber,
-          ...(lastMessageId && { beforeSid: lastMessageId }),
+        const messages = await ctx.db.sMSMessage.findMany({
+          where: {
+            OR: [
+              { to: phoneNumber },
+              { from: phoneNumber },
+            ],
+          },
+          orderBy: {
+            dateSent: "asc",
+          },
         });
 
-        const messagesFromMe = await client.messages.list({
-          limit,
-          to: otherNumber,
-          from: myNumber,
-          ...(lastMessageId && { beforeSid: lastMessageId }),
-        });
-
-        // Combine and sort messages by date
-        const allMessages = [...messagesToMe, ...messagesFromMe].sort(
-          (a, b) => new Date(a.dateSent).getTime() - new Date(b.dateSent).getTime()
-        );
-
-        return {
-          messages: await Promise.all(
-            allMessages.map(async (message) => ({
-              sid: message.sid,
-              body: message.body,
-              from: message.from,
-              to: message.to,
-              status: message.status,
-              dateSent: message.dateSent,
-              direction: message.direction,
-              mediaUrls: parseInt(message.numMedia) > 0 ? await fetchMediaUrls(message.sid) : [], // Fetch media URLs if available
-            }))
-          ),
-          hasMore: allMessages.length === limit, // Indicates if there are more messages
-          lastMessageId: allMessages.length > 0 ? allMessages[allMessages.length - 1]?.sid : null, // For next page
-        };
+        return { success: true, messages };
       } catch (error) {
-        console.error("Error fetching SMS conversation:", error);
-        throw new Error("Failed to retrieve SMS conversation");
+        console.error("Error retrieving conversations:", error);
+        throw new Error("Failed to retrieve conversations with contact");
       }
     }),
   storeSMS: publicProcedure
@@ -125,10 +113,11 @@ export const smsRouter = createTRPCRouter({
         from: z.string(),
         to: z.string(),
         body: z.string(),
+        mediaUrls: z.array(z.string()).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { messageSid, from, to, body } = input;
+      const { messageSid, from, to, body, mediaUrls } = input;
 
       try {
         // Save the incoming SMS message to the database
@@ -138,6 +127,7 @@ export const smsRouter = createTRPCRouter({
             from,
             to,
             body,
+            mediaUrls: mediaUrls || [],
           },
         });
 

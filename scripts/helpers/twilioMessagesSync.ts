@@ -37,6 +37,19 @@ export async function syncTwilioMessages(): Promise<void> {
           ? await fetchMediaUrls(message.sid)
           : [];
 
+      // Find or create the related contact for this message
+      const contact = await prisma.contact.upsert({
+        where: {
+          phoneNumber: message.from,
+        },
+        create: {
+          phoneNumber: message.from,
+          firstName: "Unknown", // Placeholder values
+          lastName: "Unknown"
+        },
+        update: {}, // No update logic; just find the contact
+      });
+
       return prisma.sMSMessage.upsert({
         where: { messageSid: message.sid },
         update: {

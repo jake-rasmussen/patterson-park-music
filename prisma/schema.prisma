@@ -63,13 +63,13 @@ model TagPerson {
 }
 
 model Contact {
-    id          String  @id @default(cuid())
-    firstName   String
-    lastName    String
-    email       String
-    phoneNumber String
-    person      Person? @relation(fields: [personId], references: [id])
-    personId    String? @unique
+    id            String         @id @default(cuid())
+    firstName     String
+    lastName      String
+    email         String?        @unique // TODO: change this to non-option
+    phoneNumber   String         @unique
+    person        Person?        @relation(fields: [personId], references: [id])
+    personId      String?        @unique
 }
 
 model Person {
@@ -125,4 +125,18 @@ model SMSMessage {
     body       String
     mediaUrls  String[]
     dateSent   DateTime @default(now())
+}
+
+model EmailMessage {
+    id          String   @id @default(cuid())
+    messageId   String   @unique
+    from        String
+    to          String[]
+    subject     String
+    body        String
+    cc          String[]
+    bcc         String[]
+    attachments String[]
+    status      String
+    dateSent    DateTime @default(now())
 }

@@ -1,5 +1,5 @@
 import { Input } from "@nextui-org/react";
-import { IconPaperclip, IconSend, IconX, IconUpload } from "@tabler/icons-react";
+import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
@@ -10,94 +10,102 @@ type PropType = {
 
 const MessageBar = (props: PropType) => {
   const { to } = props;
-  
+
   const [message, setMessage] = useState<string>("");
-  const [attachedImages, setAttachedImages] = useState<File[]>([]); // Store attached files without uploading
-  const [imageUrls, setImageUrls] = useState<string[]>([]); // Array to hold URLs for uploaded images
+  const [attachedImages, setAttachedImages] = useState<File[]>([]);
 
   const getUploadUrl = api.file.getUploadUrl.useMutation({
-    onSuccess() {
-      // Handle success if needed
-    },
     onError() {
-      // Handle error if needed
-    }
+      toast.error("Failed to get upload URL");
+    },
   });
 
   const getPresignedUrl = api.file.getPresignedUrl.useMutation({
-    onSuccess() {
-      // Handle success if needed
-    },
     onError() {
-      // Handle error if needed
-    }
+      toast.error("Failed to get presigned URL");
+    },
   });
 
   const sendSMS = api.sms.sendSMS.useMutation({
     onSuccess() {
-      toast.success("Sent Message!");
+      toast.success("Message sent successfully!");
       setMessage("");
       setAttachedImages([]);
-      setImageUrls([]);
     },
     onError() {
-      toast.error("Error...");
+      toast.error("Failed to send the message");
     },
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileAttach = (event: any) => {
-    const files: File[] = Array.from(event.target.files);
-    setAttachedImages(files); // Only attach files, don’t upload yet
+  const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files: File[] = Array.from(event.target.files || []);
+    setAttachedImages((prev) => [...prev, ...files]);
   };
 
-  const handleImageUpload = async () => {
-    // Upload files and generate URLs
-    const urls = await Promise.all(
-      attachedImages.map(async (file) => {
-        const filePath = `uploads/${Date.now()}-${file.name}`;
+  const handleImageUpload = async (): Promise<string[]> => {
+    if (attachedImages.length === 0) return [];
 
-        // Request presigned upload URL from fileRouter
-        const uploadUrl = await getUploadUrl.mutateAsync({
-          bucket: "media",
-          filePath
-        });
+    try {
+      const urls = await Promise.all(
+        attachedImages.map(async (file) => {
+          const filePath = `uploads/${Date.now()}-${file.name}`;
 
-        if (!uploadUrl) {
-          throw new Error("Failed to retrieve upload URL");
-        }
+          const uploadUrl = await getUploadUrl.mutateAsync({
+            bucket: "media",
+            filePath,
+          });
 
-        // Upload file to the presigned URL
-        const response = await fetch(uploadUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-          },
-        });
+          if (!uploadUrl) {
+            throw new Error("Failed to retrieve upload URL");
+          }
 
-        if (!response.ok) {
-          throw new Error("Failed to upload file to Supabase");
-        }
+          const response = await fetch(uploadUrl, {
+            method: "PUT",
+            body: file,
+            headers: {
+              "Content-Type": file.type,
+            },
+          });
 
-        // Request a public URL for the uploaded file
-        const publicUrl = await getPresignedUrl.mutateAsync({
-          bucket: "media",
-          filePath,
-        });
+          if (!response.ok) {
+            throw new Error("Failed to upload file");
+          }
 
-        return publicUrl;
-      })
-    );
+          const publicUrl = await getPresignedUrl.mutateAsync({
+            bucket: "media",
+            filePath,
+          });
 
-    setImageUrls(urls.filter((url) => url !== null) as string[]); // Set uploaded URLs
-    setAttachedImages([]); // Clear attached images after upload
+          return publicUrl;
+        })
+      );
+
+      return urls.filter((url) => url !== null) as string[];
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      toast.error("Failed to upload images");
+      return [];
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      const mediaUrls = await handleImageUpload();
+
+      sendSMS.mutate({
+        message,
+        to,
+        mediaUrls,
+      });
+    } catch (error) {
+      console.error("Error sending the message:", error);
+    }
   };
 
   return (
     <>
-      {/* Display attached image previews with option to remove */}
       <div className="flex flex-row gap-2">
         {attachedImages.map((file, index) => (
           <div key={index} className="relative group">
@@ -130,7 +138,7 @@ const MessageBar = (props: PropType) => {
             ref={fileInputRef}
             style={{ display: "none" }}
             multiple
-            onChange={handleFileAttach} // Attach files without uploading
+            onChange={handleFileAttach}
           />
           <button
             className="transition duration-300 ease-in-out hover:bg-gray-800 hover:text-white rounded-xl p-2"
@@ -141,16 +149,8 @@ const MessageBar = (props: PropType) => {
 
           <button
             className="transition duration-300 ease-in-out hover:bg-gray-800 p-2 hover:text-white rounded-xl disabled:opacity-50 disabled:bg-transparent disabled:text-gray-800"
-            onClick={() => {
-              handleImageUpload().then(() => {
-                sendSMS.mutate({
-                  message,
-                  to,
-                  mediaUrl: imageUrls, // Send array of URLs for the uploaded images
-                });
-              });
-            }}
-            disabled={!message}
+            onClick={handleSendMessage}
+            disabled={!message && attachedImages.length === 0}
           >
             <IconSend />
           </button>

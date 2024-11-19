@@ -9,7 +9,6 @@ import { IconUser } from "@tabler/icons-react";
 import Error from "next/error";
 import SMSView from "~/components/messaging/sms/smsView";
 import EmailView from "~/components/messaging/email/emailView";
-import MessageBar from "~/components/messaging/sms/smsBar";
 
 export default function Message() {
   const [selectedContact, setSelectedContact] = useState<Contact>();
