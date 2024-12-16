@@ -1,11 +1,9 @@
-import { Divider, Spinner } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helper";
 import MessageBubble from "../messageBubble";
 import { Contact, SMSMessage } from "@prisma/client";
-import MessageBar from "./smsBar";
-import toast from "react-hot-toast";
 import Error from "next/error";
 
 type PropType = {
@@ -43,15 +41,15 @@ const SMSView = (props: PropType) => {
     />
   } else {
     return (
-      <div>
+      <div className="flex flex-col overflow-y-scroll h-[50vh]">
         {
           isLoading ?
-            <div className="w-full flex justify-center items-center h-[50vh]">
+            <div className="w-full h-full flex justify-center items-center">
               <Spinner label="Loading..." />
             </div>
             :
-            <div className="w-full flex flex-col">
-              <div className="flex flex-col gap-2 max-h-[55vh] overflow-y-scroll pb-4">
+            <div className="w-full h-full flex flex-col">
+              <div className="flex flex-col gap-2 pb-4">
                 {messages.map((message, index) => {
                   const previousMessage = messages[index - 1];
                   const showDate =
@@ -72,13 +70,6 @@ const SMSView = (props: PropType) => {
                     </div>
                   );
                 })}
-              </div>
-  
-              <div className="w-full bg-white rounded-xl">
-                <Divider className="" />
-                <div className="w-full p-4 pb-0">
-                  <MessageBar to={selectedContact.phoneNumber} />
-                </div>
               </div>
             </div>
         }

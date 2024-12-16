@@ -50,7 +50,6 @@ export const emailRouter = createTRPCRouter({
 
         const storedEmail = await ctx.db.emailMessage.create({
           data: {
-            messageId,
             from: myEmail,
             to,
             subject,
@@ -72,25 +71,21 @@ export const emailRouter = createTRPCRouter({
   storeEmail: publicProcedure
     .input(
       z.object({
-        messageId: z.string(),
         from: z.string().email(),
-        to: z.array(z.string().email()).nonempty(),
+        to: z.array(z.string().email()),
         subject: z.string().min(1),
         body: z.string().min(1),
         cc: z.array(z.string().email()).optional(),
         bcc: z.array(z.string().email()).optional(),
         attachments: z.array(z.string()).optional(),
         headers: z.record(z.string(), z.any()).optional(),
-        status: z.string(),
-        dateSent: z.date(),
-        deliveryStatus: z.record(z.string(), z.any()).optional(),
+        status: z.string()
       })
     )
     .mutation(async ({ input, ctx }) => {
       try {
         const newEmail = await ctx.db.emailMessage.create({
           data: {
-            messageId: input.messageId,
             from: input.from,
             to: input.to,
             subject: input.subject,
@@ -99,7 +94,6 @@ export const emailRouter = createTRPCRouter({
             bcc: input.bcc || [],
             attachments: input.attachments || [],
             status: input.status,
-            dateSent: input.dateSent,
           },
         });
 

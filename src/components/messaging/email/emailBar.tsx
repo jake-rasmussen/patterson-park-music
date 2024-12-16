@@ -8,7 +8,7 @@ type PropType = {
   to: string[];
 };
 
-const EmailBar = (props: PropType) => {
+const EmailMessageBar = (props: PropType) => {
   const { to } = props;
 
   const [subject, setSubject] = useState<string>("");
@@ -186,4 +186,4 @@ const EmailBar = (props: PropType) => {
   );
 };
 
-export default EmailBar;
+export default EmailMessageBar;

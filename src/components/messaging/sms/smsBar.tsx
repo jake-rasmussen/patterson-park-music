@@ -8,7 +8,7 @@ type PropType = {
   to: string;
 };
 
-const MessageBar = (props: PropType) => {
+const SMSMessageBar = (props: PropType) => {
   const { to } = props;
 
   const [message, setMessage] = useState<string>("");
@@ -160,4 +160,4 @@ const MessageBar = (props: PropType) => {
   );
 };
 
-export default MessageBar;
+export default SMSMessageBar;

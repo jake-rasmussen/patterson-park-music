@@ -44,15 +44,15 @@ const EmailView = (props: PropType) => {
     />
   } else {
     return (<>
-      <div>
+      <div className="flex flex-col overflow-y-scroll h-[50vh]">
         {
           isLoading && selectedContact.email ?
             <div className="w-full flex justify-center items-center h-[50vh]">
               <Spinner label="Loading..." />
             </div>
             :
-            <div className="w-full flex flex-col">
-              <div className="flex flex-col gap-2 max-h-[55vh] overflow-y-scroll pb-4">
+            <div className="w-full h-full flex flex-col">
+              <div className="flex flex-col gap-2 pb-4">
                 {messages.map((message, index) => {
                   const previousMessage = messages[index - 1];
                   const showDate =
@@ -73,13 +73,6 @@ const EmailView = (props: PropType) => {
                     </div>
                   );
                 })}
-              </div>
-
-              <div className="w-full bg-white rounded-xl">
-                <Divider className="" />
-                <div className="w-full p-4 pb-0">
-                  <MessageBar to={[selectedContact.email!]} />
-                </div>
               </div>
             </div>
         }

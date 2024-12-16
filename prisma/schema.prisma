@@ -129,14 +129,13 @@ model SMSMessage {
 
 model EmailMessage {
     id          String   @id @default(cuid())
-    messageId   String   @unique
     from        String
     to          String[]
     subject     String
     body        String
     cc          String[]
     bcc         String[]
-    attachments String[]
+    attachments String[] // TODO: Decide if we should add attachments
     status      String
     dateSent    DateTime @default(now())
 }
