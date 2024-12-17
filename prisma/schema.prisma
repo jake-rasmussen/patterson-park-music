@@ -62,20 +62,27 @@ model TagPerson {
     updatedAt DateTime @updatedAt
 }
 
+model Contact {
+    id            String         @id @default(cuid())
+    firstName     String
+    lastName      String
+    email         String?        @unique // TODO: change this to non-option
+    phoneNumber   String         @unique
+    person        Person?        @relation(fields: [personId], references: [id])
+    personId      String?        @unique
+}
+
 model Person {
-    id          String       @id @default(cuid())
-    family      Family?      @relation(fields: [familyId], references: [id])
-    familyId    String?
-    firstName   String
-    lastName    String
-    email       String
-    phoneNumber String
-    userName    String
-    lastLogin   DateTime?
-    enrollment  Enrollment[]
-    section     Section[]
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
+    id         String       @id @default(cuid())
+    family     Family?      @relation(fields: [familyId], references: [id])
+    familyId   String?
+    contact    Contact?
+    userName   String
+    lastLogin  DateTime?
+    enrollment Enrollment[]
+    section    Section[]
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
 }
 
 model Enrollment {
@@ -108,4 +115,27 @@ model Family {
     doorCode  String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model SMSMessage {
+    id         String   @id @default(cuid())
+    messageSid String   @unique
+    from       String
+    to         String
+    body       String
+    mediaUrls  String[]
+    dateSent   DateTime @default(now())
+}
+
+model EmailMessage {
+    id          String   @id @default(cuid())
+    from        String
+    to          String[]
+    subject     String
+    body        String
+    cc          String[]
+    bcc         String[]
+    attachments String[] // TODO: Decide if we should add attachments
+    status      String
+    dateSent    DateTime @default(now())
 }

@@ -5,6 +5,11 @@ import { enrollmentRouter } from "./routers/enrollment";
 import { familyRouter } from "./routers/family";
 import { sectionRouter } from "./routers/section";
 import { tagPersonRouter } from "./routers/tag";
+import { smsRouter } from "./routers/sms";
+import { contactRouter } from "./routers/contact";
+import { fileRouter } from "./routers/file";
+import { emailRouter } from "./routers/email";
+import { supabaseRouter } from "./routers/supabase";
 
 /**
  * This is the primary router for your server.
@@ -18,6 +23,11 @@ export const appRouter = createTRPCRouter({
   family: familyRouter,
   section: sectionRouter,
   tag: tagPersonRouter,
+  sms: smsRouter,
+  contact: contactRouter,
+  file: fileRouter,
+  email: emailRouter,
+  supabase: supabaseRouter,
 });
 
 // export type definition of API
