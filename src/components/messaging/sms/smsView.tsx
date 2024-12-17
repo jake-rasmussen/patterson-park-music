@@ -1,10 +1,11 @@
-import { Spinner } from "@nextui-org/react";
+import { Divider, Spinner } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helper";
 import MessageBubble from "../messageBubble";
 import { Contact, SMSMessage } from "@prisma/client";
 import Error from "next/error";
+import SMSMessageBar from "./smsBar";
 
 type PropType = {
   selectedContact: Contact;
@@ -53,39 +54,41 @@ const SMSView = (props: PropType) => {
     />
   } else {
     return (
-      <div className="flex flex-col overflow-y-scroll h-[50vh]">
-        {
-          isLoading ?
-            <div className="w-full h-full flex justify-center items-center">
-              <Spinner label="Loading..." />
-            </div>
-            :
-            <div className="w-full h-full flex flex-col">
-              <div className="flex flex-col gap-2 pb-4">
-                {messages.map((message, index) => {
-                  const previousMessage = messages[index - 1];
-                  const showDate =
-                    !previousMessage ||
-                    new Date(message.dateSent).getTime() - new Date(previousMessage.dateSent).getTime() > 60 * 60 * 1000;
-
-                  return (
-                    <div className="px-4" key={message.id}>
-                      {showDate && <p className="w-full text-center py-2">{formatDate(message.dateSent)}</p>}
-                      <MessageBubble
-                        status={message.to === selectedContact.phoneNumber ? "received" : "sent"}
-                        body={message.body}
-                        dateSent={message.dateSent}
-                        contact={selectedContact}
-                        imageUrls={message.mediaUrls || null} // Pass the first media URL as the image
-                        type="sms"
-                      />
-                    </div>
-                  );
-                })}
+      <section className="overflow-y-scroll">
+        <div className="flex flex-col">
+          {
+            isLoading ?
+              <div className="w-full flex justify-center items-center">
+                <Spinner label="Loading..." />
               </div>
-            </div>
-        }
-      </div>
+              :
+              <div className="w-full flex flex-col">
+                <div className="flex flex-col gap-2 pb-4">
+                  {messages.map((message, index) => {
+                    const previousMessage = messages[index - 1];
+                    const showDate =
+                      !previousMessage ||
+                      new Date(message.dateSent).getTime() - new Date(previousMessage.dateSent).getTime() > 60 * 60 * 1000;
+
+                    return (
+                      <div className="px-4" key={message.id}>
+                        {showDate && <p className="w-full text-center py-2">{formatDate(message.dateSent)}</p>}
+                        <MessageBubble
+                          status={message.to === selectedContact.phoneNumber ? "received" : "sent"}
+                          body={message.body}
+                          dateSent={message.dateSent}
+                          contact={selectedContact}
+                          imageUrls={message.mediaUrls || null} // Pass the first media URL as the image
+                          type="sms"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+          }
+        </div>
+      </section>
     );
   }
 }

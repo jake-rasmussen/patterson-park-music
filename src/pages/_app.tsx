@@ -6,6 +6,7 @@ import { Poppins } from "@next/font/google";
 import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
+import Wrapper from "~/components/wrapper";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,7 +25,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     `}</style>
       <Toaster />
       <NextUIProvider>
-        <Component {...pageProps} />
+        <Wrapper>
+          <Component {...pageProps} />
+        </Wrapper>
       </NextUIProvider>
     </div>
   );

@@ -27,7 +27,7 @@ const MessageBubble = (props: PropType) => {
                   {formatTime(dateSent)}
                 </span>
               </div>
-              <p className="text-sm font-normal py-2.5 text-white">{body}</p>
+              <div className="text-sm font-normal py-2.5 text-white" dangerouslySetInnerHTML={{ __html: body }} />
               {imageUrls && (
                 <>
                   {
@@ -52,7 +52,7 @@ const MessageBubble = (props: PropType) => {
                 {formatTime(dateSent)}
               </span>
             </div>
-            <p className="text-sm font-normal py-2.5 text-white">{body}</p>
+            <div className="text-sm font-normal py-2.5 text-white" dangerouslySetInnerHTML={{ __html: body }} />
             {imageUrls && (
               <>
                 {
