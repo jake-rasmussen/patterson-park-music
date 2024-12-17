@@ -10,11 +10,13 @@ import EmailMessageBar from "./emailBar";
 
 type PropType = {
   selectedContact: Contact;
+  email: string;
 }
 
 const EmailView = (props: PropType) => {
   const {
-    selectedContact
+    selectedContact,
+    email
   } = props;
 
   const [messages, setMessages] = useState<EmailMessage[]>([]);
@@ -25,9 +27,7 @@ const EmailView = (props: PropType) => {
     isError,
     error
   } = api.email.getEmailConversations.useQuery({
-    email: selectedContact.email!
-  }, {
-    enabled: selectedContact.email !== undefined
+    email: email
   });
 
   api.supabase.onEmailInsert.useSubscription(undefined, {
@@ -35,7 +35,9 @@ const EmailView = (props: PropType) => {
       const newEmailMessage = data as EmailMessage;
       newEmailMessage.dateSent = new Date();
 
-      setMessages((prevMessages) => [...prevMessages, newEmailMessage]);
+      if (newEmailMessage.from === selectedContact.email) {
+        setMessages((prevMessages) => [...prevMessages, newEmailMessage]);
+      }
     },
     onError: (error) => {
       console.log("Error:", error);
@@ -60,7 +62,7 @@ const EmailView = (props: PropType) => {
       <section className="overflow-y-scroll h-full">
         <div className="flex flex-col h-full">
           {
-            isLoading && selectedContact.email ?
+            isLoading ?
               <div className="w-full h-full flex justify-center items-center">
                 <Spinner label="Loading..." className="m-auto" />
               </div>
@@ -77,7 +79,7 @@ const EmailView = (props: PropType) => {
                       <div className="px-4" key={message.id}>
                         {showDate && <p className="w-full text-center py-2">{formatDate(message.dateSent)}</p>}
                         <MessageBubble
-                          status={message.to.includes(selectedContact.email!) ? "received" : "sent"}
+                          status={message.to.includes(email!) ? "received" : "sent"}
                           body={message.body}
                           dateSent={message.dateSent}
                           contact={selectedContact}

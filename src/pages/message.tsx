@@ -10,8 +10,10 @@ import SMSView from "~/components/messaging/sms/smsView";
 import EmailView from "~/components/messaging/email/emailView";
 import SMSMessageBar from "~/components/messaging/sms/smsBar";
 import EmailMessageBar from "~/components/messaging/email/emailBar";
+import EmailPanel from "~/components/messaging/email/emailPanel";
+import SMSPanel from "~/components/messaging/sms/smsPanel";
 
-export default function MessagePage() {
+export default function Message() {
   const [selectedContact, setSelectedContact] = useState<Contact>();
 
   const { data: contacts, isLoading: isLoadingContacts, error: errorContacts } = api.contact.getAllContacts.useQuery({
@@ -64,31 +66,13 @@ export default function MessagePage() {
             <div className="flex flex-row h-full min-h-0">
 
               <div className="w-1/2 flex flex-col h-full">
-                <div className="flex-1 min-h-0 overflow-auto bg-gray-50">
-                  <SMSView selectedContact={selectedContact} />
-                </div>
-
-                <div className="w-full bg-white rounded-br-xl">
-                  <Divider />
-                  <div className="p-4">
-                    <SMSMessageBar to={selectedContact.phoneNumber} />
-                  </div>
-                </div>
+                <SMSPanel selectedContact={selectedContact} />
               </div>
 
               <Divider orientation="vertical" />
 
               <div className="w-1/2 flex flex-col h-full">
-                <div className="flex-1 min-h-0 overflow-auto bg-gray-50">
-                  <EmailView selectedContact={selectedContact} />
-                </div>
-
-                <div className="w-full bg-white rounded-br-xl">
-                  <Divider />
-                  <div className="p-4">
-                    <EmailMessageBar to={[selectedContact.email!]} />
-                  </div>
-                </div>
+                <EmailPanel selectedContact={selectedContact} />
               </div>
             </div>
           ) : (

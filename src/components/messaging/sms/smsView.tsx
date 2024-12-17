@@ -15,7 +15,7 @@ const SMSView = (props: PropType) => {
   const {
     selectedContact
   } = props;
-
+  
   const [messages, setMessages] = useState<SMSMessage[]>([]);
 
   const {
@@ -32,7 +32,9 @@ const SMSView = (props: PropType) => {
       const newSMSMessage = data as SMSMessage;
       newSMSMessage.dateSent = new Date();
 
-      setMessages((prevMessages) => [...prevMessages, newSMSMessage]);
+      if (newSMSMessage.from === selectedContact.phoneNumber) {
+        setMessages((prevMessages) => [...prevMessages, newSMSMessage]);
+      }
     },
     onError: (error) => {
       console.log("Error:", error);
