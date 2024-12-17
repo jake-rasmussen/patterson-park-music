@@ -57,12 +57,12 @@ const EmailView = (props: PropType) => {
     />
   } else {
     return (
-      <section className="overflow-y-scroll">
-        <div className="flex flex-col">
+      <section className="overflow-y-scroll h-full">
+        <div className="flex flex-col h-full">
           {
             isLoading && selectedContact.email ?
-              <div className="w-full flex justify-center items-center">
-                <Spinner label="Loading..." />
+              <div className="w-full h-full flex justify-center items-center">
+                <Spinner label="Loading..." className="m-auto" />
               </div>
               :
               <div className="w-full flex flex-col">

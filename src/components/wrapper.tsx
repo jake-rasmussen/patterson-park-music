@@ -1,4 +1,5 @@
 import { Icon3dCubeSphere, IconBolt, IconCalendar, IconHome, IconLogout, IconPencil } from "@tabler/icons-react";
+import Navbar from "./navbar";
 
 type PropType = {
   children: JSX.Element;
@@ -9,30 +10,11 @@ const Wrapper = (props: PropType) => {
 
   return (
     <main className="bg-gray-900 flex flex-row h-screen">
-      <div className="w-28 h-screen flex flex-col gap-8 justify-center items-center py-10">
-        <div className="grow">
-          <Icon3dCubeSphere className="text-white h-20 w-12 border-b border-white" />
-        </div>
-
-        <button>
-          <IconHome className="text-white h-12 w-12" />
-        </button>
-        <button>
-          <IconCalendar className="text-white h-12 w-12" />
-        </button>
-        <button>
-          <IconPencil className="text-white h-12 w-12" />
-        </button>
-        <button>
-          <IconBolt className="text-white h-12 w-12" />
-        </button>
-
-        <div className="grow flex items-end">
-          <IconLogout className="text-white h-12 w-12" />
-        </div>
+      <div className="min-w-28 h-screen flex flex-col gap-8 justify-center items-center py-10">
+        <Navbar />
       </div>
       
-      <div className="grow my-8 mr-8 bg-white rounded-2xl shadow-xl flex flex-col min-h-0">
+      <div className="grow my-8 mr-8 shadow-xl flex flex-col min-h-0">
         {children}
       </div>
     </main>

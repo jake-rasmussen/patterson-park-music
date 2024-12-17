@@ -1,9 +1,8 @@
 
 
-import { Button, Card, Divider, Tab, Tabs } from "@nextui-org/react";
+import { Button, Divider } from "@nextui-org/react";
 import { useState } from "react";
 import { api } from "~/utils/api";
-import CreateMessage from "~/components/messaging/createMessage";
 import { Contact } from "@prisma/client";
 import { IconUser } from "@tabler/icons-react";
 import Error from "next/error";
@@ -12,7 +11,7 @@ import EmailView from "~/components/messaging/email/emailView";
 import SMSMessageBar from "~/components/messaging/sms/smsBar";
 import EmailMessageBar from "~/components/messaging/email/emailBar";
 
-export default function Message() {
+export default function MessagePage() {
   const [selectedContact, setSelectedContact] = useState<Contact>();
 
   const { data: contacts, isLoading: isLoadingContacts, error: errorContacts } = api.contact.getAllContacts.useQuery({
@@ -29,8 +28,7 @@ export default function Message() {
     />
   } else {
     return (
-      <main className="flex flex-row w-full h-full">
-        {/* Left Section: Contact List */}
+      <main className="flex flex-row w-full h-full bg-white rounded-2xl">
         <section className="w-60 overflow-y-auto h-full">
           <div className="flex flex-col gap-2 items-center m-2">
             {contacts?.map((contact: Contact) => (
@@ -100,8 +98,6 @@ export default function Message() {
           )}
         </section>
       </main>
-
-
     );
   }
 }
