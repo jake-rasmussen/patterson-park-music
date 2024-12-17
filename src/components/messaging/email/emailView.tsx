@@ -29,6 +29,18 @@ const EmailView = (props: PropType) => {
     enabled: selectedContact.email !== undefined
   });
 
+  api.supabase.onEmailInsert.useSubscription(undefined, {
+    onData: (data) => {
+      const newEmailMessage = data as EmailMessage;
+      newEmailMessage.dateSent = new Date();
+      
+      setMessages((prevMessages) => [...prevMessages, newEmailMessage]);
+    },
+    onError: (error) => {
+      console.log("Error:", error);
+    }
+  });
+
   useEffect(() => {
     if (conversations && conversations.messages) {
       setMessages(conversations.messages);

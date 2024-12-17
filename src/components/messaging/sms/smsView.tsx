@@ -17,20 +17,32 @@ const SMSView = (props: PropType) => {
 
   const [messages, setMessages] = useState<SMSMessage[]>([]);
 
-  const { 
-    data: conversations, 
-    isLoading, 
-    isError, 
-    error 
+  const {
+    data: conversations,
+    isLoading,
+    isError,
+    error
   } = api.sms.getSMSConversations.useQuery({
     phoneNumber: selectedContact.phoneNumber,
+  });
+
+  api.supabase.onSMSInsert.useSubscription(undefined, {
+    onData: (data) => {
+      const newSMSMessage = data as SMSMessage;
+      newSMSMessage.dateSent = new Date();
+
+      setMessages((prevMessages) => [...prevMessages, newSMSMessage]);
+    },
+    onError: (error) => {
+      console.log("Error:", error);
+    }
   });
 
   useEffect(() => {
     if (conversations && conversations.messages) {
       setMessages(conversations.messages);
     }
-  }, [conversations])
+  }, [conversations]);
 
   if (isError) {
     return <Error
@@ -55,7 +67,7 @@ const SMSView = (props: PropType) => {
                   const showDate =
                     !previousMessage ||
                     new Date(message.dateSent).getTime() - new Date(previousMessage.dateSent).getTime() > 60 * 60 * 1000;
-  
+
                   return (
                     <div className="px-4" key={message.id}>
                       {showDate && <p className="w-full text-center py-2">{formatDate(message.dateSent)}</p>}

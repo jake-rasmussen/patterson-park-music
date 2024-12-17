@@ -31,7 +31,7 @@ export const emailRouter = createTRPCRouter({
       const { to, subject, body, cc, bcc, attachments } = input;
 
       try {
-        const msg: sgMail.MailDataRequired = {
+        const response = await sgMail.send({
           from: myEmail,
           to,
           subject,
@@ -43,10 +43,7 @@ export const emailRouter = createTRPCRouter({
             type: attachment.type,
             content: attachment.content, // Use Base64 content as is
           })),
-        };
-
-        const response = await sgMail.send(msg);
-        const messageId = response[0]?.headers["x-message-id"] || "unknown";
+        });
 
         const storedEmail = await ctx.db.emailMessage.create({
           data: {
@@ -62,9 +59,13 @@ export const emailRouter = createTRPCRouter({
           },
         });
 
-        return { success: true, email: storedEmail };
+        return {
+          success: true,
+          message: "Email sent successfully",
+          email: storedEmail
+        };
       } catch (error: any) {
-        console.error("Error sending email:", error.response?.body?.errors || error);
+        console.error("Error sending email:", error);
         throw new Error("Failed to send email");
       }
     }),

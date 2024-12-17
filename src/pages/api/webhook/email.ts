@@ -10,11 +10,9 @@ export const config = {
 };
 
 function extractEmail(rawString: string): string | null {
-  // Regex to match valid email formats
   const emailRegex = /<?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>?/;
   const match = rawString.match(emailRegex);
 
-  // Return the matched email if valid, otherwise return null
   return match ? match[1]!.trim() : null;
 }
 
@@ -34,29 +32,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return;
       }
 
-      // Extract fields
       const rawFrom = fields.from?.[0] || "";
       const rawTo = fields.to || [];
       const rawCc = fields.cc || [];
       const rawBcc = fields.bcc || [];
       const subject = fields.subject?.[0] || "(No Subject)";
       const text = fields.text?.[0] || "";
-      const html = fields.html?.[0] || text; // Prefer HTML if available
+      const html = fields.html?.[0] || text;
 
-      // Convert raw fields into required formats
       const from = extractEmail(rawFrom);
       const to = rawTo.map((email: string) => extractEmail(email)).filter(Boolean) as string[];
       const cc = rawCc.map((email: string) => extractEmail(email)).filter(Boolean) as string[];
       const bcc = rawBcc.map((email: string) => extractEmail(email)).filter(Boolean) as string[];
 
-      // Ensure `to` is non-empty
       if (!to.length) {
-        throw new Error("The 'to' field must contain at least one recipient.");
+        throw new Error("The 'to' field must contain at least one recipient");
       }
 
-      // Ensure `from` is valid
       if (!from) {
-        throw new Error("Invalid 'from' field.");
+        throw new Error("Invalid 'from' field");
       }
 
       const caller = createCaller({ db });
@@ -67,8 +61,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         body: html,
         cc,
         bcc,
-        attachments: [], // Handle attachments if necessary
-        headers: {}, // Optional headers, add if available
+        attachments: [],
+        headers: {},
         status: "received",
       });
 
