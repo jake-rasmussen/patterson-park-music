@@ -14,7 +14,7 @@ const SMSPanel = (props: PropType) => {
   return (<>
     {
       selectedContact.phoneNumber ? <>
-        <div className="flex-1 min-h-0 overflow-auto bg-gray-50">
+        <div className="flex-1 min-h-0 overflow-auto bg-gray-50 relative">
           <SMSView selectedContact={selectedContact} />
         </div>
 

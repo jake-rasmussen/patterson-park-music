@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessageBar from "./emailBar";
 import { api } from "~/utils/api";
 import { Contact, EmailMessage } from "@prisma/client";
@@ -19,7 +19,11 @@ const EmailView = (props: PropType) => {
     email
   } = props;
 
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [messages, setMessages] = useState<EmailMessage[]>([]);
+  const [newMessageAlert, setNewMessageAlert] = useState(false);
 
   const {
     data: conversations,
@@ -37,6 +41,7 @@ const EmailView = (props: PropType) => {
 
       if (newEmailMessage.from === selectedContact.email) {
         setMessages((prevMessages) => [...prevMessages, newEmailMessage]);
+        setNewMessageAlert(true); // Trigger new message alert
       }
     },
     onError: (error) => {
@@ -49,6 +54,38 @@ const EmailView = (props: PropType) => {
       setMessages(conversations.messages);
     }
   }, [conversations]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (conversations && bottomRef.current) {
+        bottomRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 500);
+  }, [conversations, bottomRef.current]);
+
+  // Use IntersectionObserver to check if bottomRef is in view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setNewMessageAlert(false); // Remove alert only when scrolled to bottom
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (bottomRef.current) {
+      observer.observe(bottomRef.current);
+    }
+
+    return () => {
+      if (bottomRef.current) {
+        observer.unobserve(bottomRef.current);
+      }
+    };
+  }, [messages]);
 
   if (isError) {
     return <Error
@@ -89,6 +126,7 @@ const EmailView = (props: PropType) => {
                       </div>
                     );
                   })}
+                  <div ref={bottomRef} /> {/* Invisible div for scroll-to-bottom */}
                 </div>
               </div>
           }

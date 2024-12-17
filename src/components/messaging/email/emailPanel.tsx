@@ -14,9 +14,10 @@ const EmailPanel = (props: PropType) => {
   return (
     <>
       {
-        selectedContact.email ? <><div className="flex-1 min-h-0 overflow-auto bg-gray-50">
-          <EmailView selectedContact={selectedContact} email={selectedContact.email} />
-        </div>
+        selectedContact.email ? <>
+          <div className="flex-1 min-h-0 overflow-auto bg-gray-50 relative">
+            <EmailView selectedContact={selectedContact} email={selectedContact.email} />
+          </div>
 
           <div className="w-full bg-white rounded-br-xl">
             <Divider />
