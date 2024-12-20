@@ -6,17 +6,13 @@ import { api } from "~/utils/api";
 import { Contact } from "@prisma/client";
 import { IconUser } from "@tabler/icons-react";
 import Error from "next/error";
-import SMSView from "~/components/messaging/sms/smsView";
-import EmailView from "~/components/messaging/email/emailView";
-import SMSMessageBar from "~/components/messaging/sms/smsBar";
-import EmailMessageBar from "~/components/messaging/email/emailBar";
 import EmailPanel from "~/components/messaging/email/emailPanel";
 import SMSPanel from "~/components/messaging/sms/smsPanel";
 
 export default function Message() {
   const [selectedContact, setSelectedContact] = useState<Contact>();
 
-  const { data: contacts, isLoading: isLoadingContacts, error: errorContacts } = api.contact.getAllContacts.useQuery({
+  const { data: contacts, isLoading: isLoadingContacts, error: errorContacts, refetch } = api.contact.getAllContacts.useQuery({
     skip: 0,
     take: 20,
   })

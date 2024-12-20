@@ -4,6 +4,7 @@ import { createCallerFactory } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import twilio from "twilio";
 import { supabase } from "~/server/supabase/supabaseClient";
+import { Status } from "@prisma/client";
 
 const createCaller = createCallerFactory(appRouter);
 
@@ -56,6 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         to: twilioBody.To,
         body: twilioBody.Body,
         mediaUrls,
+        status: Status.RECEIVED,
       });
 
       res.setHeader("Content-Type", "text/xml");

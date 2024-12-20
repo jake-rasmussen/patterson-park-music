@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import sgMail from "@sendgrid/mail";
+import { Status } from "@prisma/client";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -54,8 +55,8 @@ export const emailRouter = createTRPCRouter({
             cc: cc || [],
             bcc: bcc || [],
             attachments: attachments?.map((attachment) => attachment.url) || [],
-            status: "sent",
-            dateSent: new Date(),
+            status: Status.SENT,
+            date: new Date(),
           },
         });
 
@@ -72,7 +73,7 @@ export const emailRouter = createTRPCRouter({
   storeEmail: publicProcedure
     .input(
       z.object({
-        from: z.string().email(),
+        from: z.string().email().optional(),
         to: z.array(z.string().email()),
         subject: z.string().min(1),
         body: z.string().min(1),
@@ -80,14 +81,19 @@ export const emailRouter = createTRPCRouter({
         bcc: z.array(z.string().email()).optional(),
         attachments: z.array(z.string()).optional(),
         headers: z.record(z.string(), z.any()).optional(),
-        status: z.string()
+        status: z.enum([
+          Status.PENDING,
+          Status.RECEIVED,
+          Status.SENT,
+        ]),
+        date: z.date().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       try {
         const newEmail = await ctx.db.emailMessage.create({
           data: {
-            from: input.from,
+            from: input.from || myEmail,
             to: input.to,
             subject: input.subject,
             body: input.body,
@@ -95,6 +101,7 @@ export const emailRouter = createTRPCRouter({
             bcc: input.bcc || [],
             attachments: input.attachments || [],
             status: input.status,
+            date: input.date,
           },
         });
 
@@ -130,9 +137,12 @@ export const emailRouter = createTRPCRouter({
                 },
               },
             ],
+            NOT: {
+              status: Status.PENDING,
+            }
           },
           orderBy: {
-            dateSent: "asc",
+            date: "asc",
           },
         });
 

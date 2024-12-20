@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import twilio from "twilio";
+import { Status } from "@prisma/client";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -31,11 +32,12 @@ export const smsRouter = createTRPCRouter({
 
         const storedSMS = await ctx.db.sMSMessage.create({
           data: {
-            messageSid: response.sid,
             from: myNumber,
             to: input.to,
             body: message,
             mediaUrls: mediaUrls || [],
+            status: Status.SENT,
+            date: new Date(),
           }
         })
 
@@ -60,6 +62,8 @@ export const smsRouter = createTRPCRouter({
         to: z.string(),
         body: z.string(),
         mediaUrls: z.array(z.string()).optional(),
+        status: z.enum(Object.values(Status) as [Status, ...Status[]]),
+        date: z.date().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -68,11 +72,12 @@ export const smsRouter = createTRPCRouter({
       try {
         const newMessage = await ctx.db.sMSMessage.create({
           data: {
-            messageSid,
             from,
             to,
             body,
             mediaUrls: mediaUrls || [],
+            status: input.status,
+            date: input.date,
           },
         });
 
@@ -98,9 +103,12 @@ export const smsRouter = createTRPCRouter({
               { to: phoneNumber },
               { from: phoneNumber },
             ],
+            NOT: [
+              { status: Status.PENDING }
+            ]
           },
           orderBy: {
-            dateSent: "asc",
+            date: "asc",
           },
         });
 
