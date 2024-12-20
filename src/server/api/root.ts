@@ -1,6 +1,17 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-
+import { personRouter } from "./routers/person";
+import { enrollmentRouter } from "./routers/enrollment";
+import { familyRouter } from "./routers/family";
+import { sectionRouter } from "./routers/section";
+import { tagPersonRouter } from "./routers/tag";
+import { smsRouter } from "./routers/sms";
+import { contactRouter } from "./routers/contact";
+import { fileRouter } from "./routers/file";
+import { emailRouter } from "./routers/email";
+import { supabaseRouter } from "./routers/supabase";
+import { futureSMSRouter } from "./routers/futureSMS";
+import { futureEmailRouter } from "./routers/futureEmail";
 /**
  * This is the primary router for your server.
  *
@@ -8,6 +19,18 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
+  person: personRouter,
+  enrollment: enrollmentRouter,
+  family: familyRouter,
+  section: sectionRouter,
+  tag: tagPersonRouter,
+  sms: smsRouter,
+  contact: contactRouter,
+  file: fileRouter,
+  email: emailRouter,
+  supabase: supabaseRouter,
+  futureSMS: futureSMSRouter,
+  futureEmail: futureEmailRouter,
 });
 
 // export type definition of API
