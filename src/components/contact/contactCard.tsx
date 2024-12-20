@@ -1,5 +1,5 @@
-import { Button, Card } from "@nextui-org/react";
-import { Contact } from "@prisma/client";
+import { Card } from "@nextui-org/react";
+import type { Contact } from "@prisma/client";
 import { IconUser } from "@tabler/icons-react";
 
 type PropType = {

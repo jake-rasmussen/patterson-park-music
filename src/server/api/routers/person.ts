@@ -27,22 +27,4 @@ export const personRouter = createTRPCRouter({
         where: { id: input },
       });
     }),
-
-  updatePerson: publicProcedure
-    .input(z.object({
-      id: z.string(),
-      data: z.object({
-        firstName: z.string().optional(),
-        lastName: z.string().optional(),
-        email: z.string().email().optional(),
-        phoneNumber: z.string().optional(),
-      }),
-    }))
-    .mutation(async ({ input, ctx }) => {
-      const { id, data } = input;
-      return await ctx.db.person.update({
-        where: { id },
-        data,
-      });
-    }),
 });

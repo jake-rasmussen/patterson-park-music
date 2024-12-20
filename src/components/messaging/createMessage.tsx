@@ -32,15 +32,15 @@ const CreateMessage = () => {
               <ModalHeader className="flex flex-col gap-1">Enter Contact Details</ModalHeader>
               <ModalBody className="flex flex-col gap-4">
                 <Form
-                  onSubmit={(values) => {
-                    createContact.mutateAsync({
+                  onSubmit={async (values) => {
+                    await createContact.mutateAsync({
                       firstName: values.first,
                       lastName: values.last,
                       phoneNumber: values.phone,
                       email: values.email,
-                    }).finally(() => {
-                      onClose();
                     })
+                    
+                    onClose();
                   }}
                 >
                   {({ isValid, submit }) => (

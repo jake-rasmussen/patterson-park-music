@@ -25,11 +25,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(200).json(persons);
         }
       }
-      case "PUT": {
-        const { id, data } = req.body;
-        const updatedPerson = await caller.person.updatePerson({ id, data });
-        return res.status(200).json(updatedPerson);
-      }
+      // case "PUT": {
+      //   const { id, data } = req.body;
+      //   const updatedPerson = await caller.person.updatePerson({ id, data });
+      //   return res.status(200).json(updatedPerson);
+      // }
       default:
         return res.status(405).json({ message: "Method not allowed" });
     }
