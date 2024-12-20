@@ -21,7 +21,7 @@ export const contactRouter = createTRPCRouter({
             firstName,
             lastName,
             email,
-            phoneNumber,
+            phoneNumber: "+1" + phoneNumber,
           },
         });
         return { success: true, contact: newContact };
@@ -78,6 +78,39 @@ export const contactRouter = createTRPCRouter({
       } catch (error) {
         console.error("Error fetching contacts:", error);
         throw new Error("Failed to retrieve contacts");
+      }
+    }),
+  getContactByNumberOrEmail: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email().optional(), // Optional email input
+        phoneNumber: z.string().optional(), // Optional phone number input
+      }).refine(
+        (data) => data.email || data.phoneNumber, // At least one must be provided
+        { message: "Either email or phone number must be provided" }
+      )
+    )
+    .query(async ({ ctx, input }) => {
+      const { email, phoneNumber } = input;
+
+      try {
+        const contact = await ctx.db.contact.findFirst({
+          where: {
+            OR: [
+              { email: email || undefined }, // Match email if provided
+              { phoneNumber: phoneNumber || undefined }, // Match phone number if provided
+            ],
+          },
+        });
+
+        if (!contact) {
+          throw new Error("Contact not found");
+        }
+
+        return contact;
+      } catch (error) {
+        console.error("Error fetching contact:", error);
+        throw new Error("Failed to retrieve contact");
       }
     }),
 });

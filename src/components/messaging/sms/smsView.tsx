@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helper";
 import MessageBubble from "../messageBubble";
-import { Contact, SMSMessage } from "@prisma/client";
+import { Contact, SMSMessage, Status } from "@prisma/client";
 import Error from "next/error";
 import { IconArrowDown, IconMessageDown } from "@tabler/icons-react";
 
@@ -27,7 +27,7 @@ const SMSView = (props: PropType) => {
   api.supabase.onSMSInsert.useSubscription(undefined, {
     onData: (data) => {
       const newSMSMessage = data as SMSMessage;
-      newSMSMessage.dateSent = new Date();
+      newSMSMessage.date = new Date();
 
       if (newSMSMessage.from === selectedContact.phoneNumber) {
         setMessages((prevMessages) => [...prevMessages, newSMSMessage]);
@@ -103,15 +103,15 @@ const SMSView = (props: PropType) => {
                     const previousMessage = messages[index - 1];
                     const showDate =
                       !previousMessage ||
-                      new Date(message.dateSent).getTime() - new Date(previousMessage.dateSent).getTime() > 60 * 60 * 1000;
+                      new Date(message.date).getTime() - new Date(previousMessage.date).getTime() > 60 * 60 * 1000;
 
                     return (
                       <div className="px-4" key={message.id}>
-                        {showDate && <p className="w-full text-center py-2">{formatDate(message.dateSent)}</p>}
+                        {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
                         <MessageBubble
-                          status={message.to === selectedContact.phoneNumber ? "received" : "sent"}
+                          status={message.to === selectedContact.phoneNumber ? Status.SENT : Status.RECEIVED}
                           body={message.body}
-                          dateSent={message.dateSent}
+                          dateSent={message.date}
                           contact={selectedContact}
                           imageUrls={message.mediaUrls || null}
                           type="sms"

@@ -1,124 +1,38 @@
 import { Input, Textarea } from "@nextui-org/react";
+import { Status } from "@prisma/client";
 import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
 
 type PropType = {
-  to: string[];
+  attachedFiles: File[];
+  setAttachedFiles: Dispatch<SetStateAction<File[]>>;
+  body: string;
+  setBody: Dispatch<SetStateAction<string>>;
+  subject: string;
+  setSubject: Dispatch<SetStateAction<string>>;
+  isSendDisabled: boolean;
+  handleSendMessage: () => void;
 };
 
 const EmailMessageBar = (props: PropType) => {
-  const { to } = props;
-
-  const [subject, setSubject] = useState<string>("");
-  const [body, setBody] = useState<string>("");
-  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-
-  const getUploadUrl = api.file.getUploadUrl.useMutation({
-    onError() {
-      toast.error("Failed to get upload URL");
-    },
-  });
-
-  const getPresignedUrl = api.file.getPresignedUrl.useMutation({
-    onError() {
-      toast.error("Failed to get presigned URL");
-    },
-  });
-
-  const sendEmail = api.email.sendEmail.useMutation({
-    onSuccess() {
-      toast.success("Email sent successfully!");
-      setBody("");
-      setSubject("");
-      setAttachedFiles([]);
-    },
-    onError() {
-      toast.error("Failed to send the email");
-    },
-  });
+  const { 
+    attachedFiles,
+    setAttachedFiles,
+    body,
+    setBody,
+    subject,
+    setSubject,
+    isSendDisabled,
+    handleSendMessage,
+  } = props;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files: File[] = Array.from(event.target.files || []);
     setAttachedFiles((prev) => [...prev, ...files]);
-  };
-
-  const handleFileUpload = async (): Promise<
-    { filename: string; type: string; content: string; url: string }[]
-  > => {
-    if (attachedFiles.length === 0) return [];
-
-    try {
-      const uploadedFiles = await Promise.all(
-        attachedFiles.map(async (file) => {
-          const filePath = `uploads/${Date.now()}-${file.name}`;
-
-          const uploadUrl = await getUploadUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          if (!uploadUrl) {
-            throw new Error("Failed to retrieve upload URL");
-          }
-
-          const uploadResponse = await fetch(uploadUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-            },
-          });
-
-          if (!uploadResponse.ok) {
-            throw new Error("Failed to upload file to Supabase");
-          }
-
-          const publicUrl = await getPresignedUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          const base64Content = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve((reader.result as string).split(",")[1] || ""); // Strip the base64 header
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(file);
-          });
-
-          return {
-            filename: file.name,
-            type: file.type,
-            content: base64Content,
-            url: publicUrl,
-          };
-        })
-      );
-
-      return uploadedFiles;
-    } catch (error) {
-      console.error("Error uploading files:", error);
-      toast.error("Failed to upload files");
-      return [];
-    }
-  };
-
-  const handleSendEmail = async () => {
-    try {
-      const attachments = await handleFileUpload();
-
-      sendEmail.mutate({
-        to: to as [string, ...string[]],
-        subject,
-        body,
-        attachments,
-      });
-    } catch (error) {
-      console.error("Error sending the email:", error);
-    }
   };
 
   return (
@@ -175,8 +89,8 @@ const EmailMessageBar = (props: PropType) => {
 
           <button
             className="transition duration-300 ease-in-out hover:bg-gray-800 p-2 hover:text-white rounded-xl disabled:opacity-50 disabled:bg-transparent disabled:text-gray-800"
-            onClick={handleSendEmail}
-            disabled={!body && attachedFiles.length === 0}
+            onClick={handleSendMessage}
+            disabled={isSendDisabled}
           >
             <IconSend />
           </button>

@@ -1,107 +1,31 @@
 import { Input } from "@nextui-org/react";
 import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
-import { useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { api } from "~/utils/api";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 type PropType = {
-  to: string;
+  attachedImages: File[];
+  setAttachedImages: Dispatch<SetStateAction<File[]>>;
+  message: string;
+  setMessage: Dispatch<SetStateAction<string>>;
+  isSendDisabled: boolean;
+  handleSendMessage: () => void;
 };
 
 const SMSMessageBar = (props: PropType) => {
-  const { to } = props;
-
-  const [message, setMessage] = useState<string>("");
-  const [attachedImages, setAttachedImages] = useState<File[]>([]);
-
-  const getUploadUrl = api.file.getUploadUrl.useMutation({
-    onError() {
-      toast.error("Failed to get upload URL");
-    },
-  });
-
-  const getPresignedUrl = api.file.getPresignedUrl.useMutation({
-    onError() {
-      toast.error("Failed to get presigned URL");
-    },
-  });
-
-  const sendSMS = api.sms.sendSMS.useMutation({
-    onSuccess() {
-      toast.success("Message sent successfully!");
-      setMessage("");
-      setAttachedImages([]);
-    },
-    onError() {
-      toast.error("Failed to send the message");
-    },
-  });
+  const {
+    attachedImages,
+    setAttachedImages,
+    message,
+    isSendDisabled,
+    setMessage,
+    handleSendMessage
+  } = props;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files: File[] = Array.from(event.target.files || []);
     setAttachedImages((prev) => [...prev, ...files]);
-  };
-
-  const handleImageUpload = async (): Promise<string[]> => {
-    if (attachedImages.length === 0) return [];
-
-    try {
-      const urls = await Promise.all(
-        attachedImages.map(async (file) => {
-          const filePath = `uploads/${Date.now()}-${file.name}`;
-
-          const uploadUrl = await getUploadUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          if (!uploadUrl) {
-            throw new Error("Failed to retrieve upload URL");
-          }
-
-          const response = await fetch(uploadUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to upload file");
-          }
-
-          const publicUrl = await getPresignedUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          return publicUrl;
-        })
-      );
-
-      return urls.filter((url) => url !== null) as string[];
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      toast.error("Failed to upload images");
-      return [];
-    }
-  };
-
-  const handleSendMessage = async () => {
-    try {
-      const mediaUrls = await handleImageUpload();
-
-      sendSMS.mutate({
-        message,
-        to,
-        mediaUrls,
-      });
-    } catch (error) {
-      console.error("Error sending the message:", error);
-    }
   };
 
   return (
@@ -150,7 +74,7 @@ const SMSMessageBar = (props: PropType) => {
           <button
             className="transition duration-300 ease-in-out hover:bg-gray-800 p-2 hover:text-white rounded-xl disabled:opacity-50 disabled:bg-transparent disabled:text-gray-800"
             onClick={handleSendMessage}
-            disabled={!message && attachedImages.length === 0}
+            disabled={isSendDisabled}
           >
             <IconSend />
           </button>

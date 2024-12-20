@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import MessageBar from "./emailBar";
 import { api } from "~/utils/api";
-import { Contact, EmailMessage } from "@prisma/client";
+import { Contact, EmailMessage, Status } from "@prisma/client";
 import Error from "next/error";
 import { Divider, Spinner } from "@nextui-org/react";
 import MessageBubble from "../messageBubble";
@@ -37,7 +37,7 @@ const EmailView = (props: PropType) => {
   api.supabase.onEmailInsert.useSubscription(undefined, {
     onData: (data) => {
       const newEmailMessage = data as EmailMessage;
-      newEmailMessage.dateSent = new Date();
+      newEmailMessage.date = new Date();
 
       if (newEmailMessage.from === selectedContact.email) {
         setMessages((prevMessages) => [...prevMessages, newEmailMessage]);
@@ -110,15 +110,16 @@ const EmailView = (props: PropType) => {
                     const previousMessage = messages[index - 1];
                     const showDate =
                       !previousMessage ||
-                      new Date(message.dateSent).getTime() - new Date(previousMessage.dateSent).getTime() > 60 * 60 * 1000;
+                      new Date(message.date).getTime() - new Date(previousMessage.date).getTime() > 60 * 60 * 1000;
 
                     return (
                       <div className="px-4" key={message.id}>
-                        {showDate && <p className="w-full text-center py-2">{formatDate(message.dateSent)}</p>}
+                        {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
                         <MessageBubble
-                          status={message.to.includes(email!) ? "received" : "sent"}
+                          status={message.to.includes(email!) ? Status.RECEIVED : Status.SENT}
                           body={message.body}
-                          dateSent={message.dateSent}
+                          subject={message.subject}
+                          dateSent={message.date}
                           contact={selectedContact}
                           imageUrls={message.attachments || null} // Pass the first media URL as the image
                           type="email"

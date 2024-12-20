@@ -1,5 +1,4 @@
-import { Button, Divider, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, useDisclosure } from "@nextui-org/react";
-import { IconEdit } from "@tabler/icons-react";
+import { Button, Divider, Input, Spinner } from "@nextui-org/react";
 import { Field, Form } from "houseform";
 import toast from "react-hot-toast";
 import z from "zod";
@@ -9,7 +8,7 @@ import { Contact } from "@prisma/client";
 import ContactCard from "~/components/contact/contactCard";
 
 export default function ContactPage() {
-  const { data: contacts, isLoading: isLoadingContacts, error: errorContacts } = api.contact.getAllContacts.useQuery({
+  const { data: contacts, isLoading: isLoadingContacts, error: errorContacts, refetch } = api.contact.getAllContacts.useQuery({
     skip: 0,
     take: 20,
   });
@@ -17,6 +16,7 @@ export default function ContactPage() {
   const createContact = api.contact.createContact.useMutation({
     onSuccess() {
       toast.success("Created Contact!");
+      refetch();
     },
     onError() {
       toast.error("Error...");
@@ -41,7 +41,7 @@ export default function ContactPage() {
               isLoadingContacts ? <div className="w-full h-full flex justify-center items-center">
                 <Spinner label="Loading..." className="m-auto" />
               </div> : <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
-                {contacts?.map((contact: Contact) => <ContactCard contact={contact} />)}
+                {contacts?.map((contact: Contact) => <ContactCard contact={contact} key={contact.phoneNumber} />)}
               </div>
             }
           </div>
@@ -52,24 +52,32 @@ export default function ContactPage() {
           <Divider />
           <div>
             <Form
-              onSubmit={(values) => {
-                createContact.mutateAsync({
-                  firstName: values.first,
-                  lastName: values.last,
-                  phoneNumber: values.phone,
-                  email: values.email,
-                });
+              onSubmit={async (values, { reset }) => {
+                toast.loading("Creating contact...");
+
+                try {
+                  await createContact.mutateAsync({
+                    firstName: values.first,
+                    lastName: values.last,
+                    phoneNumber: values.phone,
+                    email: values.email,
+                  });
+                  toast.dismiss();
+                  toast.success("Contact created successfully!");
+                  reset();
+                } catch (_) {
+                  toast.dismiss();
+                  toast.error("Error creating contact...");
+                }
               }}
             >
-              {({ isValid, submit, reset }) => (
+              {({ isValid, submit }) => (
                 <>
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-row gap-4">
                       <Field<string>
                         name="first"
-                        onChangeValidate={z
-                          .string()
-                          .min(1, "Enter your first name")}
+                        onChangeValidate={z.string().min(1, "Enter your first name")}
                       >
                         {({ value, setValue, onBlur, isValid, errors }) => (
                           <Input
@@ -86,9 +94,7 @@ export default function ContactPage() {
 
                       <Field<string>
                         name="last"
-                        onChangeValidate={z
-                          .string()
-                          .min(1, "Enter your last name")}
+                        onChangeValidate={z.string().min(1, "Enter your last name")}
                       >
                         {({ value, setValue, onBlur, isValid, errors }) => (
                           <Input
@@ -106,10 +112,7 @@ export default function ContactPage() {
 
                     <Field<string>
                       name="phone"
-                      onChangeValidate={z
-                        .string()
-                        .min(10, "Enter a valid phone number")
-                        .max(15, "Enter a valid phone number")}
+                      onChangeValidate={z.string().length(10, "Enter a valid phone number")}
                     >
                       {({ value, setValue, onBlur, isValid, errors }) => (
                         <Input
@@ -145,7 +148,11 @@ export default function ContactPage() {
                     </Field>
 
                     <div className="flex flex-row justify-end items-end w-full mt-8">
-                      <Button color="primary" isDisabled={!isValid} onPress={submit}>
+                      <Button
+                        color="primary"
+                        isDisabled={!isValid}
+                        onPress={() => submit()}
+                      >
                         Submit
                       </Button>
                     </div>
@@ -153,6 +160,7 @@ export default function ContactPage() {
                 </>
               )}
             </Form>
+
           </div>
         </section>
       </main>

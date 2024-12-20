@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import multiparty from "multiparty";
 import { createCaller } from "~/server/api/root";
 import { db } from "~/server/db";
+import { Status } from "@prisma/client";
 
 export const config = {
   api: {
@@ -63,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         bcc,
         attachments: [],
         headers: {},
-        status: "received",
+        status: Status.RECEIVED,
       });
 
       res.status(200).json({

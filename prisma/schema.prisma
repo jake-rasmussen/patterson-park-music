@@ -45,6 +45,12 @@ enum TAG {
     CURRENT
 }
 
+enum Status {
+    RECEIVED
+    SENT
+    PENDING
+}
+
 // TODO: Remove
 model Post {
     id        Int      @id @default(autoincrement())
@@ -63,13 +69,13 @@ model TagPerson {
 }
 
 model Contact {
-    id            String         @id @default(cuid())
-    firstName     String
-    lastName      String
-    email         String?        @unique // TODO: change this to non-option
-    phoneNumber   String         @unique
-    person        Person?        @relation(fields: [personId], references: [id])
-    personId      String?        @unique
+    id          String  @id @default(cuid())
+    firstName   String
+    lastName    String
+    email       String? @unique // TODO: change this to non-option
+    phoneNumber String  @unique
+    person      Person? @relation(fields: [personId], references: [id])
+    personId    String? @unique
 }
 
 model Person {
@@ -118,13 +124,13 @@ model Family {
 }
 
 model SMSMessage {
-    id         String   @id @default(cuid())
-    messageSid String   @unique
-    from       String
-    to         String
-    body       String
-    mediaUrls  String[]
-    dateSent   DateTime @default(now())
+    id        String   @id @default(cuid())
+    from      String
+    to        String
+    body      String
+    mediaUrls String[]
+    status    Status
+    date      DateTime @default(now())
 }
 
 model EmailMessage {
@@ -136,6 +142,33 @@ model EmailMessage {
     cc          String[]
     bcc         String[]
     attachments String[] // TODO: Decide if we should add attachments
-    status      String
-    dateSent    DateTime @default(now())
+    status      Status
+    date        DateTime @default(now())
+}
+
+model FutureSMSMessage {
+    id        String   @id @default(cuid())
+    from      String
+    to        String
+    body      String
+    mediaUrls String[]
+    status    Status
+
+    days WEEKDAY[] // If it is a recurring messages
+    date DateTime? // If it is a one time messages
+}
+
+model FutureEmailMessage {
+    id          String   @id @default(cuid())
+    from        String
+    to          String[]
+    subject     String
+    body        String
+    cc          String[]
+    bcc         String[]
+    attachments String[] // TODO: Decide if we should add attachments
+    status      Status
+
+    days WEEKDAY[] // If it is a recurring messages
+    date DateTime? // If it is a one time messages
 }
