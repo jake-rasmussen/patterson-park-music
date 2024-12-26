@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
+import { supabase } from "~/server/supabase/supabaseClient";
+import { createCaller } from "../root";
 
 const myNumber = process.env.TWILIO_PHONE_NUMBER!;
 
@@ -49,7 +51,7 @@ export const futureSMSRouter = createTRPCRouter({
       const upcomingMessages = await ctx.db.futureSMSMessage.findMany({
         where: {
           OR: [
-            { date: { gte: now } }, // Messages with a specific date in the future
+            { date: { not: null } }, // Messages with a specific date in the future
             { days: { isEmpty: false } }, // Recurring messages
           ],
         },
@@ -95,11 +97,28 @@ export const futureSMSRouter = createTRPCRouter({
   deleteFutureSMSMessage: publicProcedure
     .input(
       z.object({
-        id: z.string(), // ID of the message to delete
+        id: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const message = await ctx.db.futureSMSMessage.findUnique({
+          where: { id: input.id },
+        });
+
+        if (!message) {
+          throw new Error("Message not found");
+        }
+
+        if (message.mediaUrls.length > 0) {
+          const fileRouterCaller = createCaller(ctx).file;
+
+          await fileRouterCaller.deleteFiles({
+            bucket: "media",
+            filePaths: message.mediaUrls,
+          });
+        }
+
         const deletedMessage = await ctx.db.futureSMSMessage.delete({
           where: { id: input.id },
         });
@@ -110,5 +129,4 @@ export const futureSMSRouter = createTRPCRouter({
         throw new Error("Failed to delete SMS message");
       }
     }),
-
 });

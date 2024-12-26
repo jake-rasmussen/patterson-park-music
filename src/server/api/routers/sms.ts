@@ -15,7 +15,7 @@ export const smsRouter = createTRPCRouter({
     .input(
       z.object({
         to: z.string().min(10),
-        message: z.string().min(1),
+        message: z.string(),
         mediaUrls: z.array(z.string()).optional(),
       })
     )
@@ -37,6 +37,7 @@ export const smsRouter = createTRPCRouter({
             body: message,
             mediaUrls: mediaUrls || [],
             status: Status.SENT,
+            errorCode: response.errorCode,
             date: new Date(),
           }
         })
@@ -67,7 +68,7 @@ export const smsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { messageSid, from, to, body, mediaUrls } = input;
+      const { from, to, body, mediaUrls } = input;
 
       try {
         const newMessage = await ctx.db.sMSMessage.create({

@@ -56,6 +56,7 @@ export const emailRouter = createTRPCRouter({
             bcc: bcc || [],
             attachments: attachments?.map((attachment) => attachment.url) || [],
             status: Status.SENT,
+            errorCode: response[0].statusCode,
             date: new Date(),
           },
         });

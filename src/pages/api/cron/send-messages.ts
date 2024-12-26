@@ -1,15 +1,15 @@
 import { WEEKDAY } from "@prisma/client";
+import { createCaller } from "~/server/api/root";
 import { db } from "~/server/db";
-import { api } from "~/utils/api";
 
 export default async function handler(req: any, res: any) {
-  const sendSMS = api.sms.sendSMS.useMutation();
-  const sendEmail = api.email.sendEmail.useMutation();
+  const caller = createCaller({ db });
 
   try {
     const now = new Date();
     const currentWeekday = Object.values(WEEKDAY)[now.getDay()];
 
+    // Fetch SMS messages
     const smsMessages = await db.futureSMSMessage.findMany({
       where: {
         date: { lte: now },
@@ -22,6 +22,7 @@ export default async function handler(req: any, res: any) {
       },
     });
 
+    // Fetch email messages
     const emailMessages = await db.futureEmailMessage.findMany({
       where: {
         date: { lte: now },
@@ -34,32 +35,65 @@ export default async function handler(req: any, res: any) {
       },
     });
 
+    // Process SMS messages
     const allSMSMessages = [...smsMessages, ...recurringSMSMessages];
     for (const sms of allSMSMessages) {
-      await sendSMS.mutateAsync({
+      await caller.sms.sendSMS({
         message: sms.body,
         to: sms.to,
         mediaUrls: sms.mediaUrls,
       });
 
-      if (!sms.days) {
-        await db.futureSMSMessage.delete({ where: { id: sms.id } });
+      if (sms.days.length === 0) {
+        // A one-time message
+        await caller.futureSMS.deleteFutureSMSMessage({ id: sms.id });
       }
     }
 
+    // Process email messages
     const allEmailMessages = [...emailMessages, ...recurringEmailMessages];
     for (const email of allEmailMessages) {
-      await sendEmail.mutateAsync({
+      // Process attachments if they exist
+      let processedAttachments: {
+        type: string;
+        filename: string;
+        content: string;
+        url: string;
+      }[] = [] = [];
+      if (email.attachments && email.attachments.length > 0) {
+        processedAttachments = await Promise.all(
+          email.attachments.map(async (attachmentUrl) => {
+            const response = await fetch(attachmentUrl);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch attachment: ${attachmentUrl}`);
+            }
+
+            const arrayBuffer = await response.arrayBuffer();
+            const base64Content = Buffer.from(arrayBuffer).toString("base64");
+
+            return {
+              filename: attachmentUrl.split("/").pop()!, // Use the filename from the URL
+              type: response.headers.get("content-type") || "application/octet-stream",
+              content: base64Content, // Base64 encoded content
+              url: attachmentUrl,
+            };
+          })
+        );
+      }
+
+      // Send email with processed attachments
+      await caller.email.sendEmail({
         to: email.to as [string, ...string[]],
         subject: email.subject,
         body: email.body,
         cc: email.cc,
         bcc: email.bcc,
-        // TODO: add attachments
+        attachments: processedAttachments, // Pass attachments here
       });
 
-      if (!email.days) {
-        await db.futureEmailMessage.delete({ where: { id: email.id } });
+      if (email.days.length === 0) {
+        // A one-time message
+        await caller.futureEmail.deleteFutureEmailMessage({ id: email.id });
       }
     }
 
