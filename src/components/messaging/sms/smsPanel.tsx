@@ -1,11 +1,12 @@
 import { Contact } from "@prisma/client";
 import { Divider } from "@nextui-org/react";
-import { IconMailX, IconMessageX } from "@tabler/icons-react";
+import { IconMessageX } from "@tabler/icons-react";
 import SMSView from "./smsView";
 import SMSMessageBar from "./smsBar";
-import { useState, useRef, SetStateAction } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
+import { useFileUpload } from "~/hooks/fileUpload";
 
 type PropType = {
   selectedContact: Contact;
@@ -14,24 +15,13 @@ type PropType = {
 const SMSPanel = (props: PropType) => {
   const { selectedContact } = props;
 
+  const { handleFileUploadSMS } = useFileUpload();
 
   const [message, setMessage] = useState<string>("");
-  const [attachedImages, setAttachedImages] = useState<File[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const utils = api.useUtils();
-
-  const getUploadUrl = api.file.getUploadUrl.useMutation({
-    onError() {
-      toast.error("Error...");
-    },
-  });
-
-  const getPresignedUrl = api.file.getPresignedUrl.useMutation({
-    onError() {
-      toast.error("Error...");
-    },
-  });
 
   const sendSMS = api.sms.sendSMS.useMutation({
     onSuccess() {
@@ -39,7 +29,7 @@ const SMSPanel = (props: PropType) => {
       toast.success("Message sent successfully!");
 
       setMessage("");
-      setAttachedImages([]);
+      setAttachedFiles([]);
       setIsLoading(false);
 
       utils.invalidate();
@@ -52,58 +42,14 @@ const SMSPanel = (props: PropType) => {
     },
   });
 
-  const handleImageUpload = async (): Promise<string[]> => {
-    if (attachedImages.length === 0) return [];
 
-    try {
-      const urls = await Promise.all(
-        attachedImages.map(async (file) => {
-          const filePath = `uploads/${Date.now()}-${file.name}`;
-
-          const uploadUrl = await getUploadUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          if (!uploadUrl) {
-            throw new Error("Failed to retrieve upload URL");
-          }
-
-          const response = await fetch(uploadUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to upload file");
-          }
-
-          const publicUrl = await getPresignedUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          return publicUrl;
-        })
-      );
-
-      return urls.filter((url) => url !== null) as string[];
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      toast.error("Error...");
-      return [];
-    }
-  };
 
   const handleSendMessage = async () => {
     try {
       setIsLoading(true);
       toast.loading("Sending message...");
 
-      const mediaUrls = await handleImageUpload();
+      const mediaUrls = await handleFileUploadSMS(attachedFiles);
 
       sendSMS.mutate({
         message,
@@ -126,11 +72,11 @@ const SMSPanel = (props: PropType) => {
           <Divider />
           <div className="p-4">
             <SMSMessageBar
-              attachedImages={attachedImages}
-              setAttachedImages={setAttachedImages}
+              attachedImages={attachedFiles}
+              setAttachedImages={setAttachedFiles}
               message={message}
               setMessage={setMessage}
-              isSendDisabled={(!message && attachedImages.length === 0) || isLoading}
+              isSendDisabled={(!message && attachedFiles.length === 0) || isLoading}
               handleSendMessage={handleSendMessage}
             />
           </div>

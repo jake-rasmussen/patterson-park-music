@@ -6,6 +6,7 @@ import { IconMailX } from "@tabler/icons-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
+import { useFileUpload } from "~/hooks/fileUpload";
 
 type PropType = {
   selectedContact: Contact;
@@ -14,24 +15,14 @@ type PropType = {
 const EmailPanel = (props: PropType) => {
   const { selectedContact } = props;
 
+  const { handleFileUploadEmail } = useFileUpload();
+
   const [subject, setSubject] = useState<string>("");
   const [body, setBody] = useState<string>("");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const utils = api.useUtils();
-
-  const getUploadUrl = api.file.getUploadUrl.useMutation({
-    onError() {
-      toast.error("Error...");
-    },
-  });
-
-  const getPresignedUrl = api.file.getPresignedUrl.useMutation({
-    onError() {
-      toast.error("Error...");
-    },
-  });
 
   const sendEmail = api.email.sendEmail.useMutation({
     onSuccess() {
@@ -48,77 +39,18 @@ const EmailPanel = (props: PropType) => {
     onError() {
       toast.dismiss();
       toast.error("Error...");
-      
+
       setIsLoading(false);
     },
   });
 
-  const handleFileUpload = async (): Promise<
-    { filename: string; type: string; content: string; url: string }[]
-  > => {
-    if (attachedFiles.length === 0) return [];
 
-    try {
-      const uploadedFiles = await Promise.all(
-        attachedFiles.map(async (file) => {
-          const filePath = `uploads/${Date.now()}-${file.name}`;
-
-          const uploadUrl = await getUploadUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          if (!uploadUrl) {
-            throw new Error("Failed to retrieve upload URL");
-          }
-
-          const uploadResponse = await fetch(uploadUrl, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-            },
-          });
-
-          if (!uploadResponse.ok) {
-            throw new Error("Failed to upload file to Supabase");
-          }
-
-          const publicUrl = await getPresignedUrl.mutateAsync({
-            bucket: "media",
-            filePath,
-          });
-
-          const base64Content = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve((reader.result as string).split(",")[1] || ""); // Strip the base64 header
-            reader.onerror = () => reject(reader.error);
-            reader.readAsDataURL(file);
-          });
-
-          return {
-            filename: file.name,
-            type: file.type,
-            content: base64Content,
-            url: publicUrl,
-          };
-        })
-      );
-
-      return uploadedFiles;
-    } catch (error) {
-      console.error("Error uploading files:", error);
-      toast.error("Error...");
-      return [];
-    }
-  };
-
-  const handleSendEmail = async () => {
+  const handleSendMessage = async () => {
     try {
       setIsLoading(true);
       toast.loading("Sending email...");
 
-      const attachments = await handleFileUpload();
+      const attachments = await handleFileUploadEmail(attachedFiles);
       const formattedBody = body.replace(/\n/g, "<br>");
 
       sendEmail.mutate({
@@ -151,7 +83,7 @@ const EmailPanel = (props: PropType) => {
                 subject={subject}
                 setSubject={setSubject}
                 isSendDisabled={(!body && attachedFiles.length === 0) || isLoading}
-                handleSendMessage={handleSendEmail} />
+                handleSendMessage={handleSendMessage} />
             </div>
           </div>
         </> : <div className="flex flex-col h-full justify-center items-center gap-4">

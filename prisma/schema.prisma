@@ -130,6 +130,7 @@ model SMSMessage {
     body      String
     mediaUrls String[]
     status    Status
+    errorCode Int?
     date      DateTime @default(now())
 }
 
@@ -143,6 +144,7 @@ model EmailMessage {
     bcc         String[]
     attachments String[] // TODO: Decide if we should add attachments
     status      Status
+    errorCode   Int?
     date        DateTime @default(now())
 }
 

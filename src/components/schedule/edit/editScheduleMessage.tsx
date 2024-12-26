@@ -1,12 +1,7 @@
-import { Modal, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button, Input, Checkbox, CheckboxGroup, DatePicker, ModalContent, Radio, RadioGroup, Tab, Tabs, Textarea, Spinner } from "@nextui-org/react";
-import { Field, Form } from "houseform";
-import { number, z } from "zod";
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Checkbox, CheckboxGroup, DatePicker, ModalContent, Radio, RadioGroup, Textarea, Spinner } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FutureEmailMessage, FutureSMSMessage, WEEKDAY } from "@prisma/client";
 import { toast } from "react-hot-toast";
-import EmailMessageBar from "~/components/messaging/email/emailBar";
-import SMSMessageBar from "~/components/messaging/sms/smsBar";
-import message from "~/pages/message";
 import { capitalizeToUppercase, dateToDateValue } from "~/utils/helper";
 import { useState } from "react";
 
@@ -44,10 +39,15 @@ const EditScheduleMessage = (props: PropType) => {
   const [smsMessage, setSMSMessage] = useState<string>(selectedMessage.body);
   const [emailSubject, setEmailSubject] = useState<string>("subject" in selectedMessage && selectedMessage.subject ? selectedMessage.subject : "");
   const [emailMessage, setEmailMessage] = useState<string>(selectedMessage.body);
-  const [attachedImages, setAttachedImages] = useState<File[]>([]);
-
+  const [existingAttachments, setExistingAttachments] = useState<string[]>(
+    isFutureEmailMessage(selectedMessage)
+      ? selectedMessage.attachments
+      : selectedMessage.mediaUrls
+  );
 
   const handleEditScheduleMessage = async () => {
+    toast.loading("Updating message...");
+
     try {
       if (isFutureEmailMessage(selectedMessage)) {
         await updateEmailMessage({
@@ -57,7 +57,7 @@ const EditScheduleMessage = (props: PropType) => {
           subject: emailSubject,
           days: isRecurring ? selectedDays : null,
           date: isRecurring ? null : selectedDate || null,
-          // TODO: add media urls
+          attachments: selectedMessage.attachments,
         });
       } else {
         await updateSMSMessage({
@@ -66,18 +66,20 @@ const EditScheduleMessage = (props: PropType) => {
           body: smsMessage,
           days: isRecurring ? selectedDays : null,
           date: isRecurring ? null : selectedDate || null,
-          // TODO: add media urls
+          mediaUrls: selectedMessage.mediaUrls,
         });
       }
 
+      toast.dismiss();
       toast.success("Message updated successfully!");
       onOpenChange();
-
       utils.invalidate();
     } catch (error) {
+      toast.dismiss();
       toast.error("Failed to update message.");
     }
   };
+
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -99,14 +101,15 @@ const EditScheduleMessage = (props: PropType) => {
                       </RadioGroup>
                     </div>
 
-
-                    {isFutureEmailMessage(selectedMessage) && (
-                      <Input
-                        label="Enter Subject"
-                        value={emailSubject}
-                        onChange={(e) => setEmailSubject(e.currentTarget.value)}
-                      />
-                    )}
+                    {
+                      isFutureEmailMessage(selectedMessage) && (
+                        <Input
+                          label="Enter Subject"
+                          value={emailSubject}
+                          onChange={(e) => setEmailSubject(e.currentTarget.value)}
+                        />
+                      )
+                    }
 
                     {
                       isFutureEmailMessage(selectedMessage) ? (
@@ -121,6 +124,22 @@ const EditScheduleMessage = (props: PropType) => {
                           value={smsMessage}
                           onChange={(e) => setSMSMessage(e.currentTarget.value)}
                         />
+                      )
+                    }
+
+                    {
+                      existingAttachments.length > 0 && (
+                        <div>
+                          <p className="text-gray-500">Attachments: </p>
+                          <div className="flex flex-row gap-2">
+                            {existingAttachments.map((url, index) => (
+                              <div key={index}>
+                                <img src={url} alt={`Attachment ${index + 1}`} className="w-16 h-16 rounded mb-2" />
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-gray-400 text-sm">Attachments cannot be modified</p>
+                        </div>
                       )
                     }
 

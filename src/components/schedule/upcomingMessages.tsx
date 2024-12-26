@@ -1,9 +1,10 @@
 import { api } from "~/utils/api";
-import { Button, Card, CardBody, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure, Modal, ModalHeader, ModalBody, ModalFooter, Input, Checkbox, CheckboxGroup, ModalContent, Textarea, DatePicker, Radio, RadioGroup, Tab, Tabs } from "@nextui-org/react";
+import { Button, Card, CardBody, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure } from "@nextui-org/react";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { FutureEmailMessage, FutureSMSMessage, SMSMessage, WEEKDAY } from "@prisma/client";
+import { FutureEmailMessage, FutureSMSMessage } from "@prisma/client";
 import EditScheduleMessage from "./edit/editScheduleMessage";
+import toast from "react-hot-toast";
 
 const UpcomingMessages = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -14,19 +15,27 @@ const UpcomingMessages = () => {
 
   const deleteEmailMessage = api.futureEmail.deleteFutureEmailMessage.useMutation({
     onSuccess: () => {
+      toast.dismiss();
+      toast.success("Successfully deleted scheduled message!");
+
       utils.futureEmail.getAllUpcomingEmailMessages.invalidate();
     },
     onError: () => {
-      alert("Failed to delete email message.");
+      toast.dismiss();
+      toast.error("Error...");
     },
   });
 
   const deleteSMSMessage = api.futureSMS.deleteFutureSMSMessage.useMutation({
     onSuccess: () => {
+      toast.dismiss();
+      toast.success("Successfully deleted scheduled message!");
+
       utils.futureSMS.getAllUpcomingSMSMessages.invalidate();
     },
     onError: () => {
-      alert("Failed to delete SMS message.");
+      toast.dismiss();
+      toast.error("Error...")
     },
   });
 
@@ -45,6 +54,8 @@ const UpcomingMessages = () => {
   });
 
   const handleDelete = async (message: FutureEmailMessage | FutureSMSMessage) => {
+    toast.loading("Deleting scheduled message...");
+
     try {
       if ("subject" in message) {
         await deleteEmailMessage.mutateAsync({ id: message.id });

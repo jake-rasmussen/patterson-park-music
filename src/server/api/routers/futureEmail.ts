@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
+import { fileRouter } from "./file";
+import { createCaller } from "../root";
 
 const myEmail = process.env.SENDGRID_SENDER_EMAIL!;
 
@@ -13,26 +15,47 @@ export const futureEmailRouter = createTRPCRouter({
         body: z.string().min(1),
         cc: z.array(z.string().email()).optional(),
         bcc: z.array(z.string().email()).optional(),
-        attachments: z.array(z.string()).optional(),
         headers: z.record(z.string(), z.any()).optional(),
         days: z.array(z.enum(Object.values(WEEKDAY) as [WEEKDAY, ...WEEKDAY[]])),
         date: z.date().optional(),
+        attachments: z
+          .array(
+            z.object({
+              filename: z.string(),
+              type: z.string(),
+              content: z.string(),
+              url: z.string().url(),
+            })
+          )
+          .optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const {
+        to,
+        subject,
+        body,
+        cc,
+        bcc,
+        headers,
+        days,
+        date,
+        attachments,
+      } = input;
+
       try {
         const newMessage = await ctx.db.futureEmailMessage.create({
           data: {
             from: myEmail,
-            to: input.to,
-            subject: input.subject,
-            body: input.body,
-            cc: input.cc || [],
-            bcc: input.bcc || [],
-            attachments: input.attachments || [],
+            to: to,
+            subject: subject,
+            body: body,
+            cc: cc || [],
+            bcc: bcc || [],
+            attachments: attachments?.map((attachment) => attachment.url) || [],
             status: Status.PENDING,
-            days: input.days,
-            date: input.date,
+            days: days,
+            date: date,
           },
         });
 
@@ -48,7 +71,7 @@ export const futureEmailRouter = createTRPCRouter({
       const upcomingMessages = await ctx.db.futureEmailMessage.findMany({
         where: {
           OR: [
-            { date: { gte: now } },
+            { date: { not: null } },
             { days: { isEmpty: false } },
           ],
         },
@@ -100,11 +123,28 @@ export const futureEmailRouter = createTRPCRouter({
   deleteFutureEmailMessage: publicProcedure
     .input(
       z.object({
-        id: z.string(), // ID of the message to delete
+        id: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const message = await ctx.db.futureEmailMessage.findUnique({
+          where: { id: input.id },
+        });
+
+        if (!message) {
+          throw new Error("Message not found");
+        }
+
+        if (message.attachments.length > 0) {
+          const fileRouterCaller = createCaller(ctx).file;
+
+          await fileRouterCaller.deleteFiles({
+            bucket: "media",
+            filePaths: message.attachments,
+          });
+        }
+
         const deletedMessage = await ctx.db.futureEmailMessage.delete({
           where: { id: input.id },
         });
@@ -115,4 +155,5 @@ export const futureEmailRouter = createTRPCRouter({
         throw new Error("Failed to delete email message");
       }
     }),
+
 });

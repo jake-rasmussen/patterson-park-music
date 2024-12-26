@@ -1,9 +1,6 @@
 import { Input, Textarea } from "@nextui-org/react";
-import { Status } from "@prisma/client";
 import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { api } from "~/utils/api";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 type PropType = {
   attachedFiles: File[];
@@ -48,9 +45,7 @@ const EmailMessageBar = (props: PropType) => {
             >
               <IconX className="w-4 h-4 bg-gray-300 bg-opacity-75 rounded-full" />
             </button>
-            <div className="w-16 h-16 rounded bg-gray-100 flex items-center justify-center mb-2">
-              <p className="text-xs truncate">{file.name}</p>
-            </div>
+            <img src={URL.createObjectURL(file)} alt="Preview" className="w-16 h-16 rounded mb-2" />
           </div>
         ))}
       </div>
