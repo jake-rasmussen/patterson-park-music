@@ -1,4 +1,4 @@
-import { Icon3dCubeSphere, IconHome, IconCalendar, IconPencil, IconBolt, IconLogout, IconUser, IconMessage, IconUserPlus, IconClock } from "@tabler/icons-react";
+import { Icon3dCubeSphere, IconLogout, IconMessage, IconClock, IconUsersGroup, IconUserEdit, IconSchool } from "@tabler/icons-react";
 import Link from "next/link";
 
 
@@ -12,11 +12,17 @@ const Navbar = () => {
       <IconMessage className="text-white h-12 w-12" />
     </Link>
     <Link href={"/contact"}>
-      <IconUserPlus className="text-white h-12 w-12" />
+      <IconUserEdit className="text-white h-12 w-12" />
     </Link>
     <Link href={"/schedule"}>
       <IconClock className="text-white h-12 w-12" />
-      </Link>
+    </Link>
+    <Link href={"/bulk"}>
+      <IconUsersGroup className="text-white h-12 w-12" />
+    </Link>
+    <Link href={"/section"}>
+      <IconSchool className="text-white h-12 w-12" />
+    </Link>
 
     <div className="grow flex items-end">
       <IconLogout className="text-white h-12 w-12" />

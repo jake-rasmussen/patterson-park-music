@@ -4,16 +4,16 @@ import toast from "react-hot-toast";
 import z from "zod";
 import { api } from "~/utils/api";
 import Error from "next/error";
-import { Contact } from "@prisma/client";
+import {User } from "@prisma/client";
 import ContactCard from "~/components/contact/contactCard";
 
 export default function ContactPage() {
-  const { data: contacts, isLoading: isLoadingContacts, error: errorContacts, refetch } = api.contact.getAllContacts.useQuery({
+  const { data: contacts, isLoading: isLoadingContacts, error: errorContacts, refetch } = api.user.getAllUsers.useQuery({
     skip: 0,
     take: 20,
   });
 
-  const createContact = api.contact.createContact.useMutation({
+  const createUser = api.user.createUser.useMutation({
     onSuccess() {
       toast.success("Created Contact!");
       refetch();
@@ -41,7 +41,7 @@ export default function ContactPage() {
               isLoadingContacts ? <div className="w-full h-full flex justify-center items-center">
                 <Spinner label="Loading..." className="m-auto" />
               </div> : <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
-                {contacts?.map((contact: Contact) => <ContactCard contact={contact} key={contact.phoneNumber} />)}
+                {contacts?.map((contact: User) => <ContactCard contact={contact} key={contact.phoneNumber} />)}
               </div>
             }
           </div>
@@ -56,7 +56,7 @@ export default function ContactPage() {
                 toast.loading("Creating contact...");
 
                 try {
-                  await createContact.mutateAsync({
+                  await createUser.mutateAsync({
                     firstName: values.first,
                     lastName: values.last,
                     phoneNumber: values.phone,
@@ -151,7 +151,7 @@ export default function ContactPage() {
                       <Button
                         color="primary"
                         isDisabled={!isValid}
-                        onPress={() => submit()}
+                        onPress={submit}
                       >
                         Submit
                       </Button>

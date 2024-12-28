@@ -8,7 +8,7 @@ import { api } from "~/utils/api";
 const CreateMessage = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const createContact = api.contact.createContact.useMutation({
+  const createContact = api.user.createUser.useMutation({
     onSuccess() {
       toast.success("Created Contact!");
     },

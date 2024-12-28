@@ -1,6 +1,6 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/modal";
 import { DatePicker, Divider, Spinner, RadioGroup, Radio, Checkbox, CheckboxGroup, Tab, Tabs } from "@nextui-org/react";
-import { Contact, WEEKDAY } from "@prisma/client";
+import { User, WEEKDAY } from "@prisma/client";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import ContactCard from "../contact/contactCard";
@@ -14,7 +14,7 @@ const ScheduleMessage = () => {
 
   const utils = api.useUtils();
 
-  const { data: contacts, isLoading: isLoadingContacts } = api.contact.getAllContacts.useQuery({
+  const { data: users, isLoading: isLoadingContacts } = api.user.getAllUsers.useQuery({
     skip: 0,
     take: 20,
   });
@@ -24,7 +24,7 @@ const ScheduleMessage = () => {
       toast.success("Text scheduled successfully!");
       reset();
       onOpenChange();
-      
+
       utils.invalidate();
     },
 
@@ -47,7 +47,7 @@ const ScheduleMessage = () => {
     }
   })
 
-  const [selectedContact, setSelectedContact] = useState<Contact>();
+  const [selectedUser, setSelectedUser] = useState<User>();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -74,7 +74,7 @@ const ScheduleMessage = () => {
   const handleSendSMSMessage = () => {
     createFutureSMSMessage.mutate({
       message: smsMessage,
-      to: selectedContact!.phoneNumber,
+      to: selectedUser!.phoneNumber,
       days: isRecurring ? selectedDays : [],
       date: isRecurring ? undefined : selectedDate,
       // TODO: add media urls
@@ -83,7 +83,7 @@ const ScheduleMessage = () => {
 
   const handleSendEmailMessage = () => {
     createFutureEmailMessage.mutate({
-      to: [selectedContact?.email!],
+      to: [selectedUser?.email!],
       body: emailMessage,
       subject: emailSubject,
       days: isRecurring ? selectedDays : [],
@@ -103,11 +103,11 @@ const ScheduleMessage = () => {
           </div>
         ) : (
           <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
-            {contacts?.map((contact: Contact) => (
+            {users?.map((contact: User) => (
               <button
                 key={contact.id}
                 onClick={() => {
-                  setSelectedContact(contact);
+                  setSelectedUser(contact);
                   onOpen();
                 }}
               >
@@ -122,7 +122,7 @@ const ScheduleMessage = () => {
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
-              Schedule Message to {selectedContact?.firstName} {selectedContact?.lastName}
+              Schedule Message to {selectedUser?.firstName} {selectedUser?.lastName}
             </ModalHeader>
             <ModalBody>
               <div className="flex flex-col gap-4">
@@ -168,7 +168,7 @@ const ScheduleMessage = () => {
                 }
 
                 {
-                  selectedContact && selectedContact.email && <div className="my-8">
+                  selectedUser && selectedUser.email && <div className="my-8">
                     <Tabs aria-label="Options" isVertical>
                       <Tab key="sms" title="SMS" className="w-full">
                         <SMSMessageBar

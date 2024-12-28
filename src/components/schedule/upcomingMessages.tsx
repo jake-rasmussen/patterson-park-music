@@ -3,7 +3,8 @@ import { Button, Card, CardBody, Divider, Dropdown, DropdownItem, DropdownMenu, 
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { FutureEmailMessage, FutureSMSMessage, SMSMessage, WEEKDAY } from "@prisma/client";
-import EditScheduleMessage from "./edit/editScheduleMessage";
+import EditScheduleMessage from "./editScheduleMessage";
+import toast from "react-hot-toast";
 
 const UpcomingMessages = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -14,19 +15,27 @@ const UpcomingMessages = () => {
 
   const deleteEmailMessage = api.futureEmail.deleteFutureEmailMessage.useMutation({
     onSuccess: () => {
+      toast.dismiss();
+      toast.success("Successfully deleted message!");
+
       utils.futureEmail.getAllUpcomingEmailMessages.invalidate();
     },
     onError: () => {
-      alert("Failed to delete email message.");
+      toast.dismiss();
+      toast.error("Error...");
     },
   });
 
   const deleteSMSMessage = api.futureSMS.deleteFutureSMSMessage.useMutation({
     onSuccess: () => {
+      toast.dismiss();
+      toast.success("Successfully deleted message!");
+      
       utils.futureSMS.getAllUpcomingSMSMessages.invalidate();
     },
     onError: () => {
-      alert("Failed to delete SMS message.");
+      toast.dismiss();
+      toast.error("Error...");
     },
   });
 
@@ -45,6 +54,8 @@ const UpcomingMessages = () => {
   });
 
   const handleDelete = async (message: FutureEmailMessage | FutureSMSMessage) => {
+    toast.loading("Deleting message...");
+
     try {
       if ("subject" in message) {
         await deleteEmailMessage.mutateAsync({ id: message.id });
@@ -90,9 +101,9 @@ const UpcomingMessages = () => {
                           <Divider orientation="vertical" />
                           <Dropdown>
                             <DropdownTrigger>
-                              <div className="my-auto hover:cursor-pointer">
-                                <IconDotsVertical className="w-8 h-8" />
-                              </div>
+                              <Button isIconOnly className="my-auto hover:cursor-pointer" variant="light">
+                                <IconDotsVertical />
+                              </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
                               <DropdownItem

@@ -1,12 +1,7 @@
-import { Modal, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button, Input, Checkbox, CheckboxGroup, DatePicker, ModalContent, Radio, RadioGroup, Tab, Tabs, Textarea, Spinner } from "@nextui-org/react";
-import { Field, Form } from "houseform";
-import { number, z } from "zod";
+import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Input, Checkbox, CheckboxGroup, DatePicker, ModalContent, Radio, RadioGroup, Textarea, Spinner } from "@nextui-org/react";
 import { api } from "~/utils/api";
 import { FutureEmailMessage, FutureSMSMessage, WEEKDAY } from "@prisma/client";
 import { toast } from "react-hot-toast";
-import EmailMessageBar from "~/components/messaging/email/emailBar";
-import SMSMessageBar from "~/components/messaging/sms/smsBar";
-import message from "~/pages/message";
 import { capitalizeToUppercase, dateToDateValue } from "~/utils/helper";
 import { useState } from "react";
 
@@ -29,7 +24,7 @@ const EditScheduleMessage = (props: PropType) => {
 
   const utils = api.useUtils();
 
-  const { data: contact, isLoading } = api.contact.getContactByNumberOrEmail.useQuery({
+  const { data: user, isLoading } = api.user.getUserByEmailOrPhone.useQuery({
     phoneNumber: isFutureEmailMessage(selectedMessage) ? undefined : selectedMessage.to,
     email: isFutureEmailMessage(selectedMessage) ? selectedMessage.to[0] : undefined
   });
@@ -88,7 +83,7 @@ const EditScheduleMessage = (props: PropType) => {
               isLoading ? <div className="w-full h-full flex justify-center items-center min-h-96">
                 <Spinner label="Loading..." className="m-auto" />
               </div> : <>
-                <ModalHeader>Edit Message to {contact?.firstName} {contact?.lastName}</ModalHeader>
+                <ModalHeader>Edit Message to {user?.firstName} {user?.lastName}</ModalHeader>
 
                 <ModalBody>
                   <div className="flex flex-col gap-4">

@@ -1,9 +1,6 @@
 import { Input, Textarea } from "@nextui-org/react";
-import { Status } from "@prisma/client";
 import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
-import toast from "react-hot-toast";
-import { api } from "~/utils/api";
+import { Dispatch, SetStateAction, useRef } from "react";
 
 type PropType = {
   attachedFiles: File[];
