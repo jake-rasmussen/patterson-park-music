@@ -53,7 +53,7 @@ export const userRouter = createTRPCRouter({
           data: {
             firstName,
             lastName,
-            phoneNumber: "+1" + phoneNumber,
+            phoneNumber: phoneNumber ? "+1" + phoneNumber : undefined,
             email
           },
         });
