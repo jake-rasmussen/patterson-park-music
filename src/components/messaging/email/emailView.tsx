@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "~/utils/api";
-import { Contact, EmailMessage, Status } from "@prisma/client";
+import { User, EmailMessage, Status } from "@prisma/client";
 import Error from "next/error";
 import { Spinner } from "@nextui-org/react";
 import MessageBubble from "../messageBubble";
@@ -8,7 +8,7 @@ import { formatDate } from "~/utils/helper";
 import { IconMessageDown } from "@tabler/icons-react";
 
 type PropType = {
-  selectedContact: Contact;
+  selectedContact: User;
   email: string;
 }
 

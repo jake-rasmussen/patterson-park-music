@@ -24,7 +24,7 @@ const EditScheduleMessage = (props: PropType) => {
 
   const utils = api.useUtils();
 
-  const { data: contact, isLoading } = api.contact.getContactByNumberOrEmail.useQuery({
+  const { data: user, isLoading } = api.user.getUserByEmailOrPhone.useQuery({
     phoneNumber: isFutureEmailMessage(selectedMessage) ? undefined : selectedMessage.to,
     email: isFutureEmailMessage(selectedMessage) ? selectedMessage.to[0] : undefined
   });
@@ -90,7 +90,7 @@ const EditScheduleMessage = (props: PropType) => {
               isLoading ? <div className="w-full h-full flex justify-center items-center min-h-96">
                 <Spinner label="Loading..." className="m-auto" />
               </div> : <>
-                <ModalHeader>Edit Message to {contact?.firstName} {contact?.lastName}</ModalHeader>
+                <ModalHeader>Edit Message to {user?.firstName} {user?.lastName}</ModalHeader>
 
                 <ModalBody>
                   <div className="flex flex-col gap-4">

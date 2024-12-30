@@ -3,16 +3,16 @@ import { useState, useEffect, useRef } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helper";
 import MessageBubble from "../messageBubble";
-import { Contact, SMSMessage, Status } from "@prisma/client";
+import {SMSMessage, Status, User } from "@prisma/client";
 import Error from "next/error";
 import { IconArrowDown, IconMessageDown } from "@tabler/icons-react";
 
 type PropType = {
-  selectedContact: Contact;
+  selectedUser: User;
 };
 
 const SMSView = (props: PropType) => {
-  const { selectedContact } = props;
+  const { selectedUser } = props;
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -21,7 +21,7 @@ const SMSView = (props: PropType) => {
   const [newMessageAlert, setNewMessageAlert] = useState(false);
 
   const { data: conversations, isLoading, isError, error } = api.sms.getSMSConversations.useQuery({
-    phoneNumber: selectedContact.phoneNumber,
+    phoneNumber: selectedUser.phoneNumber,
   });
 
   api.supabase.onSMSInsert.useSubscription(undefined, {
@@ -29,7 +29,7 @@ const SMSView = (props: PropType) => {
       const newSMSMessage = data as SMSMessage;
       newSMSMessage.date = new Date();
 
-      if (newSMSMessage.from === selectedContact.phoneNumber) {
+      if (newSMSMessage.from === selectedUser.phoneNumber) {
         setMessages((prevMessages) => [...prevMessages, newSMSMessage]);
         setNewMessageAlert(true); // Trigger new message alert
       }
@@ -109,10 +109,10 @@ const SMSView = (props: PropType) => {
                       <div className="px-4" key={message.id}>
                         {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
                         <MessageBubble
-                          status={message.to === selectedContact.phoneNumber ? Status.SENT : Status.RECEIVED}
+                          status={message.to === selectedUser.phoneNumber ? Status.SENT : Status.RECEIVED}
                           body={message.body}
                           dateSent={message.date}
-                          contact={selectedContact}
+                          contact={selectedUser}
                           imageUrls={message.mediaUrls || null}
                           type="sms"
                           errorCode={message.errorCode || undefined}

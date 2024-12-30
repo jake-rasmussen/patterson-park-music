@@ -1,48 +1,76 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { COURSE, WEEKDAY } from "@prisma/client";
+import { COURSE, WEEKDAY, SEMESTER } from "@prisma/client";
 
 export const sectionRouter = createTRPCRouter({
   createSection: publicProcedure
-    .input(z.object({
-      teacherId: z.string(),
-      course: z.nativeEnum(COURSE),
-      semester: z.string(),
-      weekday: z.nativeEnum(WEEKDAY),
-      startTime: z.date(),
-    }))
+    .input(
+      z.object({
+        teacherId: z.string(),
+        course: z.nativeEnum(COURSE),
+        semesters: z.array(z.nativeEnum(SEMESTER)),
+        weekdays: z.array(z.nativeEnum(WEEKDAY)),
+        startTime: z.date(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       return await ctx.db.section.create({
         data: input,
       });
     }),
-
   getAllSections: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.db.section.findMany();
+    return await ctx.db.section.findMany({
+      include: {
+        teacher: true, // Optional: Include teacher details if needed
+        enrollment: true, // Optional: Include enrollment details if needed
+      },
+    });
   }),
-
   getSectionById: publicProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
       return await ctx.db.section.findUnique({
         where: { id: input },
+        include: {
+          teacher: true, // Optional: Include teacher details if needed
+          enrollment: true, // Optional: Include enrollment details if needed
+        },
       });
     }),
-
   updateSection: publicProcedure
-    .input(z.object({
-      id: z.string(),
-      data: z.object({
-        semester: z.string().optional(),
-        weekday: z.nativeEnum(WEEKDAY).optional(),
+    .input(
+      z.object({
+        id: z.string(),
+        course: z.nativeEnum(COURSE).optional(),
+        semesters: z.array(z.nativeEnum(SEMESTER)).optional(),
+        weekdays: z.array(z.nativeEnum(WEEKDAY)).optional(),
         startTime: z.date().optional(),
-      }),
-    }))
+      })
+    )
     .mutation(async ({ input, ctx }) => {
-      const { id, data } = input;
+      const { id, course, semesters, weekdays, startTime } = input;
       return await ctx.db.section.update({
         where: { id },
-        data,
+        data: {
+          course,
+          semesters,
+          weekdays,
+          startTime
+        },
       });
     }),
+  deleteSection: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
+      return await ctx.db.section.delete({
+        where: {
+          id
+        }
+      })
+    })
 });

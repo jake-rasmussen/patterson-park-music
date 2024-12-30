@@ -1,4 +1,3 @@
-import { Contact } from "@prisma/client";
 import { Divider } from "@nextui-org/react";
 import { IconMessageX } from "@tabler/icons-react";
 import SMSView from "./smsView";
@@ -6,14 +5,15 @@ import SMSMessageBar from "./smsBar";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
+import { User } from "@prisma/client";
 import { useFileUpload } from "~/hooks/fileUpload";
 
 type PropType = {
-  selectedContact: Contact;
+  selectedUser: User;
 }
 
 const SMSPanel = (props: PropType) => {
-  const { selectedContact } = props;
+  const { selectedUser } = props;
 
   const { handleFileUploadSMS } = useFileUpload();
 
@@ -53,7 +53,7 @@ const SMSPanel = (props: PropType) => {
 
       sendSMS.mutate({
         message,
-        to: selectedContact.phoneNumber,
+        to: selectedUser.phoneNumber,
         mediaUrls,
       });
     } catch (error) {
@@ -63,9 +63,9 @@ const SMSPanel = (props: PropType) => {
 
   return (<>
     {
-      selectedContact.phoneNumber ? <>
+      selectedUser.phoneNumber ? <>
         <div className="flex-1 min-h-0 overflow-auto bg-gray-50 relative">
-          <SMSView selectedContact={selectedContact} />
+          <SMSView selectedUser={selectedUser} />
         </div>
 
         <div className="w-full bg-white rounded-br-xl">
