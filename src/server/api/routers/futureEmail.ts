@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
-import { fileRouter } from "./file";
 import { createCaller } from "../root";
 
 const myEmail = process.env.SENDGRID_SENDER_EMAIL!;
