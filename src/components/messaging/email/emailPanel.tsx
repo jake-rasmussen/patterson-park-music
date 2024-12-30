@@ -1,4 +1,4 @@
-import { Contact } from "@prisma/client";
+import { User } from "@prisma/client";
 import EmailView from "./emailView";
 import { Divider } from "@nextui-org/react";
 import EmailMessageBar from "./emailBar";
@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { api } from "~/utils/api";
 
 type PropType = {
-  selectedContact: Contact;
+  selectedContact: User;
 }
 
 const EmailPanel = (props: PropType) => {

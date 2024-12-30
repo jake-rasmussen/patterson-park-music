@@ -2,7 +2,6 @@ import { Button } from "@nextui-org/button";
 import { Icon3dCubeSphere, IconLogout, IconMessage, IconClock, IconUsersGroup, IconUserEdit, IconSchool } from "@tabler/icons-react";
 import Link from "next/link";
 
-
 const Navbar = () => {
   return (<>
     <div className="grow">

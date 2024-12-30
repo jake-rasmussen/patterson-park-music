@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import MessageBar from "./emailBar";
 import { api } from "~/utils/api";
-import { Contact, EmailMessage, Status } from "@prisma/client";
+import { User, EmailMessage, Status } from "@prisma/client";
 import Error from "next/error";
 import { Divider, Spinner } from "@nextui-org/react";
 import MessageBubble from "../messageBubble";
@@ -9,7 +9,7 @@ import { formatDate } from "~/utils/helper";
 import EmailMessageBar from "./emailBar";
 
 type PropType = {
-  selectedContact: Contact;
+  selectedContact: User;
   email: string;
 }
 

@@ -1,9 +1,9 @@
 import { Card } from "@nextui-org/react";
-import type { Contact } from "@prisma/client";
+import type { User } from "@prisma/client";
 import { IconUser } from "@tabler/icons-react";
 
 type PropType = {
-  contact: Contact;
+  contact: User;
 }
 
 const ContactCard = (props: PropType) => {

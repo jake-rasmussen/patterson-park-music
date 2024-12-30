@@ -1,5 +1,5 @@
 import { Divider } from "@nextui-org/react";
-import { Contact, Status } from "@prisma/client";
+import { User, Status } from "@prisma/client";
 import { formatTime } from "~/utils/helper";
 
 type PropType = {
@@ -7,7 +7,7 @@ type PropType = {
   body: string;
   subject?: string;
   dateSent: Date;
-  contact: Contact;
+  contact: User;
   imageUrls: string[] | null; // Optional prop for the image URL
   type: "email" | "sms"
 }
