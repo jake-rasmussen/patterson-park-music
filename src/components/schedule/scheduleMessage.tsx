@@ -8,9 +8,12 @@ import { capitalizeToUppercase, dateToDateValue } from "~/utils/helper";
 import SMSMessageBar from "../messaging/sms/smsBar";
 import EmailMessageBar from "../messaging/email/emailBar";
 import toast from "react-hot-toast";
+import { useFileUpload } from "~/hooks/fileUpload";
 
 const ScheduleMessage = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const { handleFileUploadEmail, handleFileUploadSMS } = useFileUpload();
 
   const utils = api.useUtils();
 
@@ -21,14 +24,18 @@ const ScheduleMessage = () => {
 
   const createFutureSMSMessage = api.futureSMS.createFutureSMSMessage.useMutation({
     onSuccess() {
+      toast.dismiss();
       toast.success("Text scheduled successfully!");
+
       reset();
       onOpenChange();
 
       utils.invalidate();
+      setIsLoading(false);
     },
 
     onError() {
+      toast.dismiss();
       toast.error("Error...");
       setIsLoading(false);
     }
@@ -36,12 +43,17 @@ const ScheduleMessage = () => {
 
   const createFutureEmailMessage = api.futureEmail.createFutureEmailMessage.useMutation({
     onSuccess() {
+      toast.dismiss();
       toast.success("Email scheduled successfully!");
+
       reset();
       onOpenChange();
+      utils.invalidate();
+      setIsLoading(false);
     },
 
     onError() {
+      toast.dismiss();
       toast.error("Error...");
       setIsLoading(false);
     }
@@ -58,7 +70,7 @@ const ScheduleMessage = () => {
   const [smsMessage, setSMSMessage] = useState<string>("");
   const [emailSubject, setEmailSubject] = useState<string>("");
   const [emailMessage, setEmailMessage] = useState<string>("");
-  const [attachedImages, setAttachedImages] = useState<File[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
 
   const reset = () => {
     setIsRecurring(false);
@@ -68,27 +80,38 @@ const ScheduleMessage = () => {
     setSMSMessage("");
     setEmailSubject("");
     setEmailMessage("");
-    setAttachedImages([]);
+    setAttachedFiles([]);
   }
 
-  const handleSendSMSMessage = () => {
+  const handleSendSMSMessage = async () => {
+    setIsLoading(true);
+    toast.loading("Creating future message...");
+
+    const mediaUrls = await handleFileUploadSMS(attachedFiles);
+
     createFutureSMSMessage.mutate({
       message: smsMessage,
       to: selectedUser!.phoneNumber,
       days: isRecurring ? selectedDays : [],
       date: isRecurring ? undefined : selectedDate,
-      // TODO: add media urls
+      mediaUrls,
     })
   }
 
-  const handleSendEmailMessage = () => {
+  const handleSendEmailMessage = async () => {
+    setIsLoading(true);
+    toast.loading("Creating future message...");
+
+    const attachments = await handleFileUploadEmail(attachedFiles);
+    const formattedBody = emailMessage.replace(/\n/g, "<br>");
+
     createFutureEmailMessage.mutate({
       to: [selectedUser?.email!],
-      body: emailMessage,
+      body: formattedBody,
       subject: emailSubject,
       days: isRecurring ? selectedDays : [],
       date: isRecurring ? undefined : selectedDate,
-      // TODO: add media urls
+      attachments,
     })
   }
 
@@ -118,7 +141,10 @@ const ScheduleMessage = () => {
         )}
       </div>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="3xl">
+      <Modal isOpen={isOpen} onOpenChange={() => {
+        reset();
+        onOpenChange();
+      }} size="3xl">
         <ModalContent>
           <>
             <ModalHeader className="flex flex-col gap-1">
@@ -127,7 +153,7 @@ const ScheduleMessage = () => {
             <ModalBody>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <RadioGroup label="What type of message would you like to send?" defaultValue="once">
+                  <RadioGroup label="What type of message would you like to send?" value={isRecurring ? "recurring" : "once"}>
                     <Radio value="once" onClick={() => setIsRecurring(false)}>One time message</Radio>
                     <Radio value="recurring" onClick={() => setIsRecurring(true)}>Recurring message</Radio>
                   </RadioGroup>
@@ -174,21 +200,21 @@ const ScheduleMessage = () => {
                         <SMSMessageBar
                           message={smsMessage}
                           setMessage={setSMSMessage}
-                          attachedImages={attachedImages}
-                          setAttachedImages={setAttachedImages}
-                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!smsMessage && attachedImages.length === 0) || isLoading}
+                          attachedImages={attachedFiles}
+                          setAttachedImages={setAttachedFiles}
+                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!smsMessage && attachedFiles.length === 0) || isLoading}
                           handleSendMessage={handleSendSMSMessage}
                         />
                       </Tab>
                       <Tab key="email" title="Email" className="w-full">
                         <EmailMessageBar
-                          attachedFiles={attachedImages}
-                          setAttachedFiles={setAttachedImages}
+                          attachedFiles={attachedFiles}
+                          setAttachedFiles={setAttachedFiles}
                           body={emailMessage}
                           setBody={setEmailMessage}
                           subject={emailSubject}
                           setSubject={setEmailSubject}
-                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!emailMessage && attachedImages.length === 0) || !emailSubject || isLoading}
+                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!emailMessage && attachedFiles.length === 0) || !emailSubject || isLoading}
                           handleSendMessage={handleSendEmailMessage}
                         />
                       </Tab>

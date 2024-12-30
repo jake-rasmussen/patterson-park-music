@@ -99,7 +99,7 @@ const SMSView = (props: PropType) => {
             ) : (
               <div className="w-full flex flex-col">
                 <div className="flex flex-col gap-2 pb-4">
-                  {messages.map((message, index) => {
+                  {messages.map((message: SMSMessage, index: number) => {
                     const previousMessage = messages[index - 1];
                     const showDate =
                       !previousMessage ||
@@ -115,6 +115,7 @@ const SMSView = (props: PropType) => {
                           contact={selectedUser}
                           imageUrls={message.mediaUrls || null}
                           type="sms"
+                          errorCode={message.errorCode || undefined}
                         />
                       </div>
                     );

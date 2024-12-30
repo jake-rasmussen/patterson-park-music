@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import MessageBar from "./emailBar";
 import { api } from "~/utils/api";
 import { User, EmailMessage, Status } from "@prisma/client";
 import Error from "next/error";
-import { Divider, Spinner } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 import MessageBubble from "../messageBubble";
 import { formatDate } from "~/utils/helper";
-import EmailMessageBar from "./emailBar";
+import { IconMessageDown } from "@tabler/icons-react";
 
 type PropType = {
   selectedContact: User;
@@ -96,43 +95,54 @@ const EmailView = (props: PropType) => {
     />
   } else {
     return (
-      <section className="overflow-y-scroll h-full">
-        <div className="flex flex-col h-full">
-          {
-            isLoading ?
-              <div className="w-full h-full flex justify-center items-center">
-                <Spinner label="Loading..." className="m-auto" />
-              </div>
-              :
-              <div className="w-full flex flex-col">
-                <div className="flex flex-col gap-2 pb-4">
-                  {messages.map((message, index) => {
-                    const previousMessage = messages[index - 1];
-                    const showDate =
-                      !previousMessage ||
-                      new Date(message.date).getTime() - new Date(previousMessage.date).getTime() > 60 * 60 * 1000;
+      <>
+        {newMessageAlert && (
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-10">
+            <div className="animate-bounce border bg-gray-400 rounded-full w-fit p-2 shadow-xl shadow-gray-400">
+              <IconMessageDown className="text-white h-10 w-10" />
+            </div>
+          </div>
+        )}
 
-                    return (
-                      <div className="px-4" key={message.id}>
-                        {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
-                        <MessageBubble
-                          status={message.to.includes(email!) ? Status.RECEIVED : Status.SENT}
-                          body={message.body}
-                          subject={message.subject}
-                          dateSent={message.date}
-                          contact={selectedContact}
-                          imageUrls={message.attachments || null} // Pass the first media URL as the image
-                          type="email"
-                        />
-                      </div>
-                    );
-                  })}
-                  <div ref={bottomRef} /> {/* Invisible div for scroll-to-bottom */}
+        <section className="overflow-y-scroll h-full" ref={containerRef}>
+          <div className="flex flex-col h-full">
+            {
+              isLoading ?
+                <div className="w-full h-full flex justify-center items-center">
+                  <Spinner label="Loading..." className="m-auto" />
                 </div>
-              </div>
-          }
-        </div>
-      </section>
+                :
+                <div className="w-full flex flex-col">
+                  <div className="flex flex-col gap-2 pb-4">
+                    {messages.map((message: EmailMessage, index: number) => {
+                      const previousMessage = messages[index - 1];
+                      const showDate =
+                        !previousMessage ||
+                        new Date(message.date).getTime() - new Date(previousMessage.date).getTime() > 60 * 60 * 1000;
+
+                      return (
+                        <div className="px-4" key={message.id}>
+                          {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
+                          <MessageBubble
+                            status={message.to.includes(email!) ? Status.RECEIVED : Status.SENT}
+                            body={message.body}
+                            subject={message.subject}
+                            dateSent={message.date}
+                            contact={selectedContact}
+                            imageUrls={message.attachments || null} // Pass the first media URL as the image
+                            type="email"
+                            errorCode={message.errorCode || undefined}
+                          />
+                        </div>
+                      );
+                    })}
+                    <div ref={bottomRef} /> {/* Invisible div for scroll-to-bottom */}
+                  </div>
+                </div>
+            }
+          </div>
+        </section>
+      </>
     );
   }
 }
