@@ -1,4 +1,3 @@
-import { Icon3dCubeSphere, IconBolt, IconCalendar, IconHome, IconLogout, IconPencil } from "@tabler/icons-react";
 import Navbar from "./navbar";
 
 type PropType = {

@@ -11,7 +11,7 @@ const Navbar = () => {
     <Link href={"/message"}>
       <IconMessage className="text-white h-12 w-12" />
     </Link>
-    <Link href={"/contact"}>
+    <Link href={"/users"}>
       <IconUserEdit className="text-white h-12 w-12" />
     </Link>
     <Link href={"/schedule"}>

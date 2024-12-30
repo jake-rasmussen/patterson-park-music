@@ -16,6 +16,28 @@ export const enrollmentRouter = createTRPCRouter({
         data: input,
       });
     }),
+  createEnrollments: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          userId: z.string(),
+          sectionId: z.string(),
+          startDate: z.date(),
+          endDate: z.date(),
+          status: z.nativeEnum(ENROLLMENT_STATUS),
+        })
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const result = await ctx.db.enrollment.createMany({
+        data: input,
+      });
+
+      return {
+        success: true,
+        count: result.count,
+      };
+    }),
 
   getAllEnrollments: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.enrollment.findMany();

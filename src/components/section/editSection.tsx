@@ -19,12 +19,12 @@ const EditSection = (props: PropType) => {
   const updateSection = api.section.updateSection.useMutation({
     onSuccess() {
       toast.dismiss();
-      toast.success("Updated Section!");
+      toast.success("Updated section!");
       utils.section.getAllSections.invalidate();
     },
     onError() {
       toast.dismiss();
-      toast.error("Error updating section...");
+      toast.error("Error...");
     },
   });
 

@@ -1,12 +1,13 @@
 import { Button } from "@nextui-org/button";
 import { Divider, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
 import { Section, User } from "@prisma/client";
-import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconDotsVertical, IconEdit, IconSchool, IconTrash } from "@tabler/icons-react";
 import { capitalizeToUppercase, joinEnums, formatTime } from "~/utils/helper";
 import EditSection from "./editSection";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
+import EnrollStudents from "./enrollment/enrollStudents";
 
 type PropType = {
   sections: (Section & {
@@ -23,7 +24,8 @@ const SectionTable = (props: PropType) => {
     isLoading
   } = props;
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit } = useDisclosure();
+  const { isOpen: isOpenAdd, onOpen: onOpenAdd, onOpenChange: onOpenChangeAdd } = useDisclosure();
 
   const [selectedSection, setSelectedSection] = useState<Section>();
 
@@ -39,7 +41,7 @@ const SectionTable = (props: PropType) => {
     onError: () => {
       toast.error("Error...");
     },
-  })
+  });
 
   return (<>
     <h2 className="text-xl text-center">Section List</h2>
@@ -51,7 +53,7 @@ const SectionTable = (props: PropType) => {
         </div>
       ) : (
         <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
-          <Table aria-label="Example empty table">
+          <Table>
             <TableHeader>
               <TableColumn>COURSE</TableColumn>
               <TableColumn>TEACHER</TableColumn>
@@ -80,10 +82,20 @@ const SectionTable = (props: PropType) => {
                       <DropdownMenu>
                         <DropdownItem
                           key="edit"
+                          startContent={<IconSchool />}
+                          onClick={() => {
+                            setSelectedSection(section);
+                            onOpenAdd();
+                          }}
+                        >
+                          Add Students
+                        </DropdownItem>
+                        <DropdownItem
+                          key="edit"
                           startContent={<IconEdit />}
                           onClick={() => {
                             setSelectedSection(section);
-                            onOpen();
+                            onOpenEdit();
                           }}
                         >
                           Edit Section
@@ -114,14 +126,20 @@ const SectionTable = (props: PropType) => {
     </div>
 
     {
-      selectedSection && (
+      selectedSection && (<>
         <EditSection
           selectedSection={selectedSection}
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
+          isOpen={isOpenEdit}
+          onOpenChange={onOpenChangeEdit}
           teachers={teachers}
         />
-      )
+        <EnrollStudents
+          sectionId={selectedSection.id}
+          isOpen={isOpenAdd}
+          onOpenChange={onOpenChangeAdd}
+        />
+      </>)
+
     }
   </>);
 }

@@ -3,7 +3,7 @@ import { DatePicker, Divider, Spinner, RadioGroup, Radio, Checkbox, CheckboxGrou
 import { User, WEEKDAY } from "@prisma/client";
 import { useState } from "react";
 import { api } from "~/utils/api";
-import ContactCard from "../contact/contactCard";
+import ContactCard from "../user/contactCard";
 import { capitalizeToUppercase, dateToDateValue } from "~/utils/helper";
 import SMSMessageBar from "../messaging/sms/smsBar";
 import EmailMessageBar from "../messaging/email/emailBar";

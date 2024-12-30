@@ -85,11 +85,25 @@ export const userRouter = createTRPCRouter({
     }),
 
   getAllTeachers: publicProcedure
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx }) => {
       try {
         const users = await ctx.db.user.findMany({
           where: {
             isTeacher: true
+          }
+        });
+
+        return users;
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    }),
+  getAllStudents: publicProcedure
+    .query(async ({ ctx}) => {
+      try {
+        const users = await ctx.db.user.findMany({
+          where: {
+            isTeacher: false
           }
         });
 
@@ -133,4 +147,19 @@ export const userRouter = createTRPCRouter({
         throw new Error("Failed to retrieve user");
       }
     }),
+  deleteUser: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+
+      return await ctx.db.user.delete({
+        where: {
+          id
+        }
+      })
+    })
 });

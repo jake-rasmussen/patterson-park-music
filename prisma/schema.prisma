@@ -73,7 +73,7 @@ model User {
     phoneNumber String       @unique
     isTeacher   Boolean
     enrollment  Enrollment[]
-    section     Section[]
+    section     Section[] // Only for teachers
     createdAt   DateTime     @default(now())
     updatedAt   DateTime     @updatedAt
 }
@@ -96,8 +96,8 @@ model Section {
     teacher    User         @relation(fields: [teacherId], references: [id])
     teacherId  String
     course     COURSE
-    semesters   SEMESTER[]
-    weekdays   WEEKDAY[]    // Retain the new array column
+    semesters  SEMESTER[]
+    weekdays   WEEKDAY[] // Retain the new array column
     startTime  DateTime
     enrollment Enrollment[]
 }

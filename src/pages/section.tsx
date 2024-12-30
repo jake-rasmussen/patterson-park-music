@@ -26,9 +26,11 @@ export default function SectionPage() {
         />
       </section>
 
-      <section className="bg-white rounded-xl h-fit flex flex-col gap-8 p-8 min-w-96">
-        <CreateSection teachers={teachers} />
-      </section>
+      <div className="flex flex-col gap-8">
+        <section className="bg-white rounded-xl h-fit flex flex-col gap-8 p-8 min-w-96">
+          <CreateSection teachers={teachers} />
+        </section>
+      </div>
     </main>
   );
 }

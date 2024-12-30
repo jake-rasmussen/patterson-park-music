@@ -40,10 +40,13 @@ export const dateToDateValue = (date: Date) => {
   return null;
 };
 
-export const capitalizeToUppercase = (str: string) => {
+export const capitalizeToUppercase = (str: string): string => {
   if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
+  return str
+    .split("_") // Split by underscore
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+    .join(" "); // Join with spaces
+};
 
 export const formatTimeInputValue = (time: TimeInputValue): string => {
   if (time instanceof ZonedDateTime) {
