@@ -67,7 +67,7 @@ const UserTable = (props: PropType) => {
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.phoneNumber}</TableCell>
+              <TableCell>{user.phoneNumber.substring(2)}</TableCell>
               {!select ? (
                 <TableCell className="flex justify-end">
                   <Dropdown>

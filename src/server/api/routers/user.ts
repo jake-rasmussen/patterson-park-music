@@ -22,7 +22,7 @@ export const userRouter = createTRPCRouter({
             firstName,
             lastName,
             email,
-            phoneNumber,
+            phoneNumber: "+1" + phoneNumber,
             isTeacher
           },
         });
@@ -45,12 +45,17 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, ...updateData } = input;
+      const { id, firstName, lastName, email, phoneNumber } = input;
 
       try {
         const updatedUser = await ctx.db.user.update({
           where: { id },
-          data: updateData,
+          data: {
+            firstName,
+            lastName,
+            phoneNumber: "+1" + phoneNumber,
+            email
+          },
         });
         return { success: true, user: updatedUser };
       } catch (error) {

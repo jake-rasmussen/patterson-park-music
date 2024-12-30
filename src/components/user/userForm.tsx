@@ -65,7 +65,7 @@ const UserForm = (props: PropType) => {
             <Field<string>
               name="phone"
               onChangeValidate={z.string().length(10, "Enter a valid phone number")}
-              initialValue={initialValues.phoneNumber}
+              initialValue={initialValues.phoneNumber ? initialValues.phoneNumber.substring(2) : ""}
             >
               {({ value, setValue, onBlur, isValid, errors }) => (
                 <Input
