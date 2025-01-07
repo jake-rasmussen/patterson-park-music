@@ -104,7 +104,7 @@ const EmailView = (props: PropType) => {
           </div>
         )}
 
-        <section className="overflow-y-scroll h-full" ref={containerRef}>
+        <section className="overflow-scroll h-full" ref={containerRef}>
           <div className="flex flex-col h-full">
             {
               isLoading ?
@@ -124,7 +124,7 @@ const EmailView = (props: PropType) => {
                         <div className="px-4" key={message.id}>
                           {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
                           <MessageBubble
-                            status={message.to.includes(email!) ? Status.RECEIVED : Status.SENT}
+                            status={message.to.includes(email!) ? Status.SENT : Status.RECEIVED}
                             body={message.body}
                             subject={message.subject}
                             dateSent={message.date}
@@ -136,7 +136,7 @@ const EmailView = (props: PropType) => {
                         </div>
                       );
                     })}
-                    <div ref={bottomRef} /> {/* Invisible div for scroll-to-bottom */}
+                    <div ref={bottomRef} />
                   </div>
                 </div>
             }

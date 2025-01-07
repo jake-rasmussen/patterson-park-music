@@ -43,7 +43,7 @@ const SectionTable = (props: PropType) => {
     },
   });
 
-  return (<>
+  return (<section className="flex flex-col gap-8 p-8  ">
     <h2 className="text-xl text-center">Section List</h2>
     <Divider />
     <div className="h-full">
@@ -141,7 +141,7 @@ const SectionTable = (props: PropType) => {
       </>)
 
     }
-  </>);
+  </section>);
 }
 
 export default SectionTable;

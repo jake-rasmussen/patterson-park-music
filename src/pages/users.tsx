@@ -35,7 +35,7 @@ export default function ContactPage() {
   } else {
     return (
       <main className="flex flex-row gap-8 h-full">
-        <section className="grow bg-white h-full rounded-xl flex flex-col gap-8 p-8">
+        <section className="grow bg-white h-fit min-h-full rounded-xl flex flex-col gap-8 p-8">
           <h2 className="text-xl text-center">User List</h2>
           <Divider />
           <div className="h-full">

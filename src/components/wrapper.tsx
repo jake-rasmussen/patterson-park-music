@@ -8,8 +8,8 @@ const Wrapper = (props: PropType) => {
   const { children } = props;
 
   return (
-    <main className="bg-gray-900 flex flex-row h-screen">
-      <div className="min-w-28 h-screen flex flex-col gap-8 justify-center items-center py-10">
+    <main className="bg-gray-900 flex flex-row h-screen overflow-auto">
+      <div className="min-w-fit h-screen flex flex-col gap-8 justify-center items-center py-10">
         <Navbar />
       </div>
       

@@ -1,11 +1,14 @@
 import { Button } from "@nextui-org/button";
-import { Icon3dCubeSphere, IconLogout, IconMessage, IconClock, IconUsersGroup, IconUserEdit, IconSchool } from "@tabler/icons-react";
+import { Divider } from "@nextui-org/react";
+import { IconLogout, IconMessage, IconClock, IconUserEdit, IconSchool, IconMusic } from "@tabler/icons-react";
 import Link from "next/link";
 
 const Navbar = () => {
-  return (<>
-    <div className="grow">
-      <Icon3dCubeSphere className="text-white h-20 w-12 border-b border-white" />
+  return (<main className="overflow-y-scroll flex flex-col items-center h-screen">
+    <div className="grow flex flex-col gap-4 max-w-xs">
+      <IconMusic className="text-white h-20 w-full" />
+      <Divider className="bg-white" />
+      <h1 className="text-white text-xl">Patterson Park Music</h1>
     </div>
 
     <div className="flex flex-col gap-8 items-center p-4">
@@ -39,7 +42,7 @@ const Navbar = () => {
     <div className="grow flex items-end">
       <IconLogout className="text-white h-12 w-12" />
     </div>
-  </>);
+  </main>);
 }
 
 export default Navbar;
