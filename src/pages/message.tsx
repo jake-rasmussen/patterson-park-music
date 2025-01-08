@@ -1,5 +1,3 @@
-
-
 import { Button, Divider } from "@nextui-org/react";
 import { useState } from "react";
 import { api } from "~/utils/api";
@@ -8,8 +6,10 @@ import { IconApple, IconUser } from "@tabler/icons-react";
 import Error from "next/error";
 import EmailPanel from "~/components/messaging/email/emailPanel";
 import SMSPanel from "~/components/messaging/sms/smsPanel";
+import { GetServerSidePropsContext } from "next";
+import { createClient } from "~/utils/supabase/client/server-props";
 
-export default function Message() {
+export default function MessagePage() {
   const [selectedUser, setSelectedUser] = useState<User>();
 
   const { data: users, error } = api.user.getAllUsers.useQuery({
@@ -37,8 +37,8 @@ export default function Message() {
                 key={user.phoneNumber}
               >
                 <div className="flex flex-row h-full items-center gap-2">
-                  { user.isTeacher ?  <IconApple className="rounded-full h-full w-auto" /> : <IconUser className="rounded-full h-full w-auto" /> }
-                  
+                  {user.isTeacher ? <IconApple className="rounded-full h-full w-auto" /> : <IconUser className="rounded-full h-full w-auto" />}
+
                   <div className="flex flex-col items-start text-black">
                     <span className="text-small">{user.firstName}</span>
                     <span className="text-tiny text-default-500">{user.lastName}</span>

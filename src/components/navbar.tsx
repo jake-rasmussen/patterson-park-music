@@ -5,10 +5,10 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (<main className="overflow-y-scroll flex flex-col items-center h-screen">
-    <div className="grow flex flex-col gap-4 max-w-xs">
+    <div className="grow flex flex-col gap-4 max-w-md">
       <IconMusic className="text-white h-20 w-full" />
       <Divider className="bg-white" />
-      <h1 className="text-white text-xl">Patterson Park Music</h1>
+      <h1 className="text-white text-xl uppercase font-black text-center px-4">Patterson <br />Park Music</h1>
     </div>
 
     <div className="flex flex-col gap-8 items-center p-4">

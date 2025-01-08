@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
-import { supabase } from "~/server/supabase/supabaseClient";
 import { createCaller } from "../root";
 
 const myNumber = process.env.TWILIO_PHONE_NUMBER!;

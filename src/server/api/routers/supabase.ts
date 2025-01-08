@@ -1,10 +1,12 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { supabase } from "~/server/supabase/supabaseClient";
+import { createClient } from "~/utils/supabase/client/component";
+
+const supabaseClient = createClient();
 
 export const supabaseRouter = createTRPCRouter({
   onSMSInsert: publicProcedure.subscription(async function* ({ ctx }) {
     const channelKey = "smsMessages";
-    const channel = supabase.channel(channelKey);
+    const channel = supabaseClient.channel(channelKey);
 
     try {
       const eventStream = new ReadableStream({
@@ -50,7 +52,7 @@ export const supabaseRouter = createTRPCRouter({
 
   onEmailInsert: publicProcedure.subscription(async function* ({ ctx }) {
     const channelKey = "emailMessages";
-    const channel = supabase.channel(channelKey);
+    const channel = supabaseClient.channel(channelKey);
 
     try {
       const eventStream = new ReadableStream({

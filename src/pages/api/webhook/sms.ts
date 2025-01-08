@@ -3,7 +3,7 @@ import { appRouter } from "~/server/api/root";
 import { createCallerFactory } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import twilio from "twilio";
-import { supabase } from "~/server/supabase/supabaseClient";
+import { supabaseClient } from "~/server/supabase/supabaseClient";
 import { Status } from "@prisma/client";
 
 const createCaller = createCallerFactory(appRouter);
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           const filePath = `uploads/${Date.now()}-${mediaUrl}${i}.${fileExtension}`;
 
-          const { error } = await supabase.storage
+          const { error } = await supabaseClient.storage
             .from("media")
             .upload(filePath, Buffer.from(mediaBuffer), {
               contentType,
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             throw new Error("Failed to upload media to Supabase");
           }
 
-          const { data: publicUrlData } = supabase.storage
+          const { data: publicUrlData } = supabaseClient.storage
             .from("media")
             .getPublicUrl(filePath);
 
