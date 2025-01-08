@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
 import { createCaller } from "../root";
 
 const myEmail = process.env.SENDGRID_SENDER_EMAIL!;
 
 export const futureEmailRouter = createTRPCRouter({
-  createFutureEmailMessage: publicProcedure
+  createFutureEmailMessage: protectedProcedure
     .input(
       z.object({
         to: z.array(z.string().email()),
@@ -64,7 +64,7 @@ export const futureEmailRouter = createTRPCRouter({
         throw new Error("Failed to save SMS message");
       }
     }),
-  getAllUpcomingEmailMessages: publicProcedure.query(async ({ ctx }) => {
+  getAllUpcomingEmailMessages: protectedProcedure.query(async ({ ctx }) => {
     try {
       const now = new Date();
       const upcomingMessages = await ctx.db.futureEmailMessage.findMany({
@@ -83,7 +83,7 @@ export const futureEmailRouter = createTRPCRouter({
       throw new Error("Failed to fetch upcoming email messages");
     }
   }),
-  updateFutureEmailMessage: publicProcedure
+  updateFutureEmailMessage: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -119,7 +119,7 @@ export const futureEmailRouter = createTRPCRouter({
         throw new Error("Failed to update email message");
       }
     }),
-  deleteFutureEmailMessage: publicProcedure
+  deleteFutureEmailMessage: protectedProcedure
     .input(
       z.object({
         id: z.string(),

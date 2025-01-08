@@ -18,7 +18,7 @@ const poppins = Poppins({
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(true);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     const checkAuthentication = async () => {
       setIsCheckingAuth(true);
       const { data, error } = await supabase.auth.getUser();
-      
+
       if (error || !data?.user) {
         setIsAuthenticated(false);
 
@@ -44,30 +44,31 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     checkAuthentication();
   }, []);
 
-  if (isCheckingAuth) {
-    return (
-      <div className="w-full h-screen flex justify-center items-center">
-        <Spinner label="Loading..." className="m-auto" size="lg" />
-      </div>
-    );
-  } else {
-    return (
-      <div className={`${poppins.variable} font-sans`}>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-        <style jsx global>{`
+  return (
+    <div className={`${poppins.variable} font-sans`}>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      <style jsx global>{`
           :root {
             --font-poppins: ${poppins.style.fontFamily};
           }
         `}</style>
-        <Toaster />
-        <NextUIProvider>
-          <Wrapper isAuthenticated={isAuthenticated ?? false}>
-            <Component {...pageProps} />
-          </Wrapper>
-        </NextUIProvider>
-      </div>
-    );
-  }
+      <Toaster />
+      <NextUIProvider>
+        {
+          isCheckingAuth ? (
+            <div className="w-full h-screen flex justify-center items-center">
+              <Spinner label="Loading..." className="m-auto" size="lg" />
+            </div>
+          ) : (
+            <Wrapper isAuthenticated={isAuthenticated ?? false}>
+              <Component {...pageProps} />
+            </Wrapper>
+          )
+        }
+
+      </NextUIProvider>
+    </div>
+  );
 };
 
 export default api.withTRPC(MyApp);

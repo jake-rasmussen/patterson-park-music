@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { createClient } from "~/utils/supabase/client/component";
 
 const extractFilePathFromSignedUrl = (url: string) => {
@@ -17,7 +17,7 @@ const supabaseClient = createClient();
 
 export const fileRouter = createTRPCRouter({
   // TODO: double check access rights for bucket, right now its public
-  getPresignedUrl: publicProcedure
+  getPresignedUrl: protectedProcedure
     .input(
       z.object({
         bucket: z.string().default("media"), // Default bucket name
@@ -40,7 +40,7 @@ export const fileRouter = createTRPCRouter({
       return data.signedUrl;
     }),
 
-  getUploadUrl: publicProcedure
+  getUploadUrl: protectedProcedure
     .input(
       z.object({
         bucket: z.string().default("media"),
@@ -61,7 +61,7 @@ export const fileRouter = createTRPCRouter({
 
       return data.signedUrl;
     }),
-  deleteFiles: publicProcedure
+  deleteFiles: protectedProcedure
     .input(
       z.object({
         bucket: z.string().default("media"),

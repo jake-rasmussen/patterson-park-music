@@ -3,10 +3,11 @@ import { appRouter } from "~/server/api/root";
 import { createCallerFactory } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import twilio from "twilio";
-import { supabaseClient } from "~/server/supabase/supabaseClient";
 import { Status } from "@prisma/client";
+import { createClient } from "~/utils/supabase/client/component";
 
 const createCaller = createCallerFactory(appRouter);
+const supabaseClient = createClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const twiml = new twilio.twiml.MessagingResponse();
@@ -17,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const numMedia = parseInt(twilioBody.NumMedia, 10);
       const mediaUrls: string[] = [];
-      
+
       for (let i = 0; i < numMedia; i++) {
         const mediaUrl = twilioBody[`MediaUrl${i}`];
         if (mediaUrl) {
@@ -50,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      const caller = createCaller({ db });
+      const caller = createCaller({ db, user: null });
       await caller.sms.storeSMS({
         messageSid: twilioBody.MessageSid,
         from: twilioBody.From,

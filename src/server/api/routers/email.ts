@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import sgMail from "@sendgrid/mail";
 import { Status } from "@prisma/client";
 
@@ -8,7 +8,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 const myEmail = process.env.SENDGRID_SENDER_EMAIL!;
 
 export const emailRouter = createTRPCRouter({
-  sendEmail: publicProcedure
+  sendEmail: protectedProcedure
     .input(
       z.object({
         to: z.array(z.string().email()).nonempty(),
@@ -71,7 +71,7 @@ export const emailRouter = createTRPCRouter({
         throw new Error("Failed to send email");
       }
     }),
-  storeEmail: publicProcedure
+  storeEmail: publicProcedure // Used from webhook
     .input(
       z.object({
         from: z.string().email().optional(),
@@ -112,7 +112,7 @@ export const emailRouter = createTRPCRouter({
         throw new Error("Failed to store email");
       }
     }),
-  getEmailConversations: publicProcedure
+  getEmailConversations: protectedProcedure
     .input(
       z.object({
         email: z.string().email(),

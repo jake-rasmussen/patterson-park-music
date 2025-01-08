@@ -1,12 +1,12 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
 import { createCaller } from "../root";
 
 const myNumber = process.env.TWILIO_PHONE_NUMBER!;
 
 export const futureSMSRouter = createTRPCRouter({
-  createFutureSMSMessage: publicProcedure
+  createFutureSMSMessage: protectedProcedure
     .input(
       z.object({
         to: z.string().min(10),
@@ -44,7 +44,7 @@ export const futureSMSRouter = createTRPCRouter({
         throw new Error("Failed to save SMS message");
       }
     }),
-  getAllUpcomingSMSMessages: publicProcedure.query(async ({ ctx }) => {
+  getAllUpcomingSMSMessages: protectedProcedure.query(async ({ ctx }) => {
     try {
       const now = new Date();
       const upcomingMessages = await ctx.db.futureSMSMessage.findMany({
@@ -63,7 +63,7 @@ export const futureSMSRouter = createTRPCRouter({
       throw new Error("Failed to fetch upcoming SMS messages");
     }
   }),
-  updateFutureSMSMessage: publicProcedure
+  updateFutureSMSMessage: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -93,7 +93,7 @@ export const futureSMSRouter = createTRPCRouter({
         throw new Error("Failed to update SMS message");
       }
     }),
-  deleteFutureSMSMessage: publicProcedure
+  deleteFutureSMSMessage: protectedProcedure
     .input(
       z.object({
         id: z.string(),
