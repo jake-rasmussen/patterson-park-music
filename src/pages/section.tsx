@@ -18,7 +18,7 @@ export default function SectionPage() {
 
   return (
     <main className="flex flex-row gap-8 h-full">
-      <section className="grow bg-white rounded-xl h-fit min-h-full">
+      <section className="grow bg-white rounded-xl h-full overflow-auto">
         <SectionTable
           sections={sections || []}
           teachers={teachers || []}

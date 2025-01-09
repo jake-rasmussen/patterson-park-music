@@ -24,10 +24,12 @@ export const formatTime = (date: Date): string => {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
+    timeZone: "UTC", // Explicitly specify UTC
   };
 
   return date.toLocaleTimeString("en-US", options);
-}
+};
+
 
 export const dateToDateValue = (date: Date) => {
   if (date) {
@@ -49,13 +51,16 @@ export const capitalizeToUppercase = (str: string): string => {
 };
 
 export const formatTimeInputValue = (time: TimeInputValue): string => {
+  if (time === null) {
+    return "";
+  }
   if (time instanceof ZonedDateTime) {
-    const hours = String(time.hour).padStart(2, "0");
-    const minutes = String(time.minute).padStart(2, "0");
+    const hours = time.hour != null ? String(time.hour).padStart(2, "0") : "00";
+    const minutes = time.minute != null ? String(time.minute).padStart(2, "0") : "00";
     return `${hours}:${minutes}`;
   } else if (time instanceof Time) {
-    const hours = String(time.hour).padStart(2, "0");
-    const minutes = String(time.minute).padStart(2, "0");
+    const hours = time.hour != null ? String(time.hour).padStart(2, "0") : "00";
+    const minutes = time.minute != null ? String(time.minute).padStart(2, "0") : "00";
     return `${hours}:${minutes}`;
   }
   throw new Error("Invalid TimeInputValue format");

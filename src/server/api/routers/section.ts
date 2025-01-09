@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { COURSE, WEEKDAY, SEMESTER } from "@prisma/client";
 
 export const sectionRouter = createTRPCRouter({
-  createSection: publicProcedure
+  createSection: protectedProcedure
     .input(
       z.object({
         teacherId: z.string(),
@@ -18,7 +18,7 @@ export const sectionRouter = createTRPCRouter({
         data: input,
       });
     }),
-  getAllSections: publicProcedure.query(async ({ ctx }) => {
+  getAllSections: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.section.findMany({
       include: {
         teacher: true, // Optional: Include teacher details if needed
@@ -26,7 +26,7 @@ export const sectionRouter = createTRPCRouter({
       },
     });
   }),
-  getSectionById: publicProcedure
+  getSectionById: protectedProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
       return await ctx.db.section.findUnique({
@@ -37,7 +37,7 @@ export const sectionRouter = createTRPCRouter({
         },
       });
     }),
-  updateSection: publicProcedure
+  updateSection: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -49,6 +49,7 @@ export const sectionRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const { id, course, semesters, weekdays, startTime } = input;
+
       return await ctx.db.section.update({
         where: { id },
         data: {
@@ -59,7 +60,7 @@ export const sectionRouter = createTRPCRouter({
         },
       });
     }),
-  deleteSection: publicProcedure
+  deleteSection: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -67,6 +68,13 @@ export const sectionRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const { id } = input;
+
+      await ctx.db.enrollment.deleteMany({
+        where: {
+          sectionId: id,
+        },
+      });
+
       return await ctx.db.section.delete({
         where: {
           id

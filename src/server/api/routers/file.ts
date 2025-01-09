@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
-import { supabase } from "~/server/supabase/supabaseClient";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createClient } from "~/utils/supabase/client/component";
 
 const extractFilePathFromSignedUrl = (url: string) => {
   const urlObject = new URL(url);
@@ -13,10 +13,11 @@ const extractFilePathFromSignedUrl = (url: string) => {
   return filePathMatch[1]!;
 }
 
+const supabaseClient = createClient();
 
 export const fileRouter = createTRPCRouter({
   // TODO: double check access rights for bucket, right now its public
-  getPresignedUrl: publicProcedure
+  getPresignedUrl: protectedProcedure
     .input(
       z.object({
         bucket: z.string().default("media"), // Default bucket name
@@ -27,7 +28,7 @@ export const fileRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { bucket, filePath, expiresIn } = input;
 
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseClient.storage
         .from(bucket)
         .createSignedUrl(filePath, expiresIn);
 
@@ -39,7 +40,7 @@ export const fileRouter = createTRPCRouter({
       return data.signedUrl;
     }),
 
-  getUploadUrl: publicProcedure
+  getUploadUrl: protectedProcedure
     .input(
       z.object({
         bucket: z.string().default("media"),
@@ -49,7 +50,7 @@ export const fileRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { bucket, filePath } = input;
 
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseClient.storage
         .from(bucket)
         .createSignedUploadUrl(filePath);
 
@@ -60,7 +61,7 @@ export const fileRouter = createTRPCRouter({
 
       return data.signedUrl;
     }),
-  deleteFiles: publicProcedure
+  deleteFiles: protectedProcedure
     .input(
       z.object({
         bucket: z.string().default("media"),
@@ -80,7 +81,7 @@ export const fileRouter = createTRPCRouter({
       });
 
       // Call Supabase's remove method
-      const { data, error } = await supabase.storage.from(bucket).remove(resolvedPaths);
+      const { data, error } = await supabaseClient.storage.from(bucket).remove(resolvedPaths);
 
       if (error) {
         console.error("Error deleting files from Supabase storage:", error);

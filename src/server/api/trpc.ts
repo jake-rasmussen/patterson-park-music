@@ -12,6 +12,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
+import createClient from "~/utils/supabase/client/api";
 
 /**
  * 1. CONTEXT
@@ -45,8 +46,17 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+export const createTRPCContext = async (_opts: CreateNextContextOptions) => {
+  const supabaseClient = createClient(
+    _opts.req, _opts.res,
+  )
+
+  const { data: user, error } = await supabaseClient.auth.getUser();
+
+  return {
+    db,
+    user: error ? null : user,
+  };
 };
 
 /**
@@ -123,3 +133,30 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+/**
+ * Middleware for checking authentication and creating protected procedures.
+ */
+const requireAuthMiddleware = t.middleware(async ({ ctx, next }) => {
+  const user = ctx.user;
+
+  if (!user) {
+    throw new Error("Unauthorized: User must be signed in");
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      user, // Add user to context for downstream use
+    },
+  });
+});
+
+/**
+ * Protected (authenticated) procedure
+ *
+ * Use this to create queries or mutations that require a logged-in user.
+ */
+export const protectedProcedure = t.procedure
+  .use(timingMiddleware) // Optional: Add timing middleware
+  .use(requireAuthMiddleware);

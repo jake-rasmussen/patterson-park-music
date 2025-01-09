@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         throw new Error("Invalid 'from' field");
       }
 
-      const caller = createCaller({ db });
+      const caller = createCaller({ db, user: null });
       await caller.email.storeEmail({
         from,
         to,

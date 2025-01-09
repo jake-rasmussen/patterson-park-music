@@ -152,7 +152,12 @@ const SectionForm = (props: PropType) => {
                 Cancel
               </Button>
             )}
-            <Button color="primary" isDisabled={!isValid} onPress={submit}>
+            <Button color="primary" isDisabled={!isValid} onPress={() => {
+              submit();
+              if (onClose) {
+                onClose();
+              }
+            }}>
               Submit
             </Button>
           </div>

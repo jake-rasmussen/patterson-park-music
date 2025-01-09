@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TAG } from "@prisma/client";
 
 export const tagPersonRouter = createTRPCRouter({
-  createTagPerson: publicProcedure
+  createTagPerson: protectedProcedure
     .input(z.object({
       tag: z.nativeEnum(TAG),
     }))
@@ -13,11 +13,11 @@ export const tagPersonRouter = createTRPCRouter({
       });
     }),
 
-  getAllTagPersons: publicProcedure.query(async ({ ctx }) => {
+  getAllTagPersons: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.tagPerson.findMany();
   }),
 
-  getTagPersonById: publicProcedure
+  getTagPersonById: protectedProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
       return await ctx.db.tagPerson.findUnique({
@@ -25,7 +25,7 @@ export const tagPersonRouter = createTRPCRouter({
       });
     }),
 
-  updateTagPerson: publicProcedure
+  updateTagPerson: protectedProcedure
     .input(z.object({
       id: z.string(),
       data: z.object({

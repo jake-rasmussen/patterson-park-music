@@ -26,6 +26,7 @@
     "@nextui-org/theme": "^2.2.11",
     "@prisma/client": "^5.14.0",
     "@sendgrid/mail": "^8.1.4",
+    "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.46.1",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tabler/icons-react": "^3.21.0",

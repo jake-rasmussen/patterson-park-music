@@ -30,7 +30,7 @@ const UpcomingMessages = () => {
     onSuccess: () => {
       toast.dismiss();
       toast.success("Successfully deleted message!");
-      
+
       utils.futureSMS.getAllUpcomingSMSMessages.invalidate();
     },
     onError: () => {
@@ -80,60 +80,60 @@ const UpcomingMessages = () => {
           <>
             {
               upcomingMessages.length !== 0 ? (
-                <>
-                  <ul className="list-none space-y-4">
-                    {upcomingMessages.map((message) => (
-                      <Card className="max-w-md" key={message.id}>
-                        <CardBody className="flex flex-row">
-                          <div className="grow flex flex-col gap-2 p-4">
-                            <p className="text-md">{message.to}</p>
-                            <p className="text-small text-default-500">{
-                              message.date ?
-                                new Date(message.date).toLocaleString() :
-                                message.days.map((day) => {
+                <ul className="list-none space-y-4">
+                  {upcomingMessages.map((message) => (
+                    <Card key={message.id}>
+                      <CardBody className="flex flex-row items-center justify-between truncate">
+                        <div className="max-w-full grow flex flex-col gap-2 p-4 truncate">
+                          <p className="text-md truncate">{message.to}</p>
+
+                          <p className="text-sm text-default-500 truncate">
+                            {message.date
+                              ? new Date(message.date).toLocaleString()
+                              : message.days
+                                .map((day) => {
                                   const dayString = day.toString().toLowerCase();
                                   return dayString.charAt(0).toUpperCase() + dayString.slice(1);
                                 })
-                                  .join(", ")
-                            }
-                            </p>
-                          </div>
-                          <Divider orientation="vertical" />
-                          <Dropdown>
-                            <DropdownTrigger>
-                              <Button isIconOnly className="my-auto hover:cursor-pointer" variant="light">
-                                <IconDotsVertical />
-                              </Button>
-                            </DropdownTrigger>
-                            <DropdownMenu>
-                              <DropdownItem
-                                key="edit"
-                                startContent={<IconEdit />}
-                                onClick={() => {
-                                  setSelectedMessage(message);
-                                  onOpen();
-                                }}
-                              >
-                                Edit Message
-                              </DropdownItem>
-                              <DropdownItem
-                                key="delete"
-                                className="text-danger"
-                                color="danger"
-                                startContent={<IconTrash />}
-                                onClick={() => {
-                                  handleDelete(message);
-                                }}
-                              >
-                                Delete Message
-                              </DropdownItem>
-                            </DropdownMenu>
-                          </Dropdown>
-                        </CardBody>
-                      </Card>
-                    ))}
-                  </ul>
-                </>
+                                .join(", ")}
+                          </p>
+                        </div>
+
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button isIconOnly className="hover:cursor-pointer" variant="light">
+                              <IconDotsVertical />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu>
+                            <DropdownItem
+                              key="edit"
+                              startContent={<IconEdit />}
+                              onClick={() => {
+                                setSelectedMessage(message);
+                                onOpen();
+                              }}
+                            >
+                              Edit Message
+                            </DropdownItem>
+                            <DropdownItem
+                              key="delete"
+                              className="text-danger"
+                              color="danger"
+                              startContent={<IconTrash />}
+                              onClick={() => {
+                                handleDelete(message);
+                              }}
+                            >
+                              Delete Message
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </CardBody>
+                    </Card>
+
+                  ))}
+                </ul>
               ) : (
                 <>
                   <p className="text-center text-gray-500">No upcoming messages scheduled.</p>

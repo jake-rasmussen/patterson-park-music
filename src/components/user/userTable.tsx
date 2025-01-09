@@ -31,6 +31,7 @@ const UserTable = (props: PropType) => {
       utils.section.getAllSections.invalidate();
     },
     onError: () => {
+      toast.dismiss();
       toast.error("Error...");
     },
   });
