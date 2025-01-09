@@ -1,4 +1,4 @@
-import { Divider } from "@nextui-org/react";
+import { Divider, Tooltip } from "@nextui-org/react";
 import { User, Status } from "@prisma/client";
 import { formatTime } from "~/utils/helper";
 import MessageImage from "./messageImage";
@@ -20,7 +20,7 @@ const MessageBubble = (props: PropType) => {
 
   return (
     <>
-      <div className={status === Status.RECEIVED ? `w-full flex items-end justify-end text-right w-fit` : ""}>
+      <div className={status === Status.RECEIVED ? `w-full flex items-end justify-end text-right` : ""}>
         <div className="flex items-start gap-2.5">
           {errorCode && errorCode !== 202 && errorCode !== 200 && (
             <div className="h-full my-auto">
@@ -29,7 +29,7 @@ const MessageBubble = (props: PropType) => {
               </Tooltip>
             </div>
           )}
-          <div className={`flex flex-col leading-1.5 p-4 rounded-l-xl rounded-br-xl bg-gray-800  shadow-xl ${type === "email" ? "w-[30rem] " : "w-[20rem] "}`}>
+          <div className={`flex flex-col leading-1.5 p-4 rounded-l-xl rounded-br-xl bg-gray-800 shadow-xl ${type === "email" ? "max-w-[30rem] " : "max-w-[20rem]"}`}>
             <div className="flex items-center space-x-2">
               <span className="text-sm font-semibold text-white w-full">
                 {status === Status.RECEIVED ? `${contact.firstName} ${contact.lastName}` : "Patterson Park Music"}

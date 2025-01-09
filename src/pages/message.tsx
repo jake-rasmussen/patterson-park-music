@@ -1,5 +1,3 @@
-
-
 import { Button, Divider } from "@nextui-org/react";
 import { useState } from "react";
 import { api } from "~/utils/api";
@@ -8,11 +6,13 @@ import { IconApple, IconUser } from "@tabler/icons-react";
 import Error from "next/error";
 import EmailPanel from "~/components/messaging/email/emailPanel";
 import SMSPanel from "~/components/messaging/sms/smsPanel";
+import { GetServerSidePropsContext } from "next";
+import { createClient } from "~/utils/supabase/client/server-props";
 
-export default function Message() {
-  const [selectedContact, setSelectedContact] = useState<Contact>();
+export default function MessagePage() {
+  const [selectedUser, setSelectedUser] = useState<User>();
 
-  const { data: contacts, isLoading, error, refetch } = api.user.getAllUsers.useQuery({
+  const { data: users, error } = api.user.getAllUsers.useQuery({
     skip: 0,
     take: 20,
   })
@@ -27,21 +27,21 @@ export default function Message() {
   } else {
     return (
       <main className="flex flex-row w-full h-full bg-white rounded-2xl">
-        <section className="w-60 overflow-y-auto h-full">
+        <section className="w-60 overflow-y-auto">
           <div className="flex flex-col gap-2 items-center m-2">
-            {contacts?.map((contact: User) => (
+            {users?.map((user: User) => (
               <Button
                 className="w-full h-full min-h-[4rem] min-w-[8rem] py-4 flex justify-start"
-                onPress={() => setSelectedContact(contact)}
-                variant={contact === selectedContact ? "solid" : "light"}
-                key={contact.phoneNumber}
+                onPress={() => setSelectedUser(user)}
+                variant={user === selectedUser ? "solid" : "light"}
+                key={user.phoneNumber}
               >
                 <div className="flex flex-row h-full items-center gap-2">
-                  { contact.isTeacher ?  <IconApple className="rounded-full h-full w-auto" /> : <IconUser className="rounded-full h-full w-auto" /> }
-                  
+                  {user.isTeacher ? <IconApple className="rounded-full h-full w-auto" /> : <IconUser className="rounded-full h-full w-auto" />}
+
                   <div className="flex flex-col items-start text-black">
-                    <span className="text-small">{contact.firstName}</span>
-                    <span className="text-tiny text-default-500">{contact.lastName}</span>
+                    <span className="text-small">{user.firstName}</span>
+                    <span className="text-tiny text-default-500">{user.lastName}</span>
                   </div>
                 </div>
               </Button>
@@ -59,22 +59,22 @@ export default function Message() {
 
           <Divider />
 
-          {selectedContact ? (
+          {selectedUser ? (
             <div className="flex flex-row h-full min-h-0">
 
               <div className="w-1/2 flex flex-col h-full">
-                <SMSPanel selectedUser={selectedContact} />
+                <SMSPanel selectedUser={selectedUser} />
               </div>
 
               <Divider orientation="vertical" />
 
               <div className="w-1/2 flex flex-col h-full">
-                <EmailPanel selectedContact={selectedContact} />
+                <EmailPanel selectedContact={selectedUser} />
               </div>
             </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <h1 className="text-xl">Select a contact to view conversation</h1>
+              <h1 className="text-xl">Select a user to view conversation</h1>
             </div>
           )}
         </section>

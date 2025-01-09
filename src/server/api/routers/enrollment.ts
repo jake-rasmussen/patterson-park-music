@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { ENROLLMENT_STATUS } from "@prisma/client";
 
 export const enrollmentRouter = createTRPCRouter({
-  createEnrollment: publicProcedure
+  createEnrollment: protectedProcedure
     .input(z.object({
       personId: z.string(),
       sectionId: z.string(),
@@ -16,7 +16,7 @@ export const enrollmentRouter = createTRPCRouter({
         data: input,
       });
     }),
-  createEnrollments: publicProcedure
+  createEnrollments: protectedProcedure
     .input(
       z.array(
         z.object({
@@ -39,11 +39,11 @@ export const enrollmentRouter = createTRPCRouter({
       };
     }),
 
-  getAllEnrollments: publicProcedure.query(async ({ ctx }) => {
+  getAllEnrollments: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.enrollment.findMany();
   }),
 
-  getEnrollmentById: publicProcedure
+  getEnrollmentById: protectedProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
       return await ctx.db.enrollment.findUnique({
@@ -51,7 +51,7 @@ export const enrollmentRouter = createTRPCRouter({
       });
     }),
 
-  updateEnrollment: publicProcedure
+  updateEnrollment: protectedProcedure
     .input(z.object({
       id: z.string(),
       data: z.object({

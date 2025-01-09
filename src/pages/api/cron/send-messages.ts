@@ -3,7 +3,7 @@ import { createCaller } from "~/server/api/root";
 import { db } from "~/server/db";
 
 export default async function handler(req: any, res: any) {
-  const caller = createCaller({ db });
+  const caller = createCaller({ db, user: null });
 
   try {
     const now = new Date();

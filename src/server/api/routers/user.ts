@@ -1,15 +1,15 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({
   // Procedure to create a new user
-  createUser: publicProcedure
+  createUser: protectedProcedure
     .input(
       z.object({
         firstName: z.string(),
         lastName: z.string(),
         email: z.string().email().optional(), // Optional as per the schema
-        phoneNumber: z.string(),
+        phoneNumber: z.string().length(10, "Enter a valid phone number"),
         isTeacher: z.boolean().default(false),
       })
     )
@@ -22,7 +22,7 @@ export const userRouter = createTRPCRouter({
             firstName,
             lastName,
             email,
-            phoneNumber,
+            phoneNumber: "+1" + phoneNumber,
             isTeacher
           },
         });
@@ -34,7 +34,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   // Procedure to update an existing user
-  updateUser: publicProcedure
+  updateUser: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -45,12 +45,17 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, ...updateData } = input;
+      const { id, firstName, lastName, email, phoneNumber } = input;
 
       try {
         const updatedUser = await ctx.db.user.update({
           where: { id },
-          data: updateData,
+          data: {
+            firstName,
+            lastName,
+            phoneNumber: phoneNumber ? "+1" + phoneNumber : undefined,
+            email
+          },
         });
         return { success: true, user: updatedUser };
       } catch (error) {
@@ -60,7 +65,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   // Procedure to get all users
-  getAllUsers: publicProcedure
+  getAllUsers: protectedProcedure
     .input(
       z.object({
         skip: z.number().optional(),
@@ -84,7 +89,7 @@ export const userRouter = createTRPCRouter({
       }
     }),
 
-  getAllTeachers: publicProcedure
+  getAllTeachers: protectedProcedure
     .query(async ({ ctx }) => {
       try {
         const users = await ctx.db.user.findMany({
@@ -98,7 +103,7 @@ export const userRouter = createTRPCRouter({
         console.error("Error fetching users:", error);
       }
     }),
-  getAllStudents: publicProcedure
+  getAllStudents: protectedProcedure
     .query(async ({ ctx}) => {
       try {
         const users = await ctx.db.user.findMany({
@@ -114,7 +119,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   // Procedure to get a user by email or phone number
-  getUserByEmailOrPhone: publicProcedure
+  getUserByEmailOrPhone: protectedProcedure
     .input(
       z.object({
         email: z.string().email().optional(),
@@ -147,7 +152,7 @@ export const userRouter = createTRPCRouter({
         throw new Error("Failed to retrieve user");
       }
     }),
-  deleteUser: publicProcedure
+  deleteUser: protectedProcedure
     .input(
       z.object({
         id: z.string(),

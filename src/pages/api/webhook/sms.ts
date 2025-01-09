@@ -3,10 +3,11 @@ import { appRouter } from "~/server/api/root";
 import { createCallerFactory } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import twilio from "twilio";
-import { supabase } from "~/server/supabase/supabaseClient";
 import { Status } from "@prisma/client";
+import { createClient } from "~/utils/supabase/client/component";
 
 const createCaller = createCallerFactory(appRouter);
+const supabaseClient = createClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const twiml = new twilio.twiml.MessagingResponse();
@@ -17,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const numMedia = parseInt(twilioBody.NumMedia, 10);
       const mediaUrls: string[] = [];
-      
+
       for (let i = 0; i < numMedia; i++) {
         const mediaUrl = twilioBody[`MediaUrl${i}`];
         if (mediaUrl) {
@@ -29,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           const filePath = `uploads/${Date.now()}-${mediaUrl}${i}.${fileExtension}`;
 
-          const { error } = await supabase.storage
+          const { error } = await supabaseClient.storage
             .from("media")
             .upload(filePath, Buffer.from(mediaBuffer), {
               contentType,
@@ -42,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             throw new Error("Failed to upload media to Supabase");
           }
 
-          const { data: publicUrlData } = supabase.storage
+          const { data: publicUrlData } = supabaseClient.storage
             .from("media")
             .getPublicUrl(filePath);
 
@@ -50,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      const caller = createCaller({ db });
+      const caller = createCaller({ db, user: null });
       await caller.sms.storeSMS({
         messageSid: twilioBody.MessageSid,
         from: twilioBody.From,

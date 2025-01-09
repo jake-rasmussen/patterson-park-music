@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import twilio from "twilio";
 import { Status } from "@prisma/client";
 
@@ -11,7 +11,7 @@ const client = twilio(
 const myNumber = process.env.TWILIO_PHONE_NUMBER!;
 
 export const smsRouter = createTRPCRouter({
-  sendSMS: publicProcedure
+  sendSMS: protectedProcedure
     .input(
       z.object({
         to: z.string().min(10),
@@ -88,7 +88,7 @@ export const smsRouter = createTRPCRouter({
         throw new Error("Failed to save SMS message");
       }
     }),
-  getSMSConversations: publicProcedure
+  getSMSConversations: protectedProcedure
     .input(
       z.object({
         phoneNumber: z.string()

@@ -180,7 +180,6 @@ const ScheduleMessage = () => {
                       label="Send Date"
                       value={selectedDate && dateToDateValue(selectedDate)}
                       onChange={(e) => {
-                        console.log(e);
                         if (e) {
                           setSelectedDate(new Date(e.year, e.month - 1, e.day));
                         }
@@ -195,7 +194,7 @@ const ScheduleMessage = () => {
 
                 {
                   selectedUser && selectedUser.email && <div className="my-8">
-                    <Tabs aria-label="Options" isVertical>
+                    <Tabs isVertical>
                       <Tab key="sms" title="SMS" className="w-full">
                         <SMSMessageBar
                           message={smsMessage}

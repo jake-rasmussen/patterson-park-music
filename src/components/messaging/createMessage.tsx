@@ -10,9 +10,11 @@ const CreateMessage = () => {
 
   const createContact = api.user.createUser.useMutation({
     onSuccess() {
+      toast.dismiss();
       toast.success("Created Contact!");
     },
     onError() {
+      toast.dismiss();
       toast.error("Error...");
     }
   })
