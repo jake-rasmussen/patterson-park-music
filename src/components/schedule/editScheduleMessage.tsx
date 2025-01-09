@@ -164,7 +164,6 @@ const EditScheduleMessage = (props: PropType) => {
                           label="Send Date"
                           value={selectedDate && dateToDateValue(selectedDate)}
                           onChange={(e) => {
-                            console.log(e);
                             if (e) {
                               setSelectedDate(new Date(e.year, e.month - 1, e.day));
                             }

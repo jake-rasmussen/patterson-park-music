@@ -8,7 +8,7 @@ type PropType = {
   selectedSection: Section;
   isOpen: boolean;
   onOpenChange: () => void;
-  teachers: User[]
+  teachers: User[];
 };
 
 const EditSection = (props: PropType) => {
@@ -30,23 +30,44 @@ const EditSection = (props: PropType) => {
 
   const handleSubmit = async (values: Record<string, any>) => {
     toast.loading("Updating section...");
-
-    const currentDate = new Date();
+  
+    // Parse the time input (assumes `values.startTime` is in "HH:mm" format)
     const [hours, minutes] = values.startTime.split(":").map(Number);
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), hours, minutes);
-
+  
+    console.log("Submitted time:", values.startTime);
+  
+    // Construct a UTC Date
+    const currentDate = new Date();
+    const utcDate = new Date(
+      Date.UTC(
+        currentDate.getUTCFullYear(),
+        currentDate.getUTCMonth(),
+        currentDate.getUTCDate(),
+        hours,
+        minutes
+      )
+    );
+  
+    console.log("UTC Date:", utcDate.toISOString());
+  
     try {
       await updateSection.mutateAsync({
         id: selectedSection.id,
         course: values.course,
         semesters: values.semesters,
         weekdays: values.weekdays,
-        startTime: date,
+        startTime: utcDate, // Send UTC time to the backend
       });
+  
+      toast.dismiss();
+      toast.success("Section updated!");
     } catch (error) {
+      toast.dismiss();
       console.error(error);
+      toast.error("Error updating section...");
     }
   };
+  
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -63,7 +84,9 @@ const EditSection = (props: PropType) => {
                   course: selectedSection.course,
                   semesters: selectedSection.semesters,
                   weekdays: selectedSection.weekdays,
-                  startTime: selectedSection.startTime.toISOString().slice(11, 16), // Convert to HH:MM format
+                  startTime: new Date(selectedSection.startTime)
+                    .toISOString() // Convert to ISO string (UTC)
+                    .slice(11, 16), // Extract "HH:mm" part
                 }}
                 teachers={teachers}
               />
@@ -73,6 +96,7 @@ const EditSection = (props: PropType) => {
       </ModalContent>
     </Modal>
   );
+
 };
 
 export default EditSection;

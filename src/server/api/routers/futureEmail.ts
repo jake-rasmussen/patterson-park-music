@@ -43,6 +43,17 @@ export const futureEmailRouter = createTRPCRouter({
       } = input;
 
       try {
+        // Adjust the date to 7:30 PM if provided
+        const adjustedDate = date
+          ? new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            19, // Set hours to 19 (7 PM)
+            30 // Set minutes to 30
+          )
+          : null;
+
         const newMessage = await ctx.db.futureEmailMessage.create({
           data: {
             from: myEmail,
@@ -54,14 +65,14 @@ export const futureEmailRouter = createTRPCRouter({
             attachments: attachments?.map((attachment) => attachment.url) || [],
             status: Status.PENDING,
             days: days,
-            date: date,
+            date: adjustedDate, // Save the adjusted date
           },
         });
 
         return { success: true, message: newMessage };
       } catch (error) {
-        console.error("Error saving SMS message:", error);
-        throw new Error("Failed to save SMS message");
+        console.error("Error saving email message:", error);
+        throw new Error("Failed to save email message");
       }
     }),
   getAllUpcomingEmailMessages: protectedProcedure.query(async ({ ctx }) => {
@@ -93,12 +104,25 @@ export const futureEmailRouter = createTRPCRouter({
         cc: z.array(z.string().email()).optional(),
         bcc: z.array(z.string().email()).optional(),
         attachments: z.array(z.string()).optional(),
-        days: z.array(z.enum(Object.values(WEEKDAY) as [WEEKDAY, ...WEEKDAY[]])).nullable(),
+        days: z
+          .array(z.enum(Object.values(WEEKDAY) as [WEEKDAY, ...WEEKDAY[]]))
+          .nullable(),
         date: z.date().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       try {
+        // Adjust the date to 7:30 PM if provided
+        const adjustedDate = input.date
+          ? new Date(
+            input.date.getFullYear(),
+            input.date.getMonth(),
+            input.date.getDate(),
+            19, // Set hours to 19 (7 PM)
+            30 // Set minutes to 30
+          )
+          : null;
+
         const updatedMessage = await ctx.db.futureEmailMessage.update({
           where: { id: input.id },
           data: {
@@ -109,7 +133,7 @@ export const futureEmailRouter = createTRPCRouter({
             bcc: input.bcc || [],
             attachments: input.attachments || [],
             days: input.days || [],
-            date: input.date,
+            date: adjustedDate, // Save the adjusted date
           },
         });
 
@@ -119,6 +143,7 @@ export const futureEmailRouter = createTRPCRouter({
         throw new Error("Failed to update email message");
       }
     }),
+
   deleteFutureEmailMessage: protectedProcedure
     .input(
       z.object({

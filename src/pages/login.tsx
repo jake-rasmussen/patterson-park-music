@@ -29,8 +29,10 @@ export default function LoginPage() {
         toast.dismiss();
 
         if (error.code === "invalid_credentials") {
+          toast.dismiss();
           toast.error("Incorrect email or password");
         } else {
+          toast.dismiss();
           toast.error("Error...");
         }
       } else {

@@ -22,15 +22,10 @@ export const supabaseRouter = createTRPCRouter({
             }
           );
 
-          channel.subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              console.log("Realtime channel subscribed successfully");
-            }
-          });
+          channel.subscribe();
         },
         cancel() {
           channel.unsubscribe();
-          console.log("Unsubscribed from SMSMessage Realtime channel");
         },
       });
 
@@ -46,7 +41,6 @@ export const supabaseRouter = createTRPCRouter({
       throw error;
     } finally {
       channel.unsubscribe();
-      console.log("Cleaned up the channel subscription.");
     }
   }),
 
@@ -68,15 +62,10 @@ export const supabaseRouter = createTRPCRouter({
             }
           );
 
-          channel.subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              console.log("Realtime channel subscribed successfully for EmailMessage");
-            }
-          });
+          channel.subscribe();
         },
         cancel() {
           channel.unsubscribe();
-          console.log("Unsubscribed from EmailMessage Realtime channel");
         },
       });
 
@@ -92,7 +81,6 @@ export const supabaseRouter = createTRPCRouter({
       throw error;
     } finally {
       channel.unsubscribe();
-      console.log("Cleaned up the channel subscription for EmailMessage.");
     }
   }),
 });

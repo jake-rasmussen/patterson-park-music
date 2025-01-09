@@ -49,6 +49,7 @@ export const sectionRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const { id, course, semesters, weekdays, startTime } = input;
+
       return await ctx.db.section.update({
         where: { id },
         data: {
@@ -67,6 +68,13 @@ export const sectionRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const { id } = input;
+
+      await ctx.db.enrollment.deleteMany({
+        where: {
+          sectionId: id,
+        },
+      });
+
       return await ctx.db.section.delete({
         where: {
           id

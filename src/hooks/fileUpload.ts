@@ -4,12 +4,14 @@ import toast from "react-hot-toast";
 export const useFileUpload = () => {
   const getUploadUrl = api.file.getUploadUrl.useMutation({
     onError() {
+      toast.dismiss();
       toast.error("Error retrieving upload URL.");
     },
   });
 
   const getPresignedUrl = api.file.getPresignedUrl.useMutation({
     onError() {
+      toast.dismiss();
       toast.error("Error retrieving presigned URL.");
     },
   });
@@ -114,7 +116,7 @@ export const useFileUpload = () => {
 
       return urls.filter((url) => url !== null) as string[];
     } catch (error) {
-      console.error("Error uploading files:", error);
+      toast.dismiss();
       toast.error("Error uploading files.");
       return [];
     }

@@ -9,7 +9,7 @@ export const userRouter = createTRPCRouter({
         firstName: z.string(),
         lastName: z.string(),
         email: z.string().email().optional(), // Optional as per the schema
-        phoneNumber: z.string(),
+        phoneNumber: z.string().length(10, "Enter a valid phone number"),
         isTeacher: z.boolean().default(false),
       })
     )

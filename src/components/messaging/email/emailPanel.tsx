@@ -39,6 +39,12 @@ const EmailPanel = (props: PropType) => {
     onError() {
       toast.dismiss();
       toast.error("Error...");
+      toast(
+        "If you're adding an attachment, make sure that the file size is less than 1MB",
+        {
+          duration: 4000,
+        }
+      );
 
       setIsLoading(false);
     },

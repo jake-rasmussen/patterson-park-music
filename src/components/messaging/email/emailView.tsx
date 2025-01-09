@@ -44,7 +44,7 @@ const EmailView = (props: PropType) => {
       }
     },
     onError: (error) => {
-      console.log("Error:", error);
+      console.error( error);
     }
   });
 

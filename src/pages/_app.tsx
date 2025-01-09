@@ -56,16 +56,17 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <NextUIProvider>
         {
           isCheckingAuth ? (
-            <div className="w-full h-screen flex justify-center items-center">
-              <Spinner label="Loading..." className="m-auto" size="lg" />
+            <div className="w-full h-screen bg-gray-900 p-8">
+              <div className="w-full h-full bg-white rounded-2xl flex justify-center items-center">
+                <Spinner label="Loading..." size="lg" />
+              </div>
             </div>
           ) : (
-            <Wrapper isAuthenticated={isAuthenticated ?? false}>
+            <Wrapper isAuthenticated={isAuthenticated ?? false} hideChildren={!isAuthenticated && !router.pathname.includes("login")}>
               <Component {...pageProps} />
             </Wrapper>
           )
         }
-
       </NextUIProvider>
     </div>
   );

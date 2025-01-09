@@ -39,6 +39,7 @@ const UserForm = (props: PropType) => {
                     isInvalid={!isValid}
                     errorMessage={errors[0]}
                     isRequired
+                    size="sm"
                   />
                 )}
               </Field>
@@ -57,6 +58,7 @@ const UserForm = (props: PropType) => {
                     isInvalid={!isValid}
                     errorMessage={errors[0]}
                     isRequired
+                    size="sm"
                   />
                 )}
               </Field>
@@ -76,6 +78,7 @@ const UserForm = (props: PropType) => {
                   isInvalid={!isValid}
                   errorMessage={errors[0]}
                   isRequired
+                  size="sm"
                 />
               )}
             </Field>
@@ -97,6 +100,7 @@ const UserForm = (props: PropType) => {
                   isInvalid={!isValid}
                   errorMessage={errors[0]}
                   isRequired
+                  size="sm"
                 />
               )}
             </Field>

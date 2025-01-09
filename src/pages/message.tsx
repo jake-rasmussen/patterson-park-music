@@ -27,7 +27,7 @@ export default function MessagePage() {
   } else {
     return (
       <main className="flex flex-row w-full h-full bg-white rounded-2xl">
-        <section className="w-60 overflow-y-auto h-full">
+        <section className="w-60 overflow-y-auto">
           <div className="flex flex-col gap-2 items-center m-2">
             {users?.map((user: User) => (
               <Button

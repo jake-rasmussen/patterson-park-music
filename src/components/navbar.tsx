@@ -40,7 +40,7 @@ const Navbar = () => {
     </div >
 
     <div className="grow flex items-end">
-      <IconLogout className="text-white h-12 w-12" />
+      {/* <IconLogout className="text-white h-12 w-12" /> */}
     </div>
   </main>);
 }
