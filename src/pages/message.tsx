@@ -6,8 +6,6 @@ import { IconApple, IconUser } from "@tabler/icons-react";
 import Error from "next/error";
 import EmailPanel from "~/components/messaging/email/emailPanel";
 import SMSPanel from "~/components/messaging/sms/smsPanel";
-import { GetServerSidePropsContext } from "next";
-import { createClient } from "~/utils/supabase/client/server-props";
 
 export default function MessagePage() {
   const [selectedUser, setSelectedUser] = useState<User>();

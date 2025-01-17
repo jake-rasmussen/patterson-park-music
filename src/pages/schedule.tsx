@@ -1,5 +1,5 @@
 import ScheduleMessage from "~/components/schedule/scheduleMessage";
-import UpcomingMessages from "~/components/schedule/upcomingMessages";
+import ManageUpcomingMessages from "~/components/schedule/manageUpcomingMessages";
 
 export default function ScheduleMessagePage() {
   return (
@@ -11,7 +11,7 @@ export default function ScheduleMessagePage() {
       <section
         className="bg-white h-full rounded-xl overflow-auto p-8 gap-8 flex flex-col min-w-96"
       >
-        <UpcomingMessages />
+        <ManageUpcomingMessages />
       </section>
     </main>
   );

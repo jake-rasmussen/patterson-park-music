@@ -34,8 +34,6 @@ const EditSection = (props: PropType) => {
     // Parse the time input (assumes `values.startTime` is in "HH:mm" format)
     const [hours, minutes] = values.startTime.split(":").map(Number);
   
-    console.log("Submitted time:", values.startTime);
-  
     // Construct a UTC Date
     const currentDate = new Date();
     const utcDate = new Date(

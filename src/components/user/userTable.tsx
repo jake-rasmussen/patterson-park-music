@@ -1,25 +1,45 @@
 import { Button } from "@nextui-org/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
-import { User } from "@prisma/client";
+import { User, USER_TYPE } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import EditUser from "./editUser";
 import { api } from "~/utils/api";
 
 type PropType = {
   users: User[];
+  type: USER_TYPE;
   select?: boolean;
   onSelectionChange?: (selectedUsers: User[]) => void; // Callback for selection change with User objects
 };
 
 const UserTable = (props: PropType) => {
-  const { users, select = false, onSelectionChange } = props;
+  const { users, type, select = false, onSelectionChange } = props;
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  const { teachers, students, parents } = useMemo(() => {
+    if (users) {
+      const teachers = users.filter((user) => user.type === USER_TYPE.TEACHER);
+      const students = users.filter((user) => user.type === USER_TYPE.STUDENT);
+      const parents = users.filter((user) => user.type === USER_TYPE.PARENT);
+
+      return { teachers, students, parents };
+    } else {
+      return {};
+    }
+  }, [users]);
+
   const [selectedUser, setSelectedUser] = useState<User>();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!select) {
+      setSelectedKeys(new Set());
+      setSelectedUser(undefined);
+    }
+  }, [select]);
 
   const utils = api.useUtils();
 
@@ -51,7 +71,7 @@ const UserTable = (props: PropType) => {
   return (
     <>
       <Table
-        selectionMode={select ? "multiple" : "none"}
+        selectionMode={select && type !== USER_TYPE.TEACHER ? "multiple" : "none"}
         selectedKeys={selectedKeys}
         onSelectionChange={handleSelectionChange} // Use the handler
       >
@@ -63,8 +83,12 @@ const UserTable = (props: PropType) => {
           {!select ? <TableColumn className="text-end">ACTIONS</TableColumn> : <TableColumn><></></TableColumn>}
         </TableHeader>
         <TableBody emptyContent={"No rows to display."}>
-          {users.map((user: User) => (
-            <TableRow key={user.id}>
+          {(
+            (type === USER_TYPE.STUDENT ? students :
+              type === USER_TYPE.PARENT ? parents :
+                teachers) || []
+          ).map((user: User) => (
+            <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
               <TableCell>{user.email}</TableCell>
@@ -118,7 +142,7 @@ const UserTable = (props: PropType) => {
           selectedUser={selectedUser}
           isOpen={isOpen}
           onOpenChange={onOpenChange}
-          isTeacher={selectedUser.isTeacher}
+          type={selectedUser.type}
         />
       )}
     </>

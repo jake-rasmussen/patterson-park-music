@@ -8,7 +8,7 @@ import {
 import UserTable from "../../user/userTable";
 import { api } from "~/utils/api";
 import { Button, Spinner } from "@nextui-org/react";
-import { ENROLLMENT_STATUS, User } from "@prisma/client";
+import { ENROLLMENT_STATUS, User, USER_TYPE } from "@prisma/client";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import EnrollStudentCard from "./enrollStudentCard";
@@ -35,10 +35,10 @@ const EnrollStudents = (props: PropType) => {
   const [enrollmentData, setEnrollmentData] = useState<Record<string, EnrollmentData | undefined>>({});
   const [page, setPage] = useState<number>(0);
 
-  const handleSelection = (students: User[]) => {
-    setSelectedUsers(students);
+  const handleSelection = (users: User[]) => {
+    setSelectedUsers(users);
 
-    const initialData = students.reduce<Record<string, EnrollmentData | undefined>>((map, user) => {
+    const initialData = users.reduce<Record<string, EnrollmentData | undefined>>((map, user) => {
       map[user.id] = {
         dateRange: null,
         status: undefined,
@@ -108,6 +108,7 @@ const EnrollStudents = (props: PropType) => {
                       users={users || []}
                       select
                       onSelectionChange={handleSelection}
+                      type={USER_TYPE.STUDENT}
                     />
                   ) : (
                     <>

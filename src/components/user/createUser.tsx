@@ -1,14 +1,18 @@
-import { Divider } from "@nextui-org/react";
+import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/react";
 import UserForm from "./userForm";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
+import { capitalizeToUppercase } from "~/utils/helper";
+import { USER_TYPE } from "@prisma/client";
 
 type PropType = {
-  isTeacher?: boolean;
+  isOpen: boolean;
+  onOpenChange: () => void;
+  type: USER_TYPE;
 }
 
 const CreateUser = (props: PropType) => {
-  const { isTeacher = false } = props;
+  const { isOpen, onOpenChange, type } = props;
 
   const utils = api.useUtils();
 
@@ -34,17 +38,33 @@ const CreateUser = (props: PropType) => {
       lastName: values.last,
       phoneNumber: values.phone,
       email: values.email,
-      isTeacher: isTeacher ? isTeacher : false,
+      type: values.type,
     });
   }
 
-  return (<>
-    <h2 className="text-xl text-center">Create {isTeacher ? "Teacher" : "Student"}</h2>
-    <Divider />
-    <div>
-      <UserForm handleSubmit={handleSubmit} />
-    </div>
-  </>)
+  return (
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader>Create {capitalizeToUppercase(type)}</ModalHeader>
+            <ModalBody>
+              <UserForm
+                handleSubmit={async (values: Record<string, any>) => {
+                  await handleSubmit(values);
+                  onClose();
+                }}
+                onClose={onClose}
+                initialValues={{
+                  type
+                }}
+              />
+            </ModalBody>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  )
 
 }
 
