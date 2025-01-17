@@ -78,6 +78,44 @@ export const userRouter = createTRPCRouter({
           skip,
           take,
           orderBy: { lastName: "asc" },
+          include: {
+            family: true
+          }
+        });
+
+        return users;
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        throw new Error("Failed to retrieve users");
+      }
+    }),
+  getAllContacts: protectedProcedure
+    .input(
+      z.object({
+        skip: z.number().optional(),
+        take: z.number().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const { skip, take } = input || {};
+
+      try {
+        const users = await ctx.db.user.findMany({
+          skip,
+          take,
+          orderBy: { lastName: "asc" },
+          include: {
+            enrollment: {
+              include: {
+                section: {
+                  include: {
+                    teacher: true
+                  }
+                }
+              }
+            },
+            family: true,
+          }
         });
 
         return users;

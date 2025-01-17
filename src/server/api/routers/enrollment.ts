@@ -38,11 +38,9 @@ export const enrollmentRouter = createTRPCRouter({
         count: result.count,
       };
     }),
-
   getAllEnrollments: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.enrollment.findMany();
   }),
-
   getEnrollmentById: protectedProcedure
     .input(z.string())
     .query(async ({ input, ctx }) => {
@@ -50,7 +48,22 @@ export const enrollmentRouter = createTRPCRouter({
         where: { id: input },
       });
     }),
-
+  getEnrollmentsByUserId: protectedProcedure
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      return await ctx.db.enrollment.findMany({
+        where: {
+          userId: input
+        },
+        include: {
+          section: {
+            include: {
+              teacher: true
+            }
+          }
+        }
+      });
+    }),
   updateEnrollment: protectedProcedure
     .input(z.object({
       id: z.string(),

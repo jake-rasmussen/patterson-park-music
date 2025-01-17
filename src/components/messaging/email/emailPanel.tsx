@@ -9,11 +9,11 @@ import { api } from "~/utils/api";
 import { useFileUpload } from "~/hooks/fileUpload";
 
 type PropType = {
-  selectedContact: User;
+  selectedUser: User;
 }
 
 const EmailPanel = (props: PropType) => {
-  const { selectedContact } = props;
+  const { selectedUser } = props;
 
   const { handleFileUploadEmail } = useFileUpload();
 
@@ -60,7 +60,7 @@ const EmailPanel = (props: PropType) => {
       const formattedBody = body.replace(/\n/g, "<br>");
 
       sendEmail.mutate({
-        to: [selectedContact.email] as [string, ...string[]],
+        to: [selectedUser.email] as [string, ...string[]],
         subject,
         body: formattedBody,
         attachments,
@@ -73,9 +73,9 @@ const EmailPanel = (props: PropType) => {
   return (
     <>
       {
-        selectedContact.email ? <>
+        selectedUser.email ? <>
           <div className="flex-1 min-h-0 overflow-auto bg-gray-50 relative">
-            <EmailView selectedContact={selectedContact} email={selectedContact.email} />
+            <EmailView selectedContact={selectedUser} email={selectedUser.email} />
           </div>
 
           <div className="w-full bg-white rounded-br-xl">
