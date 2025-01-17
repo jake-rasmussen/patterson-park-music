@@ -11,7 +11,7 @@ type PropType = {
   teachers: User[];
 };
 
-const EditSection = (props: PropType) => {
+const EditSectionModal = (props: PropType) => {
   const { selectedSection, isOpen, onOpenChange, teachers } = props;
 
   const utils = api.useUtils();
@@ -30,12 +30,10 @@ const EditSection = (props: PropType) => {
 
   const handleSubmit = async (values: Record<string, any>) => {
     toast.loading("Updating section...");
-  
+
     // Parse the time input (assumes `values.startTime` is in "HH:mm" format)
     const [hours, minutes] = values.startTime.split(":").map(Number);
-  
-    console.log("Submitted time:", values.startTime);
-  
+
     // Construct a UTC Date
     const currentDate = new Date();
     const utcDate = new Date(
@@ -47,9 +45,9 @@ const EditSection = (props: PropType) => {
         minutes
       )
     );
-  
+
     console.log("UTC Date:", utcDate.toISOString());
-  
+
     try {
       await updateSection.mutateAsync({
         id: selectedSection.id,
@@ -58,7 +56,7 @@ const EditSection = (props: PropType) => {
         weekdays: values.weekdays,
         startTime: utcDate, // Send UTC time to the backend
       });
-  
+
       toast.dismiss();
       toast.success("Section updated!");
     } catch (error) {
@@ -67,7 +65,7 @@ const EditSection = (props: PropType) => {
       toast.error("Error updating section...");
     }
   };
-  
+
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -99,4 +97,4 @@ const EditSection = (props: PropType) => {
 
 };
 
-export default EditSection;
+export default EditSectionModal;

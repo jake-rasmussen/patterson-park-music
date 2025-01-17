@@ -1,7 +1,7 @@
 import { Divider, Tooltip } from "@nextui-org/react";
 import { User, Status } from "@prisma/client";
 import { formatTime } from "~/utils/helper";
-import MessageImage from "./messageImage";
+import MessageImageModal from "./messageImageModal";
 import { IconExclamationCircle } from "@tabler/icons-react";
 
 type PropType = {
@@ -46,7 +46,7 @@ const MessageBubble = (props: PropType) => {
             {imageUrls && (
               <>
                 {
-                  imageUrls.map((imageUrl) => <MessageImage imageUrl={imageUrl} />)
+                  imageUrls.map((imageUrl) => <MessageImageModal imageUrl={imageUrl} />)
                 }
               </>
             )}

@@ -16,6 +16,12 @@ enum ENROLLMENT_STATUS {
     PAID
 }
 
+enum USER_TYPE {
+    PARENT
+    STUDENT
+    TEACHER
+}
+
 enum WEEKDAY {
     SUNDAY
     MONDAY
@@ -71,11 +77,23 @@ model User {
     lastName    String
     email       String?      @unique // TODO: change this to non-option
     phoneNumber String       @unique
-    isTeacher   Boolean
+    type        USER_TYPE
     enrollment  Enrollment[]
     section     Section[] // Only for teachers
     createdAt   DateTime     @default(now())
     updatedAt   DateTime     @updatedAt
+    family      Family?      @relation(fields: [familyId], references: [id])
+    familyId    String?
+}
+
+model Family {
+    id         String   @id @default(cuid())
+    familyName String
+    campus     String
+    doorCode   String
+    users      User[]
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }
 
 model Enrollment {

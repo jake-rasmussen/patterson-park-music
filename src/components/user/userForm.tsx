@@ -1,24 +1,23 @@
 import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/react";
+import { Input, Select, SelectItem } from "@nextui-org/react";
+import { USER_TYPE } from "@prisma/client";
 import { Field, Form } from "houseform";
 import { z } from "zod";
+import { capitalizeToUppercase } from "~/utils/helper";
 
 type PropType = {
   handleSubmit: (values: Record<string, any>) => Promise<void>;
   onClose?: () => void;
   initialValues?: Partial<Record<string, any>>; // Optional initial values
-  isTeacher?: boolean;
 }
 
 const UserForm = (props: PropType) => {
-  const { handleSubmit, onClose, initialValues = {}, isTeacher } = props;
-
+  const { handleSubmit, onClose, initialValues = {} } = props;
 
   return (
     <Form
-      onSubmit={async (values, { reset }) => {
+      onSubmit={async (values) => {
         handleSubmit(values);
-        reset();
       }}
     >
       {({ isValid, submit }) => (
@@ -66,7 +65,7 @@ const UserForm = (props: PropType) => {
 
             <Field<string>
               name="phone"
-              onChangeValidate={z.string().length(10, "Enter a valid phone number")}
+              onBlurValidate={z.string().length(10, "Enter a valid phone number")}
               initialValue={initialValues.phoneNumber ? initialValues.phoneNumber.substring(2) : ""}
             >
               {({ value, setValue, onBlur, isValid, errors }) => (
@@ -83,7 +82,7 @@ const UserForm = (props: PropType) => {
               )}
             </Field>
 
-            <Field
+            <Field<string>
               name="email"
               onBlurValidate={z
                 .string()
@@ -102,6 +101,29 @@ const UserForm = (props: PropType) => {
                   isRequired
                   size="sm"
                 />
+              )}
+            </Field>
+
+            <Field<USER_TYPE>
+              name="type"
+              initialValue={initialValues.type || undefined} // Set default value
+              onChangeValidate={z.nativeEnum(USER_TYPE, { errorMap: () => ({ message: "Please select a valid type" }) })}
+            >
+              {({ value, setValue, errors }) => (
+                <Select
+                  label="Type"
+                  selectedKeys={value ? new Set([value]) : new Set()}
+                  onSelectionChange={(keys) => setValue(Array.from(keys).pop() as USER_TYPE)}
+                  isInvalid={!!errors.length}
+                  errorMessage={errors[0]}
+                  isRequired
+                >
+                  {Object.values(USER_TYPE).map((course) => (
+                    <SelectItem key={course} value={course}>
+                      {capitalizeToUppercase(course)}
+                    </SelectItem>
+                  ))}
+                </Select>
               )}
             </Field>
 

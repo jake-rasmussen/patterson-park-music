@@ -42,8 +42,6 @@ const SMSPanel = (props: PropType) => {
     },
   });
 
-
-
   const handleSendMessage = async () => {
     try {
       setIsLoading(true);

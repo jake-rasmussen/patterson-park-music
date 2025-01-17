@@ -6,7 +6,19 @@ import { FutureEmailMessage, FutureSMSMessage } from "@prisma/client";
 import toast from "react-hot-toast";
 import EditScheduleMessage from "./editScheduleMessage";
 
-const UpcomingMessages = () => {
+type PropType = {
+  emailMessages: FutureEmailMessage[];
+  smsMessages: FutureSMSMessage[];
+  isLoading: boolean;
+}
+
+const ManageUpcomingMessages = (props: PropType) => {
+  const {
+    emailMessages,
+    smsMessages,
+    isLoading
+  } = props;
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const [selectedMessage, setSelectedMessage] = useState<FutureSMSMessage | FutureEmailMessage>();
@@ -14,35 +26,30 @@ const UpcomingMessages = () => {
   const utils = api.useUtils();
 
   const deleteEmailMessage = api.futureEmail.deleteFutureEmailMessage.useMutation({
-    onSuccess: () => {
+    onSuccess() {
       toast.dismiss();
       toast.success("Successfully deleted message!");
 
       utils.futureEmail.getAllUpcomingEmailMessages.invalidate();
     },
-    onError: () => {
+    onError() {
       toast.dismiss();
       toast.error("Error...");
     },
   });
 
   const deleteSMSMessage = api.futureSMS.deleteFutureSMSMessage.useMutation({
-    onSuccess: () => {
+    onSuccess() {
       toast.dismiss();
       toast.success("Successfully deleted message!");
 
       utils.futureSMS.getAllUpcomingSMSMessages.invalidate();
     },
-    onError: () => {
+    onError() {
       toast.dismiss();
       toast.error("Error...");
     },
   });
-
-  const { data: emailMessages, isLoading: loadingEmails } = api.futureEmail.getAllUpcomingEmailMessages.useQuery();
-  const { data: smsMessages, isLoading: loadingSMS } = api.futureSMS.getAllUpcomingSMSMessages.useQuery();
-
-  const isLoading = loadingEmails || loadingSMS;
 
   const upcomingMessages = [
     ...(emailMessages || []),
@@ -131,7 +138,6 @@ const UpcomingMessages = () => {
                         </Dropdown>
                       </CardBody>
                     </Card>
-
                   ))}
                 </ul>
               ) : (
@@ -157,4 +163,4 @@ const UpcomingMessages = () => {
   );
 };
 
-export default UpcomingMessages;
+export default ManageUpcomingMessages;

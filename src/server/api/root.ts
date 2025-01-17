@@ -9,6 +9,7 @@ import { emailRouter } from "./routers/email";
 import { supabaseRouter } from "./routers/supabase";
 import { futureSMSRouter } from "./routers/futureSMS";
 import { futureEmailRouter } from "./routers/futureEmail";
+import { familyRouter } from "./routers/family";
 /**
  * This is the primary router for your server.
  *
@@ -25,6 +26,7 @@ export const appRouter = createTRPCRouter({
   supabase: supabaseRouter,
   futureSMS: futureSMSRouter,
   futureEmail: futureEmailRouter,
+  family: familyRouter,
 });
 
 // export type definition of API
