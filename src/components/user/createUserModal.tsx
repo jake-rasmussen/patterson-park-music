@@ -11,7 +11,7 @@ type PropType = {
   type: USER_TYPE;
 }
 
-const CreateUser = (props: PropType) => {
+const CreateUserModal = (props: PropType) => {
   const { isOpen, onOpenChange, type } = props;
 
   const utils = api.useUtils();
@@ -68,4 +68,4 @@ const CreateUser = (props: PropType) => {
 
 }
 
-export default CreateUser;
+export default CreateUserModal;

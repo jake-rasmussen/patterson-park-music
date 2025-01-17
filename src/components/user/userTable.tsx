@@ -4,7 +4,7 @@ import { User, USER_TYPE } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import EditUser from "./editUser";
+import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
 
 type PropType = {
@@ -138,7 +138,7 @@ const UserTable = (props: PropType) => {
       </Table>
 
       {selectedUser && (
-        <EditUser
+        <EditUserModal
           selectedUser={selectedUser}
           isOpen={isOpen}
           onOpenChange={onOpenChange}

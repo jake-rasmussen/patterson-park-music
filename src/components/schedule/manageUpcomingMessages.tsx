@@ -6,7 +6,19 @@ import { FutureEmailMessage, FutureSMSMessage } from "@prisma/client";
 import toast from "react-hot-toast";
 import EditScheduleMessage from "./editScheduleMessage";
 
-const ManageUpcomingMessages = () => {
+type PropType = {
+  emailMessages: FutureEmailMessage[];
+  smsMessages: FutureSMSMessage[];
+  isLoading: boolean;
+}
+
+const ManageUpcomingMessages = (props: PropType) => {
+  const {
+    emailMessages,
+    smsMessages,
+    isLoading
+  } = props;
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const [selectedMessage, setSelectedMessage] = useState<FutureSMSMessage | FutureEmailMessage>();
@@ -20,7 +32,7 @@ const ManageUpcomingMessages = () => {
 
       utils.futureEmail.getAllUpcomingEmailMessages.invalidate();
     },
-    onError () {
+    onError() {
       toast.dismiss();
       toast.error("Error...");
     },
@@ -38,11 +50,6 @@ const ManageUpcomingMessages = () => {
       toast.error("Error...");
     },
   });
-
-  const { data: emailMessages, isLoading: loadingEmails } = api.futureEmail.getAllUpcomingEmailMessages.useQuery();
-  const { data: smsMessages, isLoading: loadingSMS } = api.futureSMS.getAllUpcomingSMSMessages.useQuery();
-
-  const isLoading = loadingEmails || loadingSMS;
 
   const upcomingMessages = [
     ...(emailMessages || []),

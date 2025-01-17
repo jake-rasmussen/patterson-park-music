@@ -5,7 +5,7 @@ type PropType = {
   imageUrl: string;
 }
 
-const MessageImage = (props: PropType) => {
+const MessageImageModal = (props: PropType) => {
   const { imageUrl } = props;
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -50,4 +50,4 @@ const MessageImage = (props: PropType) => {
 
 }
 
-export default MessageImage;
+export default MessageImageModal;

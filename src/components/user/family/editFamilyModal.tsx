@@ -13,7 +13,7 @@ type PropType = {
   onOpenChange: () => void;
 }
 
-const EditFamily = (props: PropType) => {
+const EditFamilyModal = (props: PropType) => {
   const {
     selectedFamily,
     users,
@@ -77,4 +77,4 @@ const EditFamily = (props: PropType) => {
   )
 }
 
-export default EditFamily;
+export default EditFamilyModal;

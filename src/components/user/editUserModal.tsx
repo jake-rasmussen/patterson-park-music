@@ -12,7 +12,7 @@ type PropType = {
   type: USER_TYPE;
 };
 
-const EditUser = (props: PropType) => {
+const EditUserModal = (props: PropType) => {
   const { selectedUser, isOpen, onOpenChange, type } = props;
 
   const utils = api.useUtils();
@@ -76,4 +76,4 @@ const EditUser = (props: PropType) => {
   );
 };
 
-export default EditUser;
+export default EditUserModal;

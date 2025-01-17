@@ -20,7 +20,7 @@ type PropType = {
   setSelectedUsers?: (value: SetStateAction<User[]>) => void;
 };
 
-const CreateFamily = (props: PropType) => {
+const CreateFamilyModal = (props: PropType) => {
   const { selectedUsers, users, isOpen, onOpenChange, setSelect, setSelectedUsers } = props;
 
   const utils = api.useUtils();
@@ -87,4 +87,4 @@ const CreateFamily = (props: PropType) => {
   );
 };
 
-export default CreateFamily;
+export default CreateFamilyModal;

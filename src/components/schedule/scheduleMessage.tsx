@@ -10,17 +10,19 @@ import EmailMessageBar from "../messaging/email/emailBar";
 import toast from "react-hot-toast";
 import { useFileUpload } from "~/hooks/fileUpload";
 
-const ScheduleMessage = () => {
+type PropType = {
+  users: User[];
+  isLoading: boolean;
+}
+
+const ScheduleMessage = (props: PropType) => {
+  const { users, isLoading } = props;
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const { handleFileUploadEmail, handleFileUploadSMS } = useFileUpload();
 
   const utils = api.useUtils();
-
-  const { data: users, isLoading: isLoadingContacts } = api.user.getAllUsers.useQuery({
-    skip: 0,
-    take: 20,
-  });
 
   const createFutureSMSMessage = api.futureSMS.createFutureSMSMessage.useMutation({
     onSuccess() {
@@ -31,13 +33,13 @@ const ScheduleMessage = () => {
       onOpenChange();
 
       utils.invalidate();
-      setIsLoading(false);
+      setIsSending(false);
     },
 
     onError() {
       toast.dismiss();
       toast.error("Error...");
-      setIsLoading(false);
+      setIsSending(false);
     }
   });
 
@@ -49,19 +51,19 @@ const ScheduleMessage = () => {
       reset();
       onOpenChange();
       utils.invalidate();
-      setIsLoading(false);
+      setIsSending(false);
     },
 
     onError() {
       toast.dismiss();
       toast.error("Error...");
-      setIsLoading(false);
+      setIsSending(false);
     }
   })
 
   const [selectedUser, setSelectedUser] = useState<User>();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSending, setIsSending] = useState<boolean>(false);
 
   const [isRecurring, setIsRecurring] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -84,7 +86,7 @@ const ScheduleMessage = () => {
   }
 
   const handleSendSMSMessage = async () => {
-    setIsLoading(true);
+    setIsSending(true);
     toast.loading("Creating future message...");
 
     const mediaUrls = await handleFileUploadSMS(attachedFiles);
@@ -99,7 +101,7 @@ const ScheduleMessage = () => {
   }
 
   const handleSendEmailMessage = async () => {
-    setIsLoading(true);
+    setIsSending(true);
     toast.loading("Creating future message...");
 
     const attachments = await handleFileUploadEmail(attachedFiles);
@@ -120,7 +122,7 @@ const ScheduleMessage = () => {
       <h2 className="text-xl text-center">Schedule Message</h2>
       <Divider />
       <div className="h-full">
-        {isLoadingContacts ? (
+        {isLoading ? (
           <div className="w-full h-full flex justify-center items-center">
             <Spinner label="Loading..." />
           </div>
@@ -201,7 +203,7 @@ const ScheduleMessage = () => {
                           setMessage={setSMSMessage}
                           attachedImages={attachedFiles}
                           setAttachedImages={setAttachedFiles}
-                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!smsMessage && attachedFiles.length === 0) || isLoading}
+                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!smsMessage && attachedFiles.length === 0) || isSending}
                           handleSendMessage={handleSendSMSMessage}
                         />
                       </Tab>
@@ -213,7 +215,7 @@ const ScheduleMessage = () => {
                           setBody={setEmailMessage}
                           subject={emailSubject}
                           setSubject={setEmailSubject}
-                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!emailMessage && attachedFiles.length === 0) || !emailSubject || isLoading}
+                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!emailMessage && attachedFiles.length === 0) || !emailSubject || isSending}
                           handleSendMessage={handleSendEmailMessage}
                         />
                       </Tab>
