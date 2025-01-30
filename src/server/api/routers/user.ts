@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { USER_TYPE } from "@prisma/client";
+import { createClient } from "~/utils/supabase/client/component";
 
 export const userRouter = createTRPCRouter({
   createUser: protectedProcedure
@@ -40,11 +41,24 @@ export const userRouter = createTRPCRouter({
         lastName: z.string().optional(),
         email: z.string().email().optional(),
         phoneNumber: z.string().optional(),
-        type: z.enum(Object.values(USER_TYPE) as [USER_TYPE, ...USER_TYPE[]]),
+        type: z.enum(Object.values(USER_TYPE) as [USER_TYPE, ...USER_TYPE[]]).optional(),
+        isArchived: z.boolean().optional(),
+        isPinned: z.boolean().optional(),
+        unreadMessage: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, firstName, lastName, email, phoneNumber, type } = input;
+      const {
+        id,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        type,
+        isArchived,
+        isPinned,
+        unreadMessage,
+      } = input;
 
       try {
         const updatedUser = await ctx.db.user.update({
@@ -55,6 +69,9 @@ export const userRouter = createTRPCRouter({
             phoneNumber: phoneNumber ? "+1" + phoneNumber : undefined,
             email,
             type,
+            isArchived,
+            isPinned,
+            unreadMessage
           },
         });
         return { success: true, user: updatedUser };
@@ -199,5 +216,61 @@ export const userRouter = createTRPCRouter({
           id
         }
       })
-    })
+    }),
+  searchUsers: protectedProcedure
+    .input(
+      z.object({
+        query: z.string().optional(), // The search query (optional)
+        skip: z.number().optional(), // Pagination support
+        take: z.number().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { query, skip, take } = input;
+
+      try {
+        return await ctx.db.user.findMany({
+          where: query
+            ? {
+              OR: [
+                { firstName: { contains: query, mode: "insensitive" } },
+                { lastName: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+                { phoneNumber: { contains: query, mode: "insensitive" } },
+                {
+                  smsMessages: {
+                    some: {
+                      OR: [
+                        { body: { contains: query, mode: "insensitive" } },
+                      ],
+                    },
+                  },
+                },
+                {
+                  emailMessages: {
+                    some: {
+                      OR: [
+                        { subject: { contains: query, mode: "insensitive" } },
+                        { body: { contains: query, mode: "insensitive" } },
+                      ],
+                    },
+                  },
+                },
+              ],
+            }
+            : {}, // If no query, return all users
+          skip,
+          take,
+          orderBy: { lastName: "asc" },
+          include: {
+            family: true,
+            smsMessages: true, // Include SMS messages in the response
+            emailMessages: true, // Include email messages in the response
+          },
+        });
+      } catch (error) {
+        console.error("Error searching users:", error);
+        throw new Error("Failed to search users");
+      }
+    }),
 });

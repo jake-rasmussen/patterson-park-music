@@ -43,7 +43,6 @@ export const supabaseRouter = createTRPCRouter({
       channel.unsubscribe();
     }
   }),
-
   onEmailInsert: protectedProcedure.subscription(async function* () {
     const channelKey = "emailMessages";
     const channel = supabaseClient.channel(channelKey);
@@ -58,6 +57,45 @@ export const supabaseRouter = createTRPCRouter({
               const email = payload.new;
               if (email?.id) {
                 controller.enqueue(email);
+              }
+            }
+          );
+
+          channel.subscribe();
+        },
+        cancel() {
+          channel.unsubscribe();
+        },
+      });
+
+      const reader = eventStream.getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        yield value;
+      }
+    } catch (error) {
+      console.error("Error in subscription:", error);
+      throw error;
+    } finally {
+      channel.unsubscribe();
+    }
+  }),
+  onUnreadMessage: protectedProcedure.subscription(async function* () {
+    const channelKey = "userUpdates";
+    const channel = supabaseClient.channel(channelKey);
+
+    try {
+      const eventStream = new ReadableStream({
+        start(controller) {
+          channel.on(
+            "postgres_changes",
+            { event: "UPDATE", schema: "public", table: "User" },
+            (payload) => {
+              const updatedUser = payload.new;
+              if (updatedUser?.unreadMessage) {
+                controller.enqueue(updatedUser);
               }
             }
           );

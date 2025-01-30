@@ -27,12 +27,12 @@ export default function MessagePage() {
   } else {
     return (
       <main className="flex flex-row w-full h-full bg-white rounded-2xl">
-        <section className="w-72 overflow-y-auto h-full">
+        <section className="w-80 overflow-y-auto h-full">
           <ContactsPanel
-            users={users || []}
             isLoading={isLoading}
             selectedUser={selectedUser}
             setSelectedUser={setSelectedUser}
+            users={users || []}
           />
         </section>
 

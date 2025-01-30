@@ -66,6 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         headers: {},
         status: Status.RECEIVED,
       });
+      
 
       res.status(200).json({
         message: "Email processed successfully",

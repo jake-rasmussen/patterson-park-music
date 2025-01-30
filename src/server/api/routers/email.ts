@@ -1,6 +1,6 @@
+import sgMail from "@sendgrid/mail";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import sgMail from "@sendgrid/mail";
 import { Status } from "@prisma/client";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
@@ -11,7 +11,7 @@ export const emailRouter = createTRPCRouter({
   sendEmail: protectedProcedure
     .input(
       z.object({
-        to: z.array(z.string().email()).nonempty(),
+        to: z.string().email(),
         subject: z.string().min(1),
         body: z.string().min(1),
         cc: z.array(z.string().email()).optional(),
@@ -32,6 +32,14 @@ export const emailRouter = createTRPCRouter({
       const { to, subject, body, cc, bcc, attachments } = input;
 
       try {
+        // Resolve userId from the `to` email addresses
+        const user = await ctx.db.user.update({
+          where: { email: to },
+          data: {
+            isArchived: false,
+          }
+        });
+
         const response = await sgMail.send({
           from: myEmail,
           to,
@@ -42,36 +50,37 @@ export const emailRouter = createTRPCRouter({
           attachments: attachments?.map((attachment) => ({
             filename: attachment.filename,
             type: attachment.type,
-            content: attachment.content, // Use Base64 content as is
+            content: attachment.content,
           })),
         });
 
         const storedEmail = await ctx.db.emailMessage.create({
           data: {
             from: myEmail,
-            to,
+            to: [to], // TODO: see if we want to handle multiple emails
             subject,
             body,
             cc: cc || [],
             bcc: bcc || [],
             attachments: attachments?.map((attachment) => attachment.url) || [],
             status: Status.SENT,
-            errorCode: response[0].statusCode,
+            errorCode: response[0]?.statusCode || null,
             date: new Date(),
+            userId: user?.id || null, // Associate userId if found
           },
         });
 
         return {
           success: true,
           message: "Email sent successfully",
-          email: storedEmail
+          email: storedEmail,
         };
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error sending email:", error);
         throw new Error("Failed to send email");
       }
     }),
-  storeEmail: publicProcedure // Used from webhook
+  storeEmail: publicProcedure
     .input(
       z.object({
         from: z.string().email().optional(),
@@ -82,16 +91,30 @@ export const emailRouter = createTRPCRouter({
         bcc: z.array(z.string().email()).optional(),
         attachments: z.array(z.string()).optional(),
         headers: z.record(z.string(), z.any()).optional(),
-        status: z.enum([
-          Status.PENDING,
-          Status.RECEIVED,
-          Status.SENT,
-        ]),
+        status: z.enum([Status.PENDING, Status.RECEIVED, Status.SENT]),
         date: z.date().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       try {
+        // Resolve userId from the `to` email addresses
+        const recipient = await ctx.db.user.findFirst({
+          where: { email: { in: input.to } },
+        });
+
+        const sender = await ctx.db.user.findFirst({
+          where: { email: input.from },
+        });
+
+        await ctx.db.user.update({
+          where: {
+            id: sender?.id,
+          },
+          data: {
+            unreadMessage: true,
+          }
+        });
+
         const newEmail = await ctx.db.emailMessage.create({
           data: {
             from: input.from || myEmail,
@@ -103,6 +126,7 @@ export const emailRouter = createTRPCRouter({
             attachments: input.attachments || [],
             status: input.status,
             date: input.date,
+            userId: recipient?.id || null, // Associate userId if found
           },
         });
 
@@ -112,6 +136,7 @@ export const emailRouter = createTRPCRouter({
         throw new Error("Failed to store email");
       }
     }),
+
   getEmailConversations: protectedProcedure
     .input(
       z.object({
@@ -140,7 +165,7 @@ export const emailRouter = createTRPCRouter({
             ],
             NOT: {
               status: Status.PENDING,
-            }
+            },
           },
           orderBy: {
             date: "asc",

@@ -1,135 +1,127 @@
-import { Button } from "@nextui-org/button";
-import { Divider, Skeleton, Spinner } from "@nextui-org/react";
-import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
-import { IconSchool, IconUser, IconApple, IconArrowBack } from "@tabler/icons-react";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Input, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Family, User } from "@prisma/client";
+import { IconSearch } from "@tabler/icons-react";
+import ContactCard from "./contactCard";
+import SelectedContactView from "./selectedContactView";
 import { api } from "~/utils/api";
-import { capitalizeToUppercase } from "~/utils/helper";
-import ParentInfo from "./parentInfo";
-import StudentInfo from "./studentInfo";
-import TeacherInfo from "./teacherInfo";
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
 type PropType = {
-  users: (User & {
-    family: Family | null
-  })[];
+  users: (User & { family: Family | null })[];
   isLoading: boolean;
-  selectedUser?: (User & {
-    family: Family | null
-  });
-  setSelectedUser: Dispatch<SetStateAction<(User & {
-    family: Family | null
-  }) | undefined>>;
-}
+  selectedUser?: User & { family: Family | null };
+  setSelectedUser: Dispatch<SetStateAction<User & { family: Family | null } | undefined>>;
+};
 
-const ContactsPanel = (props: PropType) => {
-  const {
-    users,
-    isLoading,
-    selectedUser,
-    setSelectedUser
-  } = props;
+const ContactsPanel = ({ users: initialUsers, isLoading, selectedUser, setSelectedUser }: PropType) => {
+  const [users, setUsers] = useState(initialUsers || []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  const { data: searchedUsers, isFetching } = api.user.searchUsers.useQuery(
+    { query: debouncedSearchQuery },
+    { enabled: !!debouncedSearchQuery || searchQuery.length === 0 }
+  );
+
+  api.supabase.onUnreadMessage.useSubscription(undefined, {
+    onData: (updatedUser) => {
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === updatedUser.id ? { ...user, ...updatedUser } : user
+        )
+      );
+    },
+    onError: (error) => console.error("Subscription error:", error),
+  });
+
+  useEffect(() => {
+    setUsers(searchedUsers || initialUsers || []);
+  }, [searchedUsers, initialUsers]);
+
+  const sortUsers = (userList: (User & { family: Family | null })[]) => {
+    return userList.sort((a, b) => {
+      if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
+      if (a.unreadMessage !== b.unreadMessage) return b.unreadMessage ? 1 : -1;
+      return a.firstName.localeCompare(b.firstName);
+    });
+  };
+
+  const updateUserState = (updatedUser: User) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === updatedUser.id ? { ...user, ...updatedUser } : user
+      )
+    );
+  };
+
+  const inboxUsers = sortUsers(users.filter((user) => !user.isArchived));
+  const archivedUsers = sortUsers(users.filter((user) => user.isArchived));
 
   return (
-    <div className="h-full overflow-hidden">
-      {
-        isLoading ? (
-          <div className="w-full h-full flex justify-center items-center">
-            <Spinner label="Loading..." className="m-auto" />
-          </div>
-        ) : (
-          <>
-            {
-              selectedUser ? (
-                <div className="flex flex-col gap-2 items-center m-2">
-                  <div className="w-full">
-                    <Button
-                      isIconOnly
-                      variant="light"
-                      onClick={() => {
-                        setSelectedUser(undefined);
-                      }}
-                    >
-                      <IconArrowBack />
-                    </Button>
-                  </div>
-
-                  <div className="flex flex-col gap-4 w-full text-center items-center px-2">
-                    <div className="flex flex-row gap-2 justify-center items-center">
-                      {selectedUser.type === USER_TYPE.STUDENT ? (
-                        <IconSchool className="rounded-full h-full w-auto" />
-                      ) : selectedUser.type === USER_TYPE.PARENT ? (
-                        <IconUser className="rounded-full h-full w-auto" />
-                      ) : (
-                        <IconApple />
-                      )}
-                      <h2 className="text-xl">{selectedUser.firstName} {selectedUser.lastName}</h2>
-                    </div>
-
-                    <Divider />
-
-                    {
-                      (selectedUser.type === USER_TYPE.PARENT || selectedUser.type === USER_TYPE.STUDENT) ? (
-                        <div className="flex flex-col gap-8 w-full">
-                          <div className="flex flex-row gap-4 justify-center items-center">
-                            <span>{selectedUser.family?.campus}</span>
-                            <Divider orientation="vertical" className="h-8" />
-                            <span>{selectedUser.family?.doorCode}</span>
-                          </div>
-
-                          {selectedUser.type === USER_TYPE.PARENT && (
-                            <ParentInfo users={users} selectedUser={selectedUser} />
-                          )}
-
-                          {selectedUser.type === USER_TYPE.STUDENT && (
-                            <StudentInfo users={users} selectedUser={selectedUser} />
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col pt-8 w-full">
-                          {
-                            selectedUser.type === USER_TYPE.TEACHER && (
-                              <TeacherInfo selectedUser={selectedUser} />
-                            )
-                          }
-                        </div>
-                      )
-                    }
-                  </div>
-                </div>
+    <div className="h-full overflow-hidden px-4 w-full">
+      {isLoading ? (
+        <div className="w-full h-full flex justify-center items-center">
+          <Spinner label="Loading..." className="m-auto" />
+        </div>
+      ) : selectedUser ? (
+        <SelectedContactView users={users} selectedUser={selectedUser} setSelectedUser={setSelectedUser} />
+      ) : (
+        <div className="flex flex-col gap-2 items-center h-full w-full">
+          <Tabs className="mt-8">
+            <Tab key="inbox" title="Inbox" className="flex flex-col gap-2">
+              <Input
+                isClearable
+                className="w-full"
+                placeholder="Search"
+                startContent={<IconSearch />}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {isFetching ? (
+                <Spinner label="Loading..." className="m-auto py-4" />
+              ) : inboxUsers.length > 0 ? (
+                inboxUsers.map((user) => (
+                  <ContactCard key={user.id} user={user} setSelectedUser={setSelectedUser} updateUserState={updateUserState} />
+                ))
               ) : (
-                <div className="flex flex-col gap-2 items-center m-2">
-                  {(users || []).map((user: (User & {
-                    family: Family | null
-                  })) => (
-                    <Button
-                      className="w-full h-full min-h-[4rem] min-w-[8rem] py-4 flex justify-start"
-                      onPress={() => setSelectedUser(user)}
-                      variant="light"
-                      key={user.phoneNumber}
-                    >
-                      <div className="flex flex-row h-full items-center gap-2">
-                        {user.type === USER_TYPE.STUDENT ? <IconSchool className="rounded-full h-full w-auto" /> :
-                          user.type === USER_TYPE.PARENT ? <IconUser className="rounded-full h-full w-auto" /> :
-                            <IconApple />
-                        }
-
-                        <div className="flex flex-col items-start text-black">
-                          <span className="text-small">{user.firstName}</span>
-                          <span className="text-tiny text-default-500">{user.lastName}</span>
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              )
-            }
-          </>
-        )
-      }
+                <p className="text-gray-500 py-4 text-center">No contacts found.</p>
+              )}
+            </Tab>
+            <Tab key="archived" title="Archived" className="flex flex-col gap-2">
+              <Input
+                isClearable
+                className="w-full"
+                placeholder="Search"
+                startContent={<IconSearch />}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {isFetching ? (
+                <Spinner label="Loading..." className="m-auto py-4" />
+              ) : archivedUsers.length > 0 ? (
+                archivedUsers.map((user) => (
+                  <ContactCard key={user.id} user={user} setSelectedUser={setSelectedUser} updateUserState={updateUserState} />
+                ))
+              ) : (
+                <p className="text-gray-500 py-4 text-center">No contacts found.</p>
+              )}
+            </Tab>
+          </Tabs>
+        </div>
+      )}
     </div>
-  )
-
-}
+  );
+};
 
 export default ContactsPanel;

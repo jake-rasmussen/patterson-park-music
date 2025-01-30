@@ -60,7 +60,7 @@ const EmailPanel = (props: PropType) => {
       const formattedBody = body.replace(/\n/g, "<br>");
 
       sendEmail.mutate({
-        to: [selectedUser.email] as [string, ...string[]],
+        to: selectedUser.email || "",
         subject,
         body: formattedBody,
         attachments,
@@ -75,7 +75,7 @@ const EmailPanel = (props: PropType) => {
       {
         selectedUser.email ? <>
           <div className="flex-1 min-h-0 overflow-auto bg-gray-50 relative">
-            <EmailView selectedContact={selectedUser} email={selectedUser.email} />
+            <EmailView selectedUser={selectedUser} email={selectedUser.email} />
           </div>
 
           <div className="w-full bg-white rounded-br-xl">

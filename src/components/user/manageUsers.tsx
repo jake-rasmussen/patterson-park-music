@@ -9,6 +9,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Divider, Spinner
 import { IconSearch, IconPlus, IconSchool, IconUser, IconApple, IconUsersGroup } from "@tabler/icons-react";
 import { capitalizeToUppercase } from "~/utils/helper";
 import CreateFamilyModal from "./family/createFamilyModal";
+import UserIcon from "./userIcon";
 
 type PropType = {
   users: User[];
@@ -114,11 +115,7 @@ const ManageUsers = (props: PropType) => {
                         <DropdownItem
                           key="user"
                           onClick={onOpenCreateUser}
-                          endContent={
-                            selectedType === USER_TYPE.STUDENT ? <IconSchool /> :
-                            selectedType === USER_TYPE.PARENT ? <IconUser /> :
-                                <IconApple />
-                          }
+                          endContent={<UserIcon userType={selectedType} />}
                         >
                           Create {capitalizeToUppercase(selectedType)}
                         </DropdownItem>

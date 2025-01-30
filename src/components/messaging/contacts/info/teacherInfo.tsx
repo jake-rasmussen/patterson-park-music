@@ -60,21 +60,6 @@ const TeacherInfo = (props: PropType) => {
               }
             </div>
           )
-
-          // users.filter((user) => user.familyId === selectedUser.familyId).length > 0 ? (
-          //   users
-          //     .filter((user) =>
-          //       user.familyId === selectedUser.familyId &&
-          //       user.id !== selectedUser.id &&
-          //       user.type !== USER_TYPE.STUDENT
-          //     ).map((child) => (
-          //       <div key={child.id} className="flex flex-row items-center gap-2">
-          //         <span>{child.firstName} {child.lastName}</span>
-          //       </div>
-          //     ))
-          // ) : (
-          //   <p className="text-gray-500">No sections found.</p>
-          // )
         }
       </div>
     </>

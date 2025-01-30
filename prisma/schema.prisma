@@ -20,6 +20,7 @@ enum USER_TYPE {
     PARENT
     STUDENT
     TEACHER
+    UNKNOWN
 }
 
 enum WEEKDAY {
@@ -72,18 +73,23 @@ model TagPerson {
 }
 
 model User {
-    id          String       @id @default(cuid())
-    firstName   String
-    lastName    String
-    email       String?      @unique // TODO: change this to non-option
-    phoneNumber String       @unique
-    type        USER_TYPE
-    enrollment  Enrollment[]
-    section     Section[] // Only for teachers
-    createdAt   DateTime     @default(now())
-    updatedAt   DateTime     @updatedAt
-    family      Family?      @relation(fields: [familyId], references: [id])
-    familyId    String?
+    id            String         @id @default(cuid())
+    firstName     String
+    lastName      String
+    email         String?        @unique // TODO: change this to non-option
+    phoneNumber   String         @unique
+    type          USER_TYPE
+    enrollment    Enrollment[]
+    section       Section[] // Only for teachers
+    family        Family?        @relation(fields: [familyId], references: [id])
+    familyId      String?
+    isPinned      Boolean        @default(false)
+    isArchived    Boolean        @default(false)
+    smsMessages   SMSMessage[]
+    emailMessages EmailMessage[]
+    unreadMessage Boolean        @default(false)
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
 }
 
 model Family {
@@ -129,6 +135,8 @@ model SMSMessage {
     status    Status
     errorCode Int?
     date      DateTime @default(now())
+    user      User?    @relation(fields: [userId], references: [id])
+    userId    String?
 }
 
 model EmailMessage {
@@ -143,6 +151,8 @@ model EmailMessage {
     status      Status
     errorCode   Int?
     date        DateTime @default(now())
+    user        User?    @relation(fields: [userId], references: [id])
+    userId      String?
 }
 
 model FutureSMSMessage {
