@@ -97,40 +97,40 @@ export const emailRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        // Resolve userId from the `to` email addresses
-        const recipient = await ctx.db.user.findFirst({
-          where: { email: { in: input.to } },
-        });
-
         const sender = await ctx.db.user.findFirst({
           where: { email: input.from },
         });
 
-        await ctx.db.user.update({
-          where: {
-            id: sender?.id,
-          },
-          data: {
-            unreadMessage: true,
-          }
-        });
+        if (sender) {
+          // Resolve userId from the `to` email addresses
+          const recipient = await ctx.db.user.findFirst({
+            where: { email: { in: input.to } },
+          });
 
-        const newEmail = await ctx.db.emailMessage.create({
-          data: {
-            from: input.from || myEmail,
-            to: input.to,
-            subject: input.subject,
-            body: input.body,
-            cc: input.cc || [],
-            bcc: input.bcc || [],
-            attachments: input.attachments || [],
-            status: input.status,
-            date: input.date,
-            userId: recipient?.id || null, // Associate userId if found
-          },
-        });
+          await ctx.db.user.update({
+            where: {
+              id: sender?.id,
+            },
+            data: {
+              unreadMessage: true,
+            }
+          });
 
-        return { success: true, email: newEmail };
+          return await ctx.db.emailMessage.create({
+            data: {
+              from: input.from || myEmail,
+              to: input.to,
+              subject: input.subject,
+              body: input.body,
+              cc: input.cc || [],
+              bcc: input.bcc || [],
+              attachments: input.attachments || [],
+              status: input.status,
+              date: input.date,
+              userId: recipient?.id || null, // Associate userId if found
+            },
+          });
+        }
       } catch (error) {
         console.error("Error storing email:", error);
         throw new Error("Failed to store email");

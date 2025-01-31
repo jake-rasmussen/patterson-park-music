@@ -2,13 +2,16 @@ import { Button } from "@nextui-org/button";
 import { Input, Select, SelectSection, SelectItem } from "@nextui-org/react";
 import { Field, Form } from "houseform";
 import { z } from "zod";
-import { User } from "@prisma/client";
+import { CAMPUS, Family, User } from "@prisma/client";
+import { capitalizeToUppercase } from "~/utils/helper";
 
 type PropType = {
   handleSubmit: (values: Record<string, any>) => Promise<void>;
   onClose?: () => void;
   initialValues?: Partial<Record<string, any>>;
-  users: User[];
+  users: (User & {
+    family: Family | null
+  })[];
   selectedUserIds?: string[];
 };
 
@@ -52,22 +55,19 @@ const FamilyForm = (props: PropType) => {
               )}
             </Field>
 
-            <Field<string>
-              name="campus"
-              onChangeValidate={z.string().min(1, "Campus is required")}
-              initialValue={initialValues.campus}
-            >
-              {({ value, setValue, onBlur, isValid, errors }) => (
-                <Input
+            <Field<CAMPUS> name="campus" initialValue={initialValues.campus}>
+              {({ value, setValue }) => (
+                <Select
                   label="Campus"
-                  value={value}
-                  onChange={(e) => setValue(e.currentTarget.value)}
-                  onBlur={onBlur}
-                  isInvalid={!isValid}
-                  errorMessage={errors[0]}
-                  isRequired
-                  size="sm"
-                />
+                  selectedKeys={value ? new Set([value]) : new Set()}
+                  onSelectionChange={(keys) => setValue(Array.from(keys).pop() as CAMPUS)}
+                >
+                  {Object.values(CAMPUS).map((campus) => (
+                    <SelectItem key={campus} value={campus}>
+                      {campus}
+                    </SelectItem>
+                  ))}
+                </Select>
               )}
             </Field>
 

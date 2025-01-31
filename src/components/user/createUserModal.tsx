@@ -34,11 +34,15 @@ const CreateUserModal = (props: PropType) => {
     toast.loading("Creating user...");
 
     await createUser.mutateAsync({
-      firstName: values.first,
-      lastName: values.last,
-      phoneNumber: values.phone,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      phoneNumber: values.phoneNumber,
       email: values.email,
       type: values.type,
+      interests: values.interests,
+      pronouns: values.pronouns,
+      birthday: values.birthday,
+      school: values.school,
     });
   }
 

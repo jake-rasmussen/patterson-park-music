@@ -59,6 +59,11 @@ enum TAG {
     CURRENT
 }
 
+enum CAMPUS {
+    PPAM
+    SOBO
+}
+
 enum Status {
     RECEIVED
     SENT
@@ -88,6 +93,10 @@ model User {
     smsMessages   SMSMessage[]
     emailMessages EmailMessage[]
     unreadMessage Boolean        @default(false)
+    interests     COURSE[]
+    pronouns      String?
+    birthday      DateTime?
+    school        CAMPUS?
     createdAt     DateTime       @default(now())
     updatedAt     DateTime       @updatedAt
 }
@@ -95,7 +104,7 @@ model User {
 model Family {
     id         String   @id @default(cuid())
     familyName String
-    campus     String
+    campus     CAMPUS
     doorCode   String
     users      User[]
     createdAt  DateTime @default(now())

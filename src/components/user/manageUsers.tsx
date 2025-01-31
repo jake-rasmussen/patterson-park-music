@@ -1,4 +1,4 @@
-import { User, USER_TYPE } from "@prisma/client";
+import { Family, User, USER_TYPE } from "@prisma/client";
 import UserTable from "./userTable";
 import CreateUserModal from "./createUserModal";
 import { useDisclosure } from "@nextui-org/modal";
@@ -12,7 +12,9 @@ import CreateFamilyModal from "./family/createFamilyModal";
 import UserIcon from "./userIcon";
 
 type PropType = {
-  users: User[];
+  users: (User & {
+    family: Family | null
+  })[];
   isLoading: boolean;
 }
 
@@ -91,11 +93,6 @@ const ManageUsers = (props: PropType) => {
               </Tabs>
 
               <div className="w-full flex flex-col gap-4">
-
-
-
-
-
                 <div className="flex flex-row">
                   <Input
                     isClearable

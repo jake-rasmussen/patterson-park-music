@@ -55,6 +55,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const caller = createCaller({ db, user: null });
+      console.log({
+        from,
+        to,
+        subject,
+        cc,
+        bcc,
+        attachments: [],
+        headers: {},
+        status: Status.RECEIVED,
+      })
       await caller.email.storeEmail({
         from,
         to,
@@ -66,7 +76,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         headers: {},
         status: Status.RECEIVED,
       });
-      
 
       res.status(200).json({
         message: "Email processed successfully",

@@ -8,11 +8,13 @@ import {
 import FamilyForm from "./familyForm";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
-import { User } from "@prisma/client";
+import { Family, User } from "@prisma/client";
 import { SetStateAction } from "react";
 
 type PropType = {
-  users: User[];
+  users: (User & {
+    family: Family | null
+  })[];
   selectedUsers: User[];
   isOpen: boolean;
   onOpenChange: () => void;

@@ -33,8 +33,13 @@ const Navbar = () => {
         </Button>
       </Link>
       <Link href={"/section"} className="w-full">
-        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconSchool className="text-white h-12 w-12" />}>
+        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconMusic className="text-white h-12 w-12" />}>
           Manage Sections
+        </Button>
+      </Link>
+      <Link href={"/students"} className="w-full">
+        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconSchool className="text-white h-12 w-12" />}>
+          Student Roster
         </Button>
       </Link>
     </div >

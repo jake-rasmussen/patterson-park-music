@@ -4,7 +4,7 @@ import Error from "next/error";
 import ManageUsers from "~/components/user/manageUsers";
 import ManageFamilies from "~/components/user/family/manageFamilies";
 
-export default function ContactPage() {
+export default function ManageUsersPage() {
   const { data: users, isLoading: isLoadingUsers, error: errorUsers } = api.user.getAllUsers.useQuery();
   const { data: families, isLoading: isLoadingFamilies, error: errorFamilies } = api.family.getAllFamilies.useQuery();
 

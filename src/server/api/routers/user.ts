@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { USER_TYPE } from "@prisma/client";
+import { CAMPUS, COURSE, USER_TYPE } from "@prisma/client";
 import { createClient } from "~/utils/supabase/client/component";
 
 export const userRouter = createTRPCRouter({
@@ -12,10 +12,24 @@ export const userRouter = createTRPCRouter({
         email: z.string().email().optional(), // Optional as per the schema
         phoneNumber: z.string().length(10, "Enter a valid phone number"),
         type: z.enum(Object.values(USER_TYPE) as [USER_TYPE, ...USER_TYPE[]]),
+        interests: z.array(z.enum(Object.values(COURSE) as [COURSE, ...COURSE[]])).optional(),
+        pronouns: z.string().optional(),
+        birthday: z.date().optional(),
+        school: z.enum(Object.values(CAMPUS) as [CAMPUS, ...CAMPUS[]]).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { firstName, lastName, email, phoneNumber, type } = input;
+      const {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        type,
+        interests,
+        pronouns,
+        birthday,
+        school,
+      } = input;
 
       try {
         const newUser = await ctx.db.user.create({
@@ -25,6 +39,10 @@ export const userRouter = createTRPCRouter({
             email,
             phoneNumber: "+1" + phoneNumber,
             type,
+            interests,
+            pronouns,
+            birthday,
+            school,
           },
         });
         return { success: true, user: newUser };
@@ -45,6 +63,10 @@ export const userRouter = createTRPCRouter({
         isArchived: z.boolean().optional(),
         isPinned: z.boolean().optional(),
         unreadMessage: z.boolean().optional(),
+        interests: z.array(z.enum(Object.values(COURSE) as [COURSE, ...COURSE[]])).optional(),
+        pronouns: z.string().optional(),
+        birthday: z.date().optional(),
+        school: z.enum(Object.values(CAMPUS) as [CAMPUS, ...CAMPUS[]]).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -58,10 +80,14 @@ export const userRouter = createTRPCRouter({
         isArchived,
         isPinned,
         unreadMessage,
+        interests,
+        pronouns,
+        birthday,
+        school,
       } = input;
 
       try {
-        const updatedUser = await ctx.db.user.update({
+        return await ctx.db.user.update({
           where: { id },
           data: {
             firstName,
@@ -71,10 +97,16 @@ export const userRouter = createTRPCRouter({
             type,
             isArchived,
             isPinned,
-            unreadMessage
+            unreadMessage,
+            interests,
+            pronouns,
+            birthday,
+            school
           },
+          include: {
+            family: true
+          }
         });
-        return { success: true, user: updatedUser };
       } catch (error) {
         console.error("Error updating user:", error);
         throw new Error("Failed to update user");
@@ -161,6 +193,9 @@ export const userRouter = createTRPCRouter({
         const users = await ctx.db.user.findMany({
           where: {
             type: USER_TYPE.STUDENT
+          },
+          include: {
+            family: true
           }
         });
 
