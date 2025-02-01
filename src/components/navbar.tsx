@@ -1,4 +1,3 @@
-import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/react";
 import { IconMessage, IconClock, IconUserEdit, IconSchool, IconMusic } from "@tabler/icons-react";
 import Link from "next/link";

@@ -36,11 +36,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       `}</style>
       <Toaster />
       <NextUIProvider>
-        {/* <AuthProvider>
-          <AuthConsumer> */}
+        <AuthProvider>
+          <AuthConsumer>
             {getLayout(<Component {...pageProps} />)}
-          {/* </AuthConsumer>
-        </AuthProvider> */}
+          </AuthConsumer>
+        </AuthProvider>
       </NextUIProvider>
     </div>
   );
