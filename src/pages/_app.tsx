@@ -3,7 +3,7 @@ import { Poppins } from "@next/font/google";
 import { Toaster } from "react-hot-toast";
 import "~/styles/globals.css";
 import type { AppProps } from "next/app";
-import type { ReactElement, ReactNode } from "react";
+import { useEffect, useMemo, type ReactElement, type ReactNode } from "react";
 import type { NextPage } from "next";
 import { AuthProvider, useAuth } from "~/context/auth-context";
 import { api } from "~/utils/api";
@@ -29,10 +29,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <div className={`${poppins.variable} font-sans`}>
-      <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-      />
       <style jsx global>{`
         :root {
           --font-poppins: ${poppins.style.fontFamily};
@@ -40,37 +36,34 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       `}</style>
       <Toaster />
       <NextUIProvider>
-        <AuthProvider>
-          <AuthConsumer>
-            <main className="bg-gray-900 flex flex-row h-screen overflow-auto">
-              <div className="min-w-fit h-screen flex flex-col gap-8 justify-center items-center py-10">
-                <Navbar />
-              </div>
-              <div className="grow my-8 mr-8 shadow-xl flex flex-col">
-                {getLayout(<Component {...pageProps} />)}
-              </div>
-            </main>
-          </AuthConsumer>
-        </AuthProvider>
+        {/* <AuthProvider>
+          <AuthConsumer> */}
+            {getLayout(<Component {...pageProps} />)}
+          {/* </AuthConsumer>
+        </AuthProvider> */}
       </NextUIProvider>
     </div>
   );
 }
 
-const AuthConsumer = ({ children }: { children: JSX.Element }) => {
+const AuthConsumer = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-screen flex justify-center items-center">
-        <Spinner label="Loading..." className="m-auto" />
-      </div>
-    );
-  } else if (!user) {
-    return <LoginPage />
-  } else {
+  const content = useMemo(() => {
+    if (isLoading) {
+      return (
+        <div className="w-full h-screen flex justify-center items-center">
+          <Spinner label="Loading..." className="m-auto" />
+        </div>
+      );
+    }
+    if (!user) {
+      return <LoginPage />;
+    }
     return children;
-  }
+  }, [user, isLoading]);
+
+  return content;
 };
 
 export default api.withTRPC(MyApp);

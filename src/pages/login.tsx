@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import z from "zod";
-import Layout from "~/components/layout";
+import Layout from "~/layouts/layout";
 import { createClient } from "~/utils/supabase/client/component";
 
 const LoginPage = () => {

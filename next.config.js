@@ -20,7 +20,7 @@ const config = {
   transpilePackages: ["geist"],
   eslint: {
     ignoreDuringBuilds: true,
-  },
+  }
 };
 
 export default config;

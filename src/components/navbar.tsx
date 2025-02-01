@@ -1,6 +1,6 @@
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/react";
-import { IconLogout, IconMessage, IconClock, IconUserEdit, IconSchool, IconMusic } from "@tabler/icons-react";
+import { IconMessage, IconClock, IconUserEdit, IconSchool, IconMusic } from "@tabler/icons-react";
 import Link from "next/link";
 
 const Navbar = () => {
@@ -12,35 +12,35 @@ const Navbar = () => {
     </div>
 
     <div className="flex flex-col gap-8 items-center p-4">
-      <Link href={"/message"} className="w-full">
-        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconMessage className="text-white h-12 w-12" />}>
-          Message
-        </Button>
+      <Link href="/message" className="w-full">
+        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+          <IconMessage className="text-white h-12 w-12" /> Message
+        </button>
       </Link>
-      <Link href={"/schedule"} className="w-full">
-        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconClock className="text-white h-12 w-12" />}>
-          Schedule Message
-        </Button>
+      <Link href="/schedule" className="w-full">
+        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+          <IconClock className="text-white h-12 w-12" /> Schedule Message
+        </button>
       </Link>
       {/* <Link href={"/bulk"} className="w-full">
         <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconUsersGroup className="text-white h-12 w-12" />}>
           Bulk Message
         </Button>
       </Link> */}
-      <Link href={"/users"} className="w-full">
-        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconUserEdit className="text-white h-12 w-12" />}>
-          Manage Users
-        </Button>
+      <Link href="/users" className="w-full">
+        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+          <IconUserEdit className="text-white h-12 w-12" /> Manage Users
+        </button>
       </Link>
-      <Link href={"/section"} className="w-full">
-        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconMusic className="text-white h-12 w-12" />}>
-          Manage Sections
-        </Button>
+      <Link href="/section" className="w-full">
+        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+          <IconMusic className="text-white h-12 w-12" /> Manage Sections
+        </button>
       </Link>
-      <Link href={"/students"} className="w-full">
-        <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconSchool className="text-white h-12 w-12" />}>
-          Student Roster
-        </Button>
+      <Link href="/students" className="w-full">
+        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+          <IconSchool className="text-white h-12 w-12" /> Student Roster
+        </button>
       </Link>
     </div >
 

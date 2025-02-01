@@ -2,7 +2,7 @@ import { api } from "~/utils/api";
 import Error from "next/error";
 
 import ManageStudents from "~/components/user/manageStudents";
-import Layout from "~/components/layout";
+import Layout from "~/layouts/layout";
 
 const StudentRosterPage = () => {
   const { data: users, isLoading, error } = api.user.getAllUsers.useQuery();
