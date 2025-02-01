@@ -54,7 +54,7 @@ const ManageSections = (props: PropType) => {
             <Spinner label="Loading..." className="m-auto" />
           </div>
         ) : (
-          <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
+          <div className="flex flex-wrap gap-4 items-center justify-center">
             <Table>
               <TableHeader>
                 <TableColumn>COURSE</TableColumn>

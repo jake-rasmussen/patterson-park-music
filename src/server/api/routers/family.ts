@@ -130,9 +130,7 @@ export const familyRouter = createTRPCRouter({
           orderBy: { createdAt: "desc" },
           include: { users: true }, // Include related users
         });
-
-        console.log("FAMILIES", families)
-
+        
         return families;
       } catch (error) {
         console.error("Error fetching families:", error);

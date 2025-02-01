@@ -2,7 +2,7 @@ import CreateSection from "~/components/section/createSection";
 import ManageSections from "~/components/section/manageSections";
 import { api } from "~/utils/api";
 import Error from "next/error";
-import Layout from "~/components/layout";
+import Layout from "~/layouts/layout";
 
 const SectionPage = () => {
   const { data: teachers = [], isLoading: isLoadingTeachers, error: errorTeachers } = api.user.getAllTeachers.useQuery();

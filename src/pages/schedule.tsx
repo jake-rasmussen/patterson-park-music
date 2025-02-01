@@ -2,7 +2,7 @@ import ScheduleMessage from "~/components/schedule/scheduleMessage";
 import ManageUpcomingMessages from "~/components/schedule/manageUpcomingMessages";
 import { api } from "~/utils/api";
 import Error from "next/error";
-import Layout from "~/components/layout";
+import Layout from "~/layouts/layout";
 
 const ScheduleMessagePage = () => {
   const { data: users, isLoading: isLoadingUsers, error } = api.user.getAllUsers.useQuery();

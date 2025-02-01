@@ -6,7 +6,7 @@ import Error from "next/error";
 import EmailPanel from "~/components/messaging/email/emailPanel";
 import SMSPanel from "~/components/messaging/sms/smsPanel";
 import ContactsPanel from "~/components/messaging/contacts/contactsPanel";
-import Layout from "~/components/layout";
+import Layout from "~/layouts/layout";
 
 const MessagePage = () => {
   const [selectedUser, setSelectedUser] = useState<(User & {
