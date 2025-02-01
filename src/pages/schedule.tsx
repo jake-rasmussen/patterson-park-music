@@ -2,8 +2,9 @@ import ScheduleMessage from "~/components/schedule/scheduleMessage";
 import ManageUpcomingMessages from "~/components/schedule/manageUpcomingMessages";
 import { api } from "~/utils/api";
 import Error from "next/error";
+import Layout from "~/components/layout";
 
-export default function ScheduleMessagePage() {
+const ScheduleMessagePage = () => {
   const { data: users, isLoading: isLoadingUsers, error } = api.user.getAllUsers.useQuery();
 
 
@@ -39,3 +40,9 @@ export default function ScheduleMessagePage() {
     );
   }
 }
+
+ScheduleMessagePage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default ScheduleMessagePage;

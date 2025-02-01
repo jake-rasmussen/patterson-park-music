@@ -11,7 +11,9 @@ type PropType = {
   families: (Family & {
     users: User[]
   })[];
-  users: User[];
+  users: (User & {
+    family: Family | null
+  })[];
   isLoading: boolean;
 }
 
@@ -59,10 +61,6 @@ const ManageFamilies = (props: PropType) => {
                     <CardBody className="flex flex-row items-center justify-between truncate">
                       <div className="max-w-full grow flex flex-col gap-2 p-4 truncate">
                         <p className="text-md truncate">{family.familyName}</p>
-
-                        <p className="text-sm text-default-500 truncate">
-
-                        </p>
                       </div>
 
                       <Dropdown>

@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helper";
 import MessageBubble from "../messageBubble";
-import {SMSMessage, Status, User } from "@prisma/client";
+import { SMSMessage, Status, User } from "@prisma/client";
 import Error from "next/error";
-import { IconArrowDown, IconMessageDown } from "@tabler/icons-react";
+import { IconMessageDown } from "@tabler/icons-react";
 
 type PropType = {
   selectedUser: User;
@@ -14,13 +14,15 @@ type PropType = {
 const SMSView = (props: PropType) => {
   const { selectedUser } = props;
 
+  const updateUser = api.user.updateUser.useMutation();
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<SMSMessage[]>([]);
   const [newMessageAlert, setNewMessageAlert] = useState(false);
 
-  const { data: conversations, isLoading, isError, error } = api.sms.getSMSConversations.useQuery({
+  const { data: initialMessages, isLoading, isError, error } = api.sms.getSMSConversations.useQuery({
     phoneNumber: selectedUser.phoneNumber,
   });
 
@@ -40,26 +42,27 @@ const SMSView = (props: PropType) => {
   });
 
   useEffect(() => {
-    if (conversations && conversations.messages) {
-      setMessages(conversations.messages);
+    if (initialMessages) {
+      setMessages(initialMessages);
     }
-  }, [conversations]);
+  }, [initialMessages]);
 
   useEffect(() => {
     setTimeout(() => {
-      if (conversations && bottomRef.current) {
+      if (initialMessages && bottomRef.current) {
         bottomRef.current.scrollIntoView({ behavior: "smooth" });
       }
     }, 500);
-  }, [conversations, bottomRef.current]);
+  }, [initialMessages, bottomRef.current]);
 
   // Use IntersectionObserver to check if bottomRef is in view
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && newMessageAlert) {
             setNewMessageAlert(false); // Remove alert only when scrolled to bottom
+            updateUser.mutate({ id: selectedUser.id, unreadMessage: false })
           }
         });
       },

@@ -1,8 +1,9 @@
+import twilio from "twilio";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import twilio from "twilio";
-import { Status } from "@prisma/client";
+import { Status, USER_TYPE } from "@prisma/client";
 
+// Twilio client initialization
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
@@ -23,24 +24,35 @@ export const smsRouter = createTRPCRouter({
       const { to, message, mediaUrls } = input;
 
       try {
+        // Resolve userId from the `to` phone number
+        const user = await ctx.db.user.update({
+          where: { phoneNumber: to },
+          data: {
+            isArchived: false
+          }
+        });
+
+        // Send the SMS via Twilio
         const response = await client.messages.create({
           body: message,
           from: myNumber,
-          to: to,
+          to,
           mediaUrl: mediaUrls,
         });
 
+        // Store the SMS message in the database
         const storedSMS = await ctx.db.sMSMessage.create({
           data: {
             from: myNumber,
-            to: input.to,
+            to,
             body: message,
             mediaUrls: mediaUrls || [],
             status: Status.SENT,
             errorCode: response.errorCode,
             date: new Date(),
-          }
-        })
+            userId: user?.id || null, // Associate userId if found
+          },
+        });
 
         return {
           success: true,
@@ -48,7 +60,6 @@ export const smsRouter = createTRPCRouter({
           status: response.status,
           message: "SMS sent successfully",
           sms: storedSMS,
-          mediaUrls: input.mediaUrls || [],
         };
       } catch (error) {
         console.error("Error sending SMS:", error);
@@ -71,7 +82,35 @@ export const smsRouter = createTRPCRouter({
       const { from, to, body, mediaUrls } = input;
 
       try {
-        const newMessage = await ctx.db.sMSMessage.create({
+        // Check if sender exists
+        let sender = await ctx.db.user.findFirst({
+          where: { phoneNumber: from },
+        });
+
+        // Create a new user if sender doesn't exist
+        if (!sender) {
+          sender = await ctx.db.user.create({
+            data: {
+              firstName: "Unknown",
+              lastName: "User",
+              phoneNumber: from,
+              type: USER_TYPE.UNKNOWN, // Default type, change if needed
+            },
+          });
+        }
+
+        // Update sender as having unread messages
+        await ctx.db.user.update({
+          where: { id: sender.id },
+          data: { unreadMessage: true },
+        });
+
+        // Find recipient
+        const recipient = await ctx.db.user.findFirst({
+          where: { phoneNumber: to },
+        });
+
+        return await ctx.db.sMSMessage.create({
           data: {
             from,
             to,
@@ -79,41 +118,36 @@ export const smsRouter = createTRPCRouter({
             mediaUrls: mediaUrls || [],
             status: input.status,
             date: input.date,
+            userId: sender?.id || null, // Associate userId if found
           },
         });
-
-        return { success: true, message: newMessage };
       } catch (error) {
-        console.error("Error saving SMS message:", error);
-        throw new Error("Failed to save SMS message");
+        console.error("Error storing SMS message:", error);
+        throw new Error("Failed to store SMS message");
       }
     }),
   getSMSConversations: protectedProcedure
     .input(
       z.object({
-        phoneNumber: z.string()
+        phoneNumber: z.string(),
       })
     )
     .query(async ({ input, ctx }) => {
       const { phoneNumber } = input;
 
       try {
-        const messages = await ctx.db.sMSMessage.findMany({
+        return await ctx.db.sMSMessage.findMany({
           where: {
             OR: [
               { to: phoneNumber },
               { from: phoneNumber },
             ],
-            NOT: [
-              { status: Status.PENDING }
-            ]
+            NOT: [{ status: Status.PENDING }],
           },
           orderBy: {
             date: "asc",
           },
         });
-
-        return { success: true, messages };
       } catch (error) {
         console.error("Error retrieving conversations:", error);
         throw new Error("Failed to retrieve conversations with contact");

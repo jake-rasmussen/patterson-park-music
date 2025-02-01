@@ -1,4 +1,4 @@
-import { User, USER_TYPE } from "@prisma/client";
+import { Family, User, USER_TYPE } from "@prisma/client";
 import UserTable from "./userTable";
 import CreateUserModal from "./createUserModal";
 import { useDisclosure } from "@nextui-org/modal";
@@ -9,9 +9,12 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Divider, Spinner
 import { IconSearch, IconPlus, IconSchool, IconUser, IconApple, IconUsersGroup } from "@tabler/icons-react";
 import { capitalizeToUppercase } from "~/utils/helper";
 import CreateFamilyModal from "./family/createFamilyModal";
+import UserIcon from "./userIcon";
 
 type PropType = {
-  users: User[];
+  users: (User & {
+    family: Family | null
+  })[];
   isLoading: boolean;
 }
 
@@ -24,6 +27,7 @@ const ManageUsers = (props: PropType) => {
   const [select, setSelect] = useState<boolean>();
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [selectedType, setSelectedType] = useState<USER_TYPE>(USER_TYPE.STUDENT);
+  const [query, setQuery] = useState("");
 
   const handleSelection = (newSelectedUsers: User[]) => {
     setSelectedUsers((prevSelectedUsers) => {
@@ -41,7 +45,7 @@ const ManageUsers = (props: PropType) => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full h-full flex flex-col gap-4">
       <h2 className="text-xl text-center">User List</h2>
       <Divider />
       <div className="h-full">
@@ -90,17 +94,15 @@ const ManageUsers = (props: PropType) => {
               </Tabs>
 
               <div className="w-full flex flex-col gap-4">
-
-
-
-
-
                 <div className="flex flex-row">
                   <Input
                     isClearable
                     className="max-w-xs"
                     placeholder="Search by name"
                     startContent={<IconSearch />}
+                    value={query}
+                    onChange={(e) => setQuery(e.currentTarget.value)}
+                    onClear={() => setQuery("")}
                   />
 
                   <div className="grow flex justify-end gap-4">
@@ -114,11 +116,7 @@ const ManageUsers = (props: PropType) => {
                         <DropdownItem
                           key="user"
                           onClick={onOpenCreateUser}
-                          endContent={
-                            selectedType === USER_TYPE.STUDENT ? <IconSchool /> :
-                            selectedType === USER_TYPE.PARENT ? <IconUser /> :
-                                <IconApple />
-                          }
+                          endContent={<UserIcon userType={selectedType} />}
                         >
                           Create {capitalizeToUppercase(selectedType)}
                         </DropdownItem>
@@ -138,37 +136,42 @@ const ManageUsers = (props: PropType) => {
                   </div>
                 </div>
 
-                <UserTable
-                  users={users}
-                  type={selectedType}
-                  select={select}
-                  onSelectionChange={handleSelection}
-                />
+                {!isLoading && (
+                  <>
+                    <UserTable
+                      users={users}
+                      type={selectedType}
+                      select={select}
+                      onSelectionChange={handleSelection}
+                    />
 
-                {
-                  select && (
-                    <div className="flex flex-row gap-4 w-full justify-end">
-                      <Button
-                        variant="light"
-                        color="danger"
-                        onClick={() => {
-                          setSelect(false);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        color="primary"
-                        onClick={() => {
-                          onOpenCreateFamily();
-                        }}
-                        isDisabled={selectedUsers.length === 0}
-                      >
-                        Submit
-                      </Button>
-                    </div>
-                  )
-                }
+                    {
+                      select && (
+                        <div className="flex flex-row gap-4 w-full justify-end">
+                          <Button
+                            variant="light"
+                            color="danger"
+                            onClick={() => {
+                              setSelect(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            color="primary"
+                            onClick={() => {
+                              onOpenCreateFamily();
+                            }}
+                            isDisabled={selectedUsers.length === 0}
+                          >
+                            Submit
+                          </Button>
+                        </div>
+                      )
+                    }
+                  </>
+                )}
+
 
                 <CreateUserModal isOpen={isOpenCreateUser} onOpenChange={onOpenChangeCreateUser} type={selectedType} />
                 <CreateFamilyModal

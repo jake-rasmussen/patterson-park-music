@@ -83,7 +83,7 @@ export default async function handler(req: any, res: any) {
 
       // Send email with processed attachments
       await caller.email.sendEmail({
-        to: email.to as [string, ...string[]],
+        to: email.to[0]!,
         subject: email.subject,
         body: email.body,
         cc: email.cc,

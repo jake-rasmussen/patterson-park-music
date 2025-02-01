@@ -1,12 +1,15 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { CAMPUS } from "@prisma/client";
 
 export const familyRouter = createTRPCRouter({
   createFamily: protectedProcedure
     .input(
       z.object({
         familyName: z.string().min(1, "Family name is required"),
-        campus: z.string().min(1, "Campus is required"),
+        campus: z.nativeEnum(CAMPUS).refine((value) => value !== undefined, {
+          message: "Campus is required",
+        }),
         doorCode: z.string(),
         userIds: z.array(z.string()).nonempty("At least one user must be selected"),
       })
@@ -36,7 +39,9 @@ export const familyRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         familyName: z.string().min(1, "Family name is required").optional(),
-        campus: z.string().min(1, "Campus is required").optional(),
+        campus: z.nativeEnum(CAMPUS).refine((value) => value !== undefined, {
+          message: "Campus is required",
+        }).optional(),
         doorCode: z.string().optional(),
         userIds: z.array(z.string()).optional(),
       })

@@ -29,7 +29,20 @@ const EnrollStudents = (props: PropType) => {
 
   const { data: users, isLoading } = api.user.getAllStudents.useQuery();
 
-  const createEnrollments = api.enrollment.createEnrollments.useMutation();
+  const createEnrollments = api.enrollment.createEnrollments.useMutation({
+    onSuccess() {
+      toast.dismiss();
+      toast.success("Enrollments created successfully!");
+
+      onOpenChange();
+      setPage(0);
+      setSelectedUsers([]);
+    },
+    onError() {
+      toast.dismiss();
+      toast.success("Error...");
+    }
+  });
 
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [enrollmentData, setEnrollmentData] = useState<Record<string, EnrollmentData | undefined>>({});
@@ -66,28 +79,24 @@ const EnrollStudents = (props: PropType) => {
   };
 
   const handleSubmit = async () => {
+    toast.loading("Enrolling student(s)");
+
     const enrollments = selectedUsers.map((user) => {
       const data = enrollmentData[user.id];
       if (!data?.dateRange || !data?.status) {
         return null;
+      } else {
+        return {
+          userId: user.id,
+          sectionId: sectionId,
+          startDate: data.dateRange.start,
+          endDate: data.dateRange.end,
+          status: data.status,
+        };
       }
-      return {
-        userId: user.id,
-        sectionId: sectionId,
-        startDate: data.dateRange.start,
-        endDate: data.dateRange.end,
-        status: data.status,
-      };
     }).filter((enrollment): enrollment is NonNullable<typeof enrollment> => !!enrollment);
 
-    try {
-      await createEnrollments.mutateAsync(enrollments);
-      toast.success("Enrollments created successfully!");
-      onOpenChange(); // Close the modal
-    } catch (error) {
-      console.error("Error creating enrollments:", error);
-      toast.error("Failed to create enrollments.");
-    }
+    await createEnrollments.mutateAsync(enrollments);
   };
 
   return (
@@ -95,7 +104,7 @@ const EnrollStudents = (props: PropType) => {
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader>Enroll Students to Section</ModalHeader>
+            <ModalHeader>Enroll Student(s) to Section</ModalHeader>
             <ModalBody>
               {isLoading ? (
                 <div className="w-full h-full flex justify-center items-center py-20">

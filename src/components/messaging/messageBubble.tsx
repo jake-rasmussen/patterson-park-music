@@ -29,7 +29,9 @@ const MessageBubble = (props: PropType) => {
               </Tooltip>
             </div>
           )}
-          <div className={`flex flex-col leading-1.5 p-4 rounded-l-xl rounded-br-xl bg-gray-800 shadow-xl ${type === "email" ? "max-w-[30rem] " : "max-w-[20rem]"}`}>
+          <div className={`flex flex-col leading-1.5 p-4  bg-gray-800 shadow-xl 
+          ${type === "email" ? "max-w-[30rem] " : "max-w-[20rem]"}
+          ${status === Status.RECEIVED ? "rounded-l-xl rounded-br-xl" : "rounded-r-xl rounded-bl-xl"}`}>
             <div className="flex items-center space-x-2">
               <span className="text-sm font-semibold text-white w-full">
                 {status === Status.RECEIVED ? `${contact.firstName} ${contact.lastName}` : "Patterson Park Music"}

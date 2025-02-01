@@ -2,8 +2,9 @@ import CreateSection from "~/components/section/createSection";
 import ManageSections from "~/components/section/manageSections";
 import { api } from "~/utils/api";
 import Error from "next/error";
+import Layout from "~/components/layout";
 
-export default function SectionPage() {
+const SectionPage = () => {
   const { data: teachers = [], isLoading: isLoadingTeachers, error: errorTeachers } = api.user.getAllTeachers.useQuery();
   const { data: sections, isLoading: isLoadingSections, error: errorSections } = api.section.getAllSections.useQuery();
 
@@ -34,3 +35,9 @@ export default function SectionPage() {
     );
   }
 }
+
+SectionPage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default SectionPage;

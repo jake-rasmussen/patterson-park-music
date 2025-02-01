@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { USER_TYPE } from "@prisma/client";
+import { CAMPUS, COURSE, USER_TYPE } from "@prisma/client";
+import { createClient } from "~/utils/supabase/client/component";
 
 export const userRouter = createTRPCRouter({
   createUser: protectedProcedure
@@ -11,10 +12,24 @@ export const userRouter = createTRPCRouter({
         email: z.string().email().optional(), // Optional as per the schema
         phoneNumber: z.string().length(10, "Enter a valid phone number"),
         type: z.enum(Object.values(USER_TYPE) as [USER_TYPE, ...USER_TYPE[]]),
+        interests: z.array(z.enum(Object.values(COURSE) as [COURSE, ...COURSE[]])).optional(),
+        pronouns: z.string().optional(),
+        birthday: z.date().optional(),
+        school: z.enum(Object.values(CAMPUS) as [CAMPUS, ...CAMPUS[]]).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { firstName, lastName, email, phoneNumber, type } = input;
+      const {
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        type,
+        interests,
+        pronouns,
+        birthday,
+        school,
+      } = input;
 
       try {
         const newUser = await ctx.db.user.create({
@@ -24,6 +39,10 @@ export const userRouter = createTRPCRouter({
             email,
             phoneNumber: "+1" + phoneNumber,
             type,
+            interests,
+            pronouns,
+            birthday,
+            school,
           },
         });
         return { success: true, user: newUser };
@@ -40,14 +59,35 @@ export const userRouter = createTRPCRouter({
         lastName: z.string().optional(),
         email: z.string().email().optional(),
         phoneNumber: z.string().optional(),
-        type: z.enum(Object.values(USER_TYPE) as [USER_TYPE, ...USER_TYPE[]]),
+        type: z.enum(Object.values(USER_TYPE) as [USER_TYPE, ...USER_TYPE[]]).optional(),
+        isArchived: z.boolean().optional(),
+        isPinned: z.boolean().optional(),
+        unreadMessage: z.boolean().optional(),
+        interests: z.array(z.enum(Object.values(COURSE) as [COURSE, ...COURSE[]])).optional(),
+        pronouns: z.string().optional(),
+        birthday: z.date().optional(),
+        school: z.enum(Object.values(CAMPUS) as [CAMPUS, ...CAMPUS[]]).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, firstName, lastName, email, phoneNumber, type } = input;
+      const {
+        id,
+        firstName,
+        lastName,
+        email,
+        phoneNumber,
+        type,
+        isArchived,
+        isPinned,
+        unreadMessage,
+        interests,
+        pronouns,
+        birthday,
+        school,
+      } = input;
 
       try {
-        const updatedUser = await ctx.db.user.update({
+        return await ctx.db.user.update({
           where: { id },
           data: {
             firstName,
@@ -55,9 +95,18 @@ export const userRouter = createTRPCRouter({
             phoneNumber: phoneNumber ? "+1" + phoneNumber : undefined,
             email,
             type,
+            isArchived,
+            isPinned,
+            unreadMessage,
+            interests,
+            pronouns,
+            birthday,
+            school
           },
+          include: {
+            family: true
+          }
         });
-        return { success: true, user: updatedUser };
       } catch (error) {
         console.error("Error updating user:", error);
         throw new Error("Failed to update user");
@@ -78,6 +127,44 @@ export const userRouter = createTRPCRouter({
           skip,
           take,
           orderBy: { lastName: "asc" },
+          include: {
+            family: true
+          }
+        });
+
+        return users;
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        throw new Error("Failed to retrieve users");
+      }
+    }),
+  getAllContacts: protectedProcedure
+    .input(
+      z.object({
+        skip: z.number().optional(),
+        take: z.number().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const { skip, take } = input || {};
+
+      try {
+        const users = await ctx.db.user.findMany({
+          skip,
+          take,
+          orderBy: { lastName: "asc" },
+          include: {
+            enrollment: {
+              include: {
+                section: {
+                  include: {
+                    teacher: true
+                  }
+                }
+              }
+            },
+            family: true,
+          }
         });
 
         return users;
@@ -106,6 +193,9 @@ export const userRouter = createTRPCRouter({
         const users = await ctx.db.user.findMany({
           where: {
             type: USER_TYPE.STUDENT
+          },
+          include: {
+            family: true
           }
         });
 
@@ -161,5 +251,61 @@ export const userRouter = createTRPCRouter({
           id
         }
       })
-    })
+    }),
+  searchUsers: protectedProcedure
+    .input(
+      z.object({
+        query: z.string().optional(), // The search query (optional)
+        skip: z.number().optional(), // Pagination support
+        take: z.number().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { query, skip, take } = input;
+
+      try {
+        return await ctx.db.user.findMany({
+          where: query
+            ? {
+              OR: [
+                { firstName: { contains: query, mode: "insensitive" } },
+                { lastName: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+                { phoneNumber: { contains: query, mode: "insensitive" } },
+                {
+                  smsMessages: {
+                    some: {
+                      OR: [
+                        { body: { contains: query, mode: "insensitive" } },
+                      ],
+                    },
+                  },
+                },
+                {
+                  emailMessages: {
+                    some: {
+                      OR: [
+                        { subject: { contains: query, mode: "insensitive" } },
+                        { body: { contains: query, mode: "insensitive" } },
+                      ],
+                    },
+                  },
+                },
+              ],
+            }
+            : {}, // If no query, return all users
+          skip,
+          take,
+          orderBy: { lastName: "asc" },
+          include: {
+            family: true,
+            smsMessages: true, // Include SMS messages in the response
+            emailMessages: true, // Include email messages in the response
+          },
+        });
+      } catch (error) {
+        console.error("Error searching users:", error);
+        throw new Error("Failed to search users");
+      }
+    }),
 });

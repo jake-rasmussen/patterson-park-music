@@ -8,15 +8,17 @@ import { formatDate } from "~/utils/helper";
 import { IconMessageDown } from "@tabler/icons-react";
 
 type PropType = {
-  selectedContact: User;
+  selectedUser: User;
   email: string;
 }
 
 const EmailView = (props: PropType) => {
   const {
-    selectedContact,
+    selectedUser,
     email
   } = props;
+
+  const updateUser = api.user.updateUser.useMutation();
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -38,13 +40,13 @@ const EmailView = (props: PropType) => {
       const newEmailMessage = data as EmailMessage;
       newEmailMessage.date = new Date();
 
-      if (newEmailMessage.from === selectedContact.email) {
+      if (newEmailMessage.from === selectedUser.email) {
         setMessages((prevMessages) => [...prevMessages, newEmailMessage]);
         setNewMessageAlert(true); // Trigger new message alert
       }
     },
     onError: (error) => {
-      console.error( error);
+      console.error(error);
     }
   });
 
@@ -67,7 +69,8 @@ const EmailView = (props: PropType) => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && newMessageAlert) {
+            updateUser.mutate({ id: selectedUser.id, unreadMessage: false });
             setNewMessageAlert(false); // Remove alert only when scrolled to bottom
           }
         });
@@ -128,7 +131,7 @@ const EmailView = (props: PropType) => {
                             body={message.body}
                             subject={message.subject}
                             dateSent={message.date}
-                            contact={selectedContact}
+                            contact={selectedUser}
                             imageUrls={message.attachments || null} // Pass the first media URL as the image
                             type="email"
                             errorCode={message.errorCode || undefined}

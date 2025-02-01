@@ -8,7 +8,9 @@ type PropType = {
   selectedFamily: (Family & {
     users: User[]
   });
-  users: User[]
+  users: (User & {
+    family: Family | null
+  })[]
   isOpen: boolean;
   onOpenChange: () => void;
 }

@@ -3,8 +3,9 @@ import Error from "next/error";
 
 import ManageUsers from "~/components/user/manageUsers";
 import ManageFamilies from "~/components/user/family/manageFamilies";
+import Layout from "~/components/layout";
 
-export default function ContactPage() {
+const ManageUsersPage = () => {
   const { data: users, isLoading: isLoadingUsers, error: errorUsers } = api.user.getAllUsers.useQuery();
   const { data: families, isLoading: isLoadingFamilies, error: errorFamilies } = api.family.getAllFamilies.useQuery();
 
@@ -20,7 +21,7 @@ export default function ContactPage() {
     return (
       <main className="flex flex-row gap-8 h-full">
         <section className="grow bg-white rounded-xl flex flex-col gap-8 p-8 overflow-auto max-h-full">
-          <ManageUsers users={users || []} isLoading={false} />
+          <ManageUsers users={users || []} isLoading={isLoadingUsers} />
         </section>
 
         <section className="w-1/4 bg-white rounded-xl flex flex-col gap-8 p-8 overflow-auto max-h-full">
@@ -30,3 +31,9 @@ export default function ContactPage() {
     )
   }
 }
+
+ManageUsersPage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default ManageUsersPage;

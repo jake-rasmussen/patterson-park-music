@@ -55,6 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const caller = createCaller({ db, user: null });
+      
       await caller.email.storeEmail({
         from,
         to,

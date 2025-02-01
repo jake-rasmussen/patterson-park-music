@@ -1,6 +1,6 @@
 import { Button } from "@nextui-org/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
-import { User, USER_TYPE } from "@prisma/client";
+import { Family, User, USER_TYPE } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -8,7 +8,9 @@ import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
 
 type PropType = {
-  users: User[];
+  users: (User & {
+    family: Family | null
+  })[];
   type: USER_TYPE;
   select?: boolean;
   onSelectionChange?: (selectedUsers: User[]) => void; // Callback for selection change with User objects
@@ -31,7 +33,9 @@ const UserTable = (props: PropType) => {
     }
   }, [users]);
 
-  const [selectedUser, setSelectedUser] = useState<User>();
+  const [selectedUser, setSelectedUser] = useState<(User & {
+    family: Family | null
+  })>();
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -49,6 +53,8 @@ const UserTable = (props: PropType) => {
       toast.success("Successfully deleted user!");
 
       utils.section.getAllSections.invalidate();
+      utils.user.getAllStudents.invalidate();
+      utils.user.getAllUsers.invalidate();
     },
     onError: () => {
       toast.dismiss();
@@ -87,7 +93,9 @@ const UserTable = (props: PropType) => {
             (type === USER_TYPE.STUDENT ? students :
               type === USER_TYPE.PARENT ? parents :
                 teachers) || []
-          ).map((user: User) => (
+          ).map((user: User & {
+            family: Family | null
+          }) => (
             <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
@@ -143,6 +151,7 @@ const UserTable = (props: PropType) => {
           isOpen={isOpen}
           onOpenChange={onOpenChange}
           type={selectedUser.type}
+          setSelectedUser={setSelectedUser}
         />
       )}
     </>
