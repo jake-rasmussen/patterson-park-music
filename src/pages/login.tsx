@@ -7,9 +7,10 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import z from "zod";
+import Layout from "~/components/layout";
 import { createClient } from "~/utils/supabase/client/component";
 
-export default function LoginPage() {
+const LoginPage = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -143,3 +144,9 @@ export default function LoginPage() {
     </main>
   );
 }
+
+LoginPage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default LoginPage;

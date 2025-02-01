@@ -6,8 +6,9 @@ import Error from "next/error";
 import EmailPanel from "~/components/messaging/email/emailPanel";
 import SMSPanel from "~/components/messaging/sms/smsPanel";
 import ContactsPanel from "~/components/messaging/contacts/contactsPanel";
+import Layout from "~/components/layout";
 
-export default function MessagePage() {
+const MessagePage = () => {
   const [selectedUser, setSelectedUser] = useState<(User & {
     family: Family | null
   })>();
@@ -69,3 +70,9 @@ export default function MessagePage() {
     );
   }
 }
+
+MessagePage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default MessagePage;

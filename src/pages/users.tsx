@@ -3,8 +3,9 @@ import Error from "next/error";
 
 import ManageUsers from "~/components/user/manageUsers";
 import ManageFamilies from "~/components/user/family/manageFamilies";
+import Layout from "~/components/layout";
 
-export default function ManageUsersPage() {
+const ManageUsersPage = () => {
   const { data: users, isLoading: isLoadingUsers, error: errorUsers } = api.user.getAllUsers.useQuery();
   const { data: families, isLoading: isLoadingFamilies, error: errorFamilies } = api.family.getAllFamilies.useQuery();
 
@@ -30,3 +31,9 @@ export default function ManageUsersPage() {
     )
   }
 }
+
+ManageUsersPage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default ManageUsersPage;

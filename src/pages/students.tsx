@@ -2,8 +2,9 @@ import { api } from "~/utils/api";
 import Error from "next/error";
 
 import ManageStudents from "~/components/user/manageStudents";
+import Layout from "~/components/layout";
 
-export default function StudentRosterPage() {
+const StudentRosterPage = () => {
   const { data: users, isLoading, error } = api.user.getAllUsers.useQuery();
 
   if (error) {
@@ -18,3 +19,9 @@ export default function StudentRosterPage() {
     )
   }
 }
+
+StudentRosterPage.getLayout = (page: React.ReactElement, isAuthenticated: boolean) => (
+  <Layout>{page}</Layout>
+);
+
+export default StudentRosterPage;
