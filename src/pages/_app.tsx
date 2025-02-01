@@ -3,11 +3,10 @@ import { Poppins } from "@next/font/google";
 import { Toaster } from "react-hot-toast";
 import "~/styles/globals.css";
 import type { AppProps } from "next/app";
-import { useEffect, useMemo, type ReactElement, type ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 import type { NextPage } from "next";
 import { AuthProvider, useAuth } from "~/context/auth-context";
 import { api } from "~/utils/api";
-import Navbar from "~/components/navbar";
 import LoginPage from "./login";
 
 const poppins = Poppins({
@@ -49,21 +48,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
 const AuthConsumer = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading } = useAuth();
 
-  const content = useMemo(() => {
-    if (isLoading) {
-      return (
-        <div className="w-full h-screen flex justify-center items-center">
-          <Spinner label="Loading..." className="m-auto" />
-        </div>
-      );
-    }
-    if (!user) {
-      return <LoginPage />;
-    }
-    return children;
-  }, [user, isLoading]);
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex justify-center items-center">
+        <Spinner label="Loading..." className="m-auto" />
+      </div>
+    );
+  }
+  if (!user) {
+    return <LoginPage />;
+  }
 
-  return content;
+  return children;
 };
 
 export default api.withTRPC(MyApp);

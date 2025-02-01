@@ -12,14 +12,14 @@ const Navbar = () => {
 
     <div className="flex flex-col gap-8 items-center p-4">
       <Link href="/message" className="w-full">
-        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+        <div className="text-white w-full flex justify-start flex-row items-center gap-2 mx-2">
           <IconMessage className="text-white h-12 w-12" /> Message
-        </button>
+        </div>
       </Link>
       <Link href="/schedule" className="w-full">
-        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+        <div className="text-white w-full flex justify-start flex-row items-center gap-2 mx-2">
           <IconClock className="text-white h-12 w-12" /> Schedule Message
-        </button>
+        </div>
       </Link>
       {/* <Link href={"/bulk"} className="w-full">
         <Button className="text-white w-full flex justify-start" size="lg" variant="light" startContent={<IconUsersGroup className="text-white h-12 w-12" />}>
@@ -27,19 +27,19 @@ const Navbar = () => {
         </Button>
       </Link> */}
       <Link href="/users" className="w-full">
-        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+        <div className="text-white w-full flex justify-start flex-row items-center gap-2 mx-2">
           <IconUserEdit className="text-white h-12 w-12" /> Manage Users
-        </button>
+        </div>
       </Link>
       <Link href="/section" className="w-full">
-        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
+        <div className="text-white w-full flex justify-start flex-row items-center gap-2 mx-2">
           <IconMusic className="text-white h-12 w-12" /> Manage Sections
-        </button>
+        </div>
       </Link>
       <Link href="/students" className="w-full">
-        <button className="text-white w-full flex flex-row items-center gap-2 justify-start">
-          <IconSchool className="text-white h-12 w-12" /> Student Roster
-        </button>
+        <div className="text-white w-full flex justify-start flex-row items-center gap-2 mx-2">
+          <IconSchool className="text-white h-12 w-12" />Student Roster
+        </div>
       </Link>
     </div >
 
