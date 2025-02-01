@@ -87,6 +87,9 @@ const ContactsPanel = ({ users: initialUsers, isLoading, selectedUser, setSelect
                 startContent={<IconSearch />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onClear={() => {
+                  setSearchQuery("");
+                }}
               />
               {isFetching ? (
                 <Spinner label="Loading..." className="m-auto py-4" />
@@ -106,6 +109,9 @@ const ContactsPanel = ({ users: initialUsers, isLoading, selectedUser, setSelect
                 startContent={<IconSearch />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onClear={() => {
+                  setSearchQuery("");
+                }}
               />
               {isFetching ? (
                 <Spinner label="Loading..." className="m-auto py-4" />

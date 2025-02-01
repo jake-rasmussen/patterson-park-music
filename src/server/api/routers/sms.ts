@@ -118,7 +118,7 @@ export const smsRouter = createTRPCRouter({
             mediaUrls: mediaUrls || [],
             status: input.status,
             date: input.date,
-            userId: recipient?.id || null, // Associate userId if found
+            userId: sender?.id || null, // Associate userId if found
           },
         });
       } catch (error) {

@@ -66,7 +66,7 @@ const ContactCard = (props: PropType) => {
             updateUserState(user);
             updateUser.mutate({ id: user.id, isPinned: user.isPinned });
           }}
-          className={`${!user.isPinned && "invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 ease-in-out"}`}
+          className={`${!user.isPinned && "invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-300 ease-in-out z-10"}`}
         >
           {user.isPinned ? (
             <IconPin className="transition-transform duration-300 ease-in-out hover:scale-125 text-blue-500 hover:text-black" />
@@ -77,7 +77,7 @@ const ContactCard = (props: PropType) => {
 
         {
           user.unreadMessage && (
-            <div className="absolute right-0 -translate-x-1/2 top-1/2 -translate-y-1/2">
+            <div className={`absolute right-0 -translate-x-1/2 top-1/2 -translate-y-1/2 ${user.isPinned && "mr-8 z-0"}`}>
               <span className="flex h-3 w-3 visible opacity-100 group-hover:invisible group-hover:opacity-0 transition-all duration-300 ease-in-out">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>

@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { createClient } from '~/utils/supabase/client/component';
-import { User } from '@supabase/supabase-js';
+import { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { createClient } from "~/utils/supabase/client/component";
+import { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;

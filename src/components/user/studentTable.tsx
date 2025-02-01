@@ -6,6 +6,7 @@ import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
+import { capitalizeToUppercase } from "~/utils/helper";
 
 type PropType = {
   users: (User & {
@@ -28,7 +29,10 @@ const UserTable = (props: PropType) => {
     onSuccess: () => {
       toast.dismiss();
       toast.success("Successfully deleted user!");
+      
       utils.section.getAllSections.invalidate();
+      utils.user.getAllStudents.invalidate();
+      utils.user.getAllUsers.invalidate();
     },
     onError: () => {
       toast.dismiss();
@@ -53,7 +57,7 @@ const UserTable = (props: PropType) => {
             <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
-              <TableCell>{user.interests?.join(", ") || "-"}</TableCell>
+              <TableCell>{user.interests?.map(capitalizeToUppercase).join(", ") || "-"}</TableCell>
               <TableCell>{user.pronouns || "-"}</TableCell>
               <TableCell>{user.birthday ? new Date(user.birthday).toLocaleDateString() : "-"}</TableCell>
               <TableCell>{user.school || "-"}</TableCell>

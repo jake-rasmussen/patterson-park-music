@@ -13,7 +13,7 @@ const StudentRosterPage = () => {
     return (
       <main className="flex flex-row gap-8 h-full">
         <section className="grow bg-white rounded-xl flex flex-col gap-8 p-8 overflow-auto max-h-full">
-          <ManageStudents users={users || []} isLoading={false} />
+          <ManageStudents users={users || []} isLoading={isLoading} />
         </section>
       </main>
     )

@@ -53,6 +53,8 @@ const UserTable = (props: PropType) => {
       toast.success("Successfully deleted user!");
 
       utils.section.getAllSections.invalidate();
+      utils.user.getAllStudents.invalidate();
+      utils.user.getAllUsers.invalidate();
     },
     onError: () => {
       toast.dismiss();

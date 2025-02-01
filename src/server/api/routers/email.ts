@@ -102,11 +102,6 @@ export const emailRouter = createTRPCRouter({
         });
 
         if (sender) {
-          // Resolve userId from the `to` email addresses
-          const recipient = await ctx.db.user.findFirst({
-            where: { email: { in: input.to } },
-          });
-
           await ctx.db.user.update({
             where: {
               id: sender?.id,
@@ -127,7 +122,7 @@ export const emailRouter = createTRPCRouter({
               attachments: input.attachments || [],
               status: input.status,
               date: input.date,
-              userId: recipient?.id || null, // Associate userId if found
+              userId: sender?.id || null, // Associate userId if found
             },
           });
         }

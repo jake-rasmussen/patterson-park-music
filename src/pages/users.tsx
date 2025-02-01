@@ -21,7 +21,7 @@ const ManageUsersPage = () => {
     return (
       <main className="flex flex-row gap-8 h-full">
         <section className="grow bg-white rounded-xl flex flex-col gap-8 p-8 overflow-auto max-h-full">
-          <ManageUsers users={users || []} isLoading={false} />
+          <ManageUsers users={users || []} isLoading={isLoadingUsers} />
         </section>
 
         <section className="w-1/4 bg-white rounded-xl flex flex-col gap-8 p-8 overflow-auto max-h-full">

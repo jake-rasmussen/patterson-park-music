@@ -1,19 +1,19 @@
-import { NextUIProvider, Spinner } from '@nextui-org/react';
-import { Poppins } from '@next/font/google';
-import { Toaster } from 'react-hot-toast';
-import '~/styles/globals.css';
-import type { AppProps } from 'next/app';
-import type { ReactElement, ReactNode } from 'react';
-import type { NextPage } from 'next';
-import { AuthProvider, useAuth } from '~/context/auth-context';
-import { api } from '~/utils/api';
-import Navbar from '~/components/navbar';
-import LoginPage from './login';
+import { NextUIProvider, Spinner } from "@nextui-org/react";
+import { Poppins } from "@next/font/google";
+import { Toaster } from "react-hot-toast";
+import "~/styles/globals.css";
+import type { AppProps } from "next/app";
+import type { ReactElement, ReactNode } from "react";
+import type { NextPage } from "next";
+import { AuthProvider, useAuth } from "~/context/auth-context";
+import { api } from "~/utils/api";
+import Navbar from "~/components/navbar";
+import LoginPage from "./login";
 
 const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-poppins',
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-poppins",
 });
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {

@@ -13,7 +13,7 @@ const ManageStudents = (props: PropType) => {
   const { users, isLoading } = props;
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-4 h-full">
       <h2 className="text-xl text-center">Student Roster</h2>
       <Divider />
       <div className="h-full">
