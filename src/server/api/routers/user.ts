@@ -104,7 +104,8 @@ export const userRouter = createTRPCRouter({
             school
           },
           include: {
-            family: true
+            family: true,
+            enrollment: true,
           }
         });
       } catch (error) {
@@ -128,7 +129,8 @@ export const userRouter = createTRPCRouter({
           take,
           orderBy: { lastName: "asc" },
           include: {
-            family: true
+            family: true,
+            enrollment: true,
           }
         });
 
@@ -195,7 +197,8 @@ export const userRouter = createTRPCRouter({
             type: USER_TYPE.STUDENT
           },
           include: {
-            family: true
+            family: true,
+            enrollment: true,
           }
         });
 

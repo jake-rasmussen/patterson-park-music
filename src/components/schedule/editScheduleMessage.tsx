@@ -76,7 +76,7 @@ const EditScheduleMessage = (props: PropType) => {
       utils.invalidate();
     } catch (error) {
       toast.dismiss();
-      toast.error("Failed to update message.");
+      toast.error("Error...");
     }
   };
 

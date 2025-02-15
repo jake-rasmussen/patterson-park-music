@@ -87,5 +87,15 @@ export const sectionRouter = createTRPCRouter({
           id
         }
       })
-    })
+    }),
+  getSectionsByIds: protectedProcedure
+    .input(z.object({ ids: z.array(z.string()) }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.section.findMany({
+        where: { id: { in: input.ids } },
+        include: {
+          teacher: true
+        }
+      });
+    }),
 });

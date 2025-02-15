@@ -1,4 +1,4 @@
-import { Family, User, USER_TYPE } from "@prisma/client";
+import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import UserTable from "./userTable";
 import CreateUserModal from "./createUserModal";
 import { useDisclosure } from "@nextui-org/modal";
@@ -13,7 +13,8 @@ import UserIcon from "./userIcon";
 
 type PropType = {
   users: (User & {
-    family: Family | null
+    family: Family | null;
+    enrollment: Enrollment[];
   })[];
   isLoading: boolean;
 }
@@ -172,8 +173,12 @@ const ManageUsers = (props: PropType) => {
                   </>
                 )}
 
+                <CreateUserModal
+                  isOpen={isOpenCreateUser}
+                  onOpenChange={onOpenChangeCreateUser}
+                  type={selectedType}
+                />
 
-                <CreateUserModal isOpen={isOpenCreateUser} onOpenChange={onOpenChangeCreateUser} type={selectedType} />
                 <CreateFamilyModal
                   isOpen={isOpenCreateFamily}
                   onOpenChange={onOpenChangeCreateFamily}

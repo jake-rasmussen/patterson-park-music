@@ -1,5 +1,5 @@
 import { Modal, ModalHeader, ModalBody, ModalContent } from "@nextui-org/react";
-import { Family, User, USER_TYPE } from "@prisma/client";
+import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 import UserForm from "./userForm";
@@ -11,7 +11,7 @@ type PropType = {
   isOpen: boolean;
   onOpenChange: () => void;
   type: USER_TYPE;
-  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null }) | undefined>>;
+  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null; enrollment: Enrollment[] }) | undefined>>;
 };
 
 const EditUserModal = (props: PropType) => {

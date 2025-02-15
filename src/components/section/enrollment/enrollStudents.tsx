@@ -13,7 +13,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import EnrollStudentCard from "./enrollStudentCard";
 
-type EnrollmentData = {
+export type EnrollmentData = {
   dateRange: { start: Date; end: Date } | null;
   status: ENROLLMENT_STATUS | undefined;
 };
@@ -29,10 +29,15 @@ const EnrollStudents = (props: PropType) => {
 
   const { data: users, isLoading } = api.user.getAllStudents.useQuery();
 
+  const utils = api.useUtils();
+
   const createEnrollments = api.enrollment.createEnrollments.useMutation({
     onSuccess() {
       toast.dismiss();
       toast.success("Enrollments created successfully!");
+
+      utils.section.getAllSections.invalidate();
+      utils.user.getAllStudents.invalidate();
 
       onOpenChange();
       setPage(0);
@@ -94,7 +99,7 @@ const EnrollStudents = (props: PropType) => {
           status: data.status,
         };
       }
-    }).filter((enrollment): enrollment is NonNullable<typeof enrollment> => !!enrollment);
+    }).filter((enrollment) => !!enrollment);
 
     await createEnrollments.mutateAsync(enrollments);
   };
