@@ -5,7 +5,7 @@ import { ENROLLMENT_STATUS } from "@prisma/client";
 export const enrollmentRouter = createTRPCRouter({
   createEnrollment: protectedProcedure
     .input(z.object({
-      personId: z.string(),
+      userId: z.string(),
       sectionId: z.string(),
       startDate: z.date(),
       endDate: z.date(),
@@ -80,4 +80,12 @@ export const enrollmentRouter = createTRPCRouter({
         data,
       });
     }),
+  deleteEnrollment: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const id = input;
+      return await ctx.db.enrollment.delete({
+        where: { id }
+      })
+    })
 });

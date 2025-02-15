@@ -6,17 +6,11 @@ import {
   DateRangePicker,
   Select,
   SelectItem,
-  DateValue,
-  RangeValue,
 } from "@nextui-org/react";
 import { ENROLLMENT_STATUS, User } from "@prisma/client";
 import { capitalizeToUppercase } from "~/utils/helper";
 import { parseDate } from "@internationalized/date";
-
-type EnrollmentData = {
-  dateRange: { start: Date; end: Date } | null;
-  status: ENROLLMENT_STATUS | undefined;
-};
+import { EnrollmentData } from "../section/enrollment/enrollStudents";
 
 type PropType = {
   user: User;
@@ -56,6 +50,11 @@ const EnrollStudentCard: React.FC<PropType> = ({ user, enrollmentData, updateEnr
           }
           variant="underlined"
           className="max-w-xs mb-4"
+          errorMessage={(value) => {
+            if (value.isInvalid) {
+              return "Please enter a valid date";
+            }
+          }}
         />
         <Select
           label="Enrollment Status"

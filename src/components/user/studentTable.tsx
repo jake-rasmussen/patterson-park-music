@@ -1,16 +1,18 @@
 import { Button } from "@nextui-org/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
-import { Family, User, USER_TYPE } from "@prisma/client";
-import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
+import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
+import { IconDotsVertical, IconEdit, IconEye, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
 import { capitalizeToUppercase } from "~/utils/helper";
+import EnrollmentDropdown from "../enrollment/enrollmentDropdown";
 
 type PropType = {
   users: (User & {
     family: Family | null;
+    enrollment: Enrollment[];
   })[];
 };
 
@@ -22,14 +24,15 @@ const UserTable = (props: PropType) => {
     return users?.filter((user) => user.type === USER_TYPE.STUDENT) || [];
   }, [users]);
 
-  const [selectedUser, setSelectedUser] = useState<(User & { family: Family | null })>();
+  const [selectedUser, setSelectedUser] = useState<(User & { family: Family | null; enrollment: Enrollment[] })>();
 
   const utils = api.useUtils();
+
   const deleteUser = api.user.deleteUser.useMutation({
     onSuccess: () => {
       toast.dismiss();
       toast.success("Successfully deleted user!");
-      
+
       utils.section.getAllSections.invalidate();
       utils.user.getAllStudents.invalidate();
       utils.user.getAllUsers.invalidate();
@@ -50,10 +53,11 @@ const UserTable = (props: PropType) => {
           <TableColumn>PRONOUNS</TableColumn>
           <TableColumn>BIRTHDAY</TableColumn>
           <TableColumn>CAMPUS</TableColumn>
+          <TableColumn>ENROLLMENTS</TableColumn>
           <TableColumn className="text-end">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody emptyContent={"No rows to display."}>
-          {students.map((user: User & { family: Family | null }) => (
+          {students.map((user: User & { family: Family | null; enrollment: Enrollment[] }) => (
             <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
@@ -61,6 +65,9 @@ const UserTable = (props: PropType) => {
               <TableCell>{user.pronouns || "-"}</TableCell>
               <TableCell>{user.birthday ? new Date(user.birthday).toLocaleDateString() : "-"}</TableCell>
               <TableCell>{user.school || "-"}</TableCell>
+              <TableCell>
+                <EnrollmentDropdown enrollments={user.enrollment} />
+              </TableCell>
               <TableCell className="flex justify-end">
                 <Dropdown>
                   <DropdownTrigger>

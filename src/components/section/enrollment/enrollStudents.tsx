@@ -11,9 +11,9 @@ import { Button, Spinner } from "@nextui-org/react";
 import { ENROLLMENT_STATUS, User, USER_TYPE } from "@prisma/client";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import EnrollStudentCard from "./enrollStudentCard";
+import EnrollStudentCard from "../../user/enrollStudentCard";
 
-type EnrollmentData = {
+export type EnrollmentData = {
   dateRange: { start: Date; end: Date } | null;
   status: ENROLLMENT_STATUS | undefined;
 };
@@ -94,7 +94,7 @@ const EnrollStudents = (props: PropType) => {
           status: data.status,
         };
       }
-    }).filter((enrollment): enrollment is NonNullable<typeof enrollment> => !!enrollment);
+    }).filter((enrollment) => !!enrollment);
 
     await createEnrollments.mutateAsync(enrollments);
   };

@@ -25,7 +25,7 @@ const ManageSections = (props: PropType) => {
   } = props;
 
   const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit } = useDisclosure();
-  const { isOpen: isOpenAdd, onOpen: onOpenAdd, onOpenChange: onOpenChangeAdd } = useDisclosure();
+  const { isOpen: isOpenCreate, onOpen: onOpenCreate, onOpenChange: onOpenChangeCreate } = useDisclosure();
 
   const [selectedSection, setSelectedSection] = useState<Section>();
 
@@ -87,10 +87,10 @@ const ManageSections = (props: PropType) => {
                             startContent={<IconSchool />}
                             onClick={() => {
                               setSelectedSection(section);
-                              onOpenAdd();
+                              onOpenCreate();
                             }}
                           >
-                            Add Students
+                            Enroll Student(s)
                           </DropdownItem>
                           <DropdownItem
                             key="edit"
@@ -138,8 +138,8 @@ const ManageSections = (props: PropType) => {
             />
             <EnrollStudents
               sectionId={selectedSection.id}
-              isOpen={isOpenAdd}
-              onOpenChange={onOpenChangeAdd}
+              isOpen={isOpenCreate}
+              onOpenChange={onOpenChangeCreate}
             />
           </>
         )

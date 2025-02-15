@@ -1,15 +1,18 @@
 import { Button } from "@nextui-org/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
-import { Family, User, USER_TYPE } from "@prisma/client";
-import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
-import { useMemo, useState, useEffect } from "react";
+import { $Enums, Enrollment, Family, User, USER_TYPE } from "@prisma/client";
+import { IconDotsVertical, IconEdit, IconSchool, IconTrash } from "@tabler/icons-react";
+import { useMemo, useState, useEffect, SetStateAction } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
+import EnrollmentDropdown from "../enrollment/enrollmentDropdown";
+import ManageStudentEnrollmentsModal from "../enrollment/manageEnrollmentsModal";
 
 type PropType = {
   users: (User & {
-    family: Family | null
+    family: Family | null;
+    enrollment: Enrollment[];
   })[];
   type: USER_TYPE;
   select?: boolean;
@@ -19,23 +22,27 @@ type PropType = {
 const UserTable = (props: PropType) => {
   const { users, type, select = false, onSelectionChange } = props;
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isOpenEditUser,
+    onOpen: onOpenEditUser,
+    onOpenChange: onOpenChangeEditUser
+  } = useDisclosure();
 
-  const { teachers, students, parents } = useMemo(() => {
-    if (users) {
-      const teachers = users.filter((user) => user.type === USER_TYPE.TEACHER);
-      const students = users.filter((user) => user.type === USER_TYPE.STUDENT);
-      const parents = users.filter((user) => user.type === USER_TYPE.PARENT);
+  const {
+    isOpen: isOpenEnrollStudent,
+    onOpen: onOpenEnrollStudent,
+    onOpenChange: onOpenChangeEnrollStudent
+  } = useDisclosure();
 
-      return { teachers, students, parents };
-    } else {
-      return {};
-    }
-  }, [users]);
+  const teachers = users?.filter((user) => user.type === USER_TYPE.TEACHER) ?? [];
+  const students = users?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
+  const parents = users?.filter((user) => user.type === USER_TYPE.PARENT) ?? [];
 
   const [selectedUser, setSelectedUser] = useState<(User & {
-    family: Family | null
+    family: Family | null;
+    enrollment: Enrollment[];
   })>();
+
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -44,6 +51,12 @@ const UserTable = (props: PropType) => {
       setSelectedUser(undefined);
     }
   }, [select]);
+
+  useEffect(() => {
+    if (users && selectedUser) {
+      setSelectedUser(users.find((user) => user.id === selectedUser.id)); // Make sure data is updated
+    }
+  }, [users]);
 
   const utils = api.useUtils();
 
@@ -65,11 +78,11 @@ const UserTable = (props: PropType) => {
   const handleSelectionChange = (keys: any) => {
     if (keys === "all" || typeof keys === "string") return;
 
-    const selectedIds = new Set(Array.from(keys).map(String)); // Convert keys to strings
+    const selectedIds = new Set(Array.from(keys).map(String));
     setSelectedKeys(selectedIds);
 
     if (onSelectionChange) {
-      const selectedUsers = users.filter((user) => selectedIds.has(user.id)); // Map selected IDs to User objects
+      const selectedUsers = users.filter((user) => selectedIds.has(user.id));
       onSelectionChange(selectedUsers);
     }
   };
@@ -79,13 +92,14 @@ const UserTable = (props: PropType) => {
       <Table
         selectionMode={select && type !== USER_TYPE.TEACHER ? "multiple" : "none"}
         selectedKeys={selectedKeys}
-        onSelectionChange={handleSelectionChange} // Use the handler
+        onSelectionChange={handleSelectionChange}
       >
         <TableHeader>
           <TableColumn>FIRST NAME</TableColumn>
           <TableColumn>LAST NAME</TableColumn>
           <TableColumn>EMAIL</TableColumn>
           <TableColumn>PHONE NUMBER</TableColumn>
+          {type === USER_TYPE.STUDENT ? <TableColumn>ENROLLMENTS</TableColumn> : <TableColumn><></></TableColumn>}
           {!select ? <TableColumn className="text-end">ACTIONS</TableColumn> : <TableColumn><></></TableColumn>}
         </TableHeader>
         <TableBody emptyContent={"No rows to display."}>
@@ -94,13 +108,21 @@ const UserTable = (props: PropType) => {
               type === USER_TYPE.PARENT ? parents :
                 teachers) || []
           ).map((user: User & {
-            family: Family | null
+            family: Family | null;
+            enrollment: Enrollment[];
           }) => (
             <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.phoneNumber.substring(2)}</TableCell>
+              {type === USER_TYPE.STUDENT ? (
+                <TableCell>
+                  <EnrollmentDropdown enrollments={user.enrollment} />
+                </TableCell>
+              ) : (
+                <TableCell><></></TableCell>
+              )}
               {!select ? (
                 <TableCell className="flex justify-end">
                   <Dropdown>
@@ -115,11 +137,25 @@ const UserTable = (props: PropType) => {
                         startContent={<IconEdit />}
                         onClick={() => {
                           setSelectedUser(user);
-                          onOpen();
+                          onOpenEditUser();
                         }}
                       >
                         Edit User
                       </DropdownItem>
+                      {
+                        type === USER_TYPE.STUDENT ? (
+                          <DropdownItem
+                            key="enroll"
+                            startContent={<IconSchool />}
+                            onClick={() => {
+                              setSelectedUser(user);
+                              onOpenEnrollStudent();
+                            }}
+                          >
+                            Edit Enrollments
+                          </DropdownItem>
+                        ) : <></>
+                      }
                       <DropdownItem
                         key="delete"
                         className="text-danger"
@@ -138,7 +174,9 @@ const UserTable = (props: PropType) => {
                   </Dropdown>
                 </TableCell>
               ) : (
-                <TableCell><></></TableCell>
+                <TableCell>
+                  <></>
+                </TableCell>
               )}
             </TableRow>
           ))}
@@ -146,13 +184,22 @@ const UserTable = (props: PropType) => {
       </Table>
 
       {selectedUser && (
-        <EditUserModal
-          selectedUser={selectedUser}
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          type={selectedUser.type}
-          setSelectedUser={setSelectedUser}
-        />
+        <>
+          <EditUserModal
+            selectedUser={selectedUser}
+            isOpen={isOpenEditUser}
+            onOpenChange={onOpenChangeEditUser}
+            type={selectedUser.type}
+            setSelectedUser={setSelectedUser}
+          />
+          <ManageStudentEnrollmentsModal
+            selectedUser={selectedUser}
+            isOpen={isOpenEnrollStudent}
+            onOpenChange={onOpenChangeEnrollStudent}
+            type={USER_TYPE.STUDENT}
+            setSelectedUser={setSelectedUser}
+          />
+        </>
       )}
     </>
   );
