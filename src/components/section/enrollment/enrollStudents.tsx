@@ -11,7 +11,7 @@ import { Button, Spinner } from "@nextui-org/react";
 import { ENROLLMENT_STATUS, User, USER_TYPE } from "@prisma/client";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import EnrollStudentCard from "../../user/enrollStudentCard";
+import EnrollStudentCard from "./enrollStudentCard";
 
 export type EnrollmentData = {
   dateRange: { start: Date; end: Date } | null;
@@ -29,10 +29,15 @@ const EnrollStudents = (props: PropType) => {
 
   const { data: users, isLoading } = api.user.getAllStudents.useQuery();
 
+  const utils = api.useUtils();
+
   const createEnrollments = api.enrollment.createEnrollments.useMutation({
     onSuccess() {
       toast.dismiss();
       toast.success("Enrollments created successfully!");
+
+      utils.section.getAllSections.invalidate();
+      utils.user.getAllStudents.invalidate();
 
       onOpenChange();
       setPage(0);

@@ -10,7 +10,7 @@ import {
 import { ENROLLMENT_STATUS, User } from "@prisma/client";
 import { capitalizeToUppercase } from "~/utils/helper";
 import { parseDate } from "@internationalized/date";
-import { EnrollmentData } from "../section/enrollment/enrollStudents";
+import { EnrollmentData } from "./enrollStudents";
 
 type PropType = {
   user: User;
@@ -52,7 +52,7 @@ const EnrollStudentCard: React.FC<PropType> = ({ user, enrollmentData, updateEnr
           className="max-w-xs mb-4"
           errorMessage={(value) => {
             if (value.isInvalid) {
-              return "Please enter a valid date";
+              return "Please select a valid date range";
             }
           }}
         />
