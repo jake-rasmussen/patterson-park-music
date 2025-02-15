@@ -1,13 +1,14 @@
 import { Button } from "@nextui-org/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
 import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
-import { IconDotsVertical, IconEdit, IconEye, IconTrash } from "@tabler/icons-react";
+import { IconDotsVertical, IconEdit, IconEye, IconSchool, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
 import { capitalizeToUppercase } from "~/utils/helper";
 import EnrollmentDropdown from "../enrollment/enrollmentDropdown";
+import ManageStudentEnrollmentsModal from "../enrollment/manageEnrollmentsModal";
 
 type PropType = {
   users: (User & {
@@ -18,13 +19,28 @@ type PropType = {
 
 const UserTable = (props: PropType) => {
   const { users } = props;
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const students = useMemo(() => {
-    return users?.filter((user) => user.type === USER_TYPE.STUDENT) || [];
-  }, [users]);
+  const {
+    isOpen: isOpenEditUser,
+    onOpen: onOpenEditUser,
+    onOpenChange: onOpenChangeEditUser
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenEnrollStudent,
+    onOpen: onOpenEnrollStudent,
+    onOpenChange: onOpenChangeEnrollStudent
+  } = useDisclosure();
+
+  const students = users?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
 
   const [selectedUser, setSelectedUser] = useState<(User & { family: Family | null; enrollment: Enrollment[] })>();
+
+  useEffect(() => {
+    if (users && selectedUser) {
+      setSelectedUser(users.find((user) => user.id === selectedUser.id)); // Make sure data is updated
+    }
+  }, [users]);
 
   const utils = api.useUtils();
 
@@ -81,10 +97,20 @@ const UserTable = (props: PropType) => {
                       startContent={<IconEdit />}
                       onClick={() => {
                         setSelectedUser(user);
-                        onOpen();
+                        onOpenEditUser();
                       }}
                     >
                       Edit User
+                    </DropdownItem>
+                    <DropdownItem
+                      key="enroll"
+                      startContent={<IconSchool />}
+                      onClick={() => {
+                        setSelectedUser(user);
+                        onOpenEnrollStudent();
+                      }}
+                    >
+                      Manage Enrollments
                     </DropdownItem>
                     <DropdownItem
                       key="delete"
@@ -107,13 +133,22 @@ const UserTable = (props: PropType) => {
       </Table>
 
       {selectedUser && (
-        <EditUserModal
-          selectedUser={selectedUser}
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          type={selectedUser.type}
-          setSelectedUser={setSelectedUser}
-        />
+        <>
+          <EditUserModal
+            selectedUser={selectedUser}
+            isOpen={isOpenEditUser}
+            onOpenChange={onOpenChangeEditUser}
+            type={selectedUser.type}
+            setSelectedUser={setSelectedUser}
+          />
+          <ManageStudentEnrollmentsModal
+            selectedUser={selectedUser}
+            isOpen={isOpenEnrollStudent}
+            onOpenChange={onOpenChangeEnrollStudent}
+            type={USER_TYPE.STUDENT}
+            setSelectedUser={setSelectedUser}
+          />
+        </>
       )}
     </>
   );

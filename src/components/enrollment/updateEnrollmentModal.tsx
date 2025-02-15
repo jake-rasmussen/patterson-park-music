@@ -23,6 +23,7 @@ const UpdateEnrollmentModal = ({ selectedEnrollment, isOpen, onOpenChange, secti
 
       utils.enrollment.getAllEnrollments.invalidate();
       utils.user.getAllUsers.invalidate();
+      utils.user.getAllStudents.invalidate();
     },
     onError() {
       toast.dismiss();

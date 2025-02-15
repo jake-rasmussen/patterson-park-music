@@ -31,6 +31,8 @@ const ManageStudentEnrollmentsModal = ({ selectedUser, isOpen, onOpenChange, set
       toast.success("Enrollment deleeted successfully!");
 
       utils.user.getAllUsers.invalidate();
+      utils.user.getAllStudents.invalidate();
+      utils.user.getAllUsers.invalidate();
     },
     onError() {
       toast.dismiss();

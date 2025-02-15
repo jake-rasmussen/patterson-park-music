@@ -21,6 +21,7 @@ const CreateEnrollmentModal = ({ isOpen, onOpenChange, sections, userId }: PropT
 
       utils.enrollment.getAllEnrollments.invalidate();
       utils.user.getAllUsers.invalidate();
+      utils.user.getAllStudents.invalidate();
     },
     onError() {
       toast.dismiss();

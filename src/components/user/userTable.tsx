@@ -152,7 +152,7 @@ const UserTable = (props: PropType) => {
                               onOpenEnrollStudent();
                             }}
                           >
-                            Edit Enrollments
+                            Manage Enrollments
                           </DropdownItem>
                         ) : <></>
                       }
