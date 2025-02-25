@@ -1,4 +1,4 @@
-import { user } from "@nextui-org/theme";
+import { user } from "@heroui/theme";
 import { USER_TYPE } from "@prisma/client";
 import { IconSchool, IconUser, IconApple, IconQuestionMark } from "@tabler/icons-react";
 

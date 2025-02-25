@@ -1,6 +1,6 @@
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react";
+import { Input } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { Field, Form } from "houseform";
 import { useRouter } from "next/router";

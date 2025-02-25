@@ -131,6 +131,7 @@ model Section {
     course     COURSE
     semesters  SEMESTER[]
     weekdays   WEEKDAY[] // Retain the new array column
+    campus     CAMPUS
     startTime  DateTime
     enrollment Enrollment[]
 }

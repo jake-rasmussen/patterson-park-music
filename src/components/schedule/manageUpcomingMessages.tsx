@@ -1,5 +1,5 @@
 import { api } from "~/utils/api";
-import { Button, Card, CardBody, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure } from "@nextui-org/react";
+import { Button, Card, CardBody, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure } from "@heroui/react";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { FutureEmailMessage, FutureSMSMessage } from "@prisma/client";

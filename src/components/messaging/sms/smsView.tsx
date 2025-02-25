@@ -1,4 +1,4 @@
-import { Divider, Spinner } from "@nextui-org/react";
+import { Divider, Spinner } from "@heroui/react";
 import { useState, useEffect, useRef } from "react";
 import { api } from "~/utils/api";
 import { formatDate } from "~/utils/helper";

@@ -1,4 +1,4 @@
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@heroui/react";
 import { Family, User, USER_TYPE } from "@prisma/client";
 import { IconSchool, IconUser } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";

@@ -1,4 +1,4 @@
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button, ModalContent } from "@nextui-org/react";
+import { Modal, ModalHeader, ModalBody, ModalContent } from "@heroui/react";
 import { Section, User } from "@prisma/client";
 import SectionForm from "./sectionForm";
 import { api } from "~/utils/api";
@@ -20,6 +20,7 @@ const EditSectionModal = (props: PropType) => {
     onSuccess() {
       toast.dismiss();
       toast.success("Updated section!");
+
       utils.section.getAllSections.invalidate();
     },
     onError() {
@@ -46,14 +47,13 @@ const EditSectionModal = (props: PropType) => {
       )
     );
 
-    console.log("UTC Date:", utcDate.toISOString());
-
     try {
       await updateSection.mutateAsync({
         id: selectedSection.id,
         course: values.course,
         semesters: values.semesters,
         weekdays: values.weekdays,
+        campus: values.campus,
         startTime: utcDate, // Send UTC time to the backend
       });
 
@@ -82,6 +82,7 @@ const EditSectionModal = (props: PropType) => {
                   course: selectedSection.course,
                   semesters: selectedSection.semesters,
                   weekdays: selectedSection.weekdays,
+                  campus: selectedSection.campus,
                   startTime: new Date(selectedSection.startTime)
                     .toISOString() // Convert to ISO string (UTC)
                     .slice(11, 16), // Extract "HH:mm" part

@@ -1,5 +1,5 @@
-import { Button } from "@nextui-org/button";
-import { useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/modal";
+import { Button } from "@heroui/button";
+import { useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 
 type PropType = {
   imageUrl: string;

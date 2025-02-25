@@ -1,5 +1,5 @@
-import { Button } from "@nextui-org/button";
-import { Divider, useDisclosure } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Divider, useDisclosure } from "@heroui/react";
 import { $Enums, Family, User, USER_TYPE } from "@prisma/client";
 import { IconArrowBack, IconEdit } from "@tabler/icons-react";
 import ParentInfo from "./info/parentInfo";

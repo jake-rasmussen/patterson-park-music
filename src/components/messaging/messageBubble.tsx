@@ -1,4 +1,4 @@
-import { Divider, Tooltip } from "@nextui-org/react";
+import { Divider, Tooltip } from "@heroui/react";
 import { User, Status } from "@prisma/client";
 import { formatTime } from "~/utils/helper";
 import MessageImageModal from "./messageImageModal";

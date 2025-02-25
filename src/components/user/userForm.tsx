@@ -1,10 +1,10 @@
-import { Button } from "@nextui-org/button";
-import { CalendarDate, DatePicker, Divider, Input, Select, SelectItem } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { CalendarDate, DatePicker, Divider, Input, Select, SelectItem } from "@heroui/react";
 import { USER_TYPE, COURSE, CAMPUS } from "@prisma/client";
 import { Field, Form } from "houseform";
 import { useState } from "react";
 import { z } from "zod";
-import { capitalizeToUppercase, dateToDateValue } from "~/utils/helper";
+import { enumToStr, dateToDateValue } from "~/utils/helper";
 
 type PropType = {
   handleSubmit: (values: Record<string, any>) => Promise<void>;
@@ -123,8 +123,8 @@ const UserForm = (props: PropType) => {
                   isRequired
                 >
                   {Object.values(USER_TYPE).map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {capitalizeToUppercase(type)}
+                    <SelectItem key={type}>
+                      {enumToStr(type)}
                     </SelectItem>
                   ))}
                 </Select>
@@ -146,8 +146,8 @@ const UserForm = (props: PropType) => {
                       onSelectionChange={(keys) => setValue(Array.from(keys) as COURSE[])}
                     >
                       {Object.values(COURSE).map((course) => (
-                        <SelectItem key={course} value={course}>
-                          {capitalizeToUppercase(course)}
+                        <SelectItem key={course}>
+                          {enumToStr(course)}
                         </SelectItem>
                       ))}
                     </Select>
@@ -158,7 +158,7 @@ const UserForm = (props: PropType) => {
                     <Input label="Pronouns" value={value} onChange={(e) => setValue(e.currentTarget.value)} size="sm" />
                   )}
                 </Field>
-                <Field<Date>
+                <Field
                   name="birthday"
                   initialValue={initialValues.birthday || undefined}
                 >
@@ -166,7 +166,7 @@ const UserForm = (props: PropType) => {
                     <DatePicker
                       label="Birthday"
                       value={dateToDateValue(value)}
-                      onChange={(e: CalendarDate) => setValue(e.toDate("UTC"))}
+                      onChange={(e: CalendarDate | null) => setValue(e ? e.toDate("EST") : null)}
                       size="sm"
                     />
                   )}
@@ -179,7 +179,7 @@ const UserForm = (props: PropType) => {
                       onSelectionChange={(keys) => setValue(Array.from(keys).pop() as CAMPUS)}
                     >
                       {Object.values(CAMPUS).map((campus) => (
-                        <SelectItem key={campus} value={campus}>
+                        <SelectItem key={campus}>
                           {campus}
                         </SelectItem>
                       ))}

@@ -1,4 +1,4 @@
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@heroui/react";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import { Family, User } from "@prisma/client";

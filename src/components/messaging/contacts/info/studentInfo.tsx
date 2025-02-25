@@ -1,8 +1,8 @@
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@heroui/react";
 import { Family, User, USER_TYPE, COURSE, CAMPUS } from "@prisma/client";
 import { IconSchool, IconUser, IconBook, IconCake, IconTextSize, IconMessageCircleUser } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 
 type PropType = {
   users: (User & { family: Family | null })[];
@@ -70,7 +70,7 @@ const StudentInfo = (props: PropType) => {
             </div>
             <ul className="ml-6 list-disc text-gray-700">
               {selectedUser.interests.map((interest) => (
-                <li key={interest}>{capitalizeToUppercase(interest)}</li>
+                <li key={interest}>{enumToStr(interest)}</li>
               ))}
             </ul>
           </div>

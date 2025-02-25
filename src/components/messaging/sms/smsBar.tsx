@@ -1,4 +1,4 @@
-import { Input } from "@nextui-org/react";
+import { Input } from "@heroui/react";
 import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useRef } from "react";
 

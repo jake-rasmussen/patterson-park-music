@@ -1,15 +1,17 @@
-import { Divider } from "@nextui-org/react";
 import toast from "react-hot-toast";
 import { api } from "~/utils/api";
 import SectionForm from "./sectionForm";
 import { User } from "@prisma/client";
+import { Modal, ModalHeader, ModalBody, ModalContent } from "@heroui/react";
 
 type PropType = {
+  isOpen: boolean;
+  onOpenChange: () => void;
   teachers: User[];
 }
 
-const CreateSection = (props: PropType) => {
-  const { teachers } = props;
+const CreateSectionModal = (props: PropType) => {
+  const { isOpen, onOpenChange, teachers } = props;
 
   const utils = api.useUtils();
 
@@ -45,6 +47,7 @@ const CreateSection = (props: PropType) => {
         course: values.course,
         semesters: values.semesters,
         weekdays: values.weekdays,
+        campus: values.campus,
         startTime: date,
       });
     } catch (error) {
@@ -52,14 +55,25 @@ const CreateSection = (props: PropType) => {
     }
   }
 
-  return (<>
-    <h2 className="text-xl text-center">Create Section</h2>
-    <Divider />
-    <div>
-      <SectionForm handleSubmit={handleSubmit} teachers={teachers} />
-    </div>
-  </>);
+  return (
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader>Create Section</ModalHeader>
+            <ModalBody>
+              <SectionForm
+                handleSubmit={handleSubmit}
+                teachers={teachers}
+                onClose={onClose}
+              />
+            </ModalBody>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  );
 
 }
 
-export default CreateSection;
+export default CreateSectionModal;

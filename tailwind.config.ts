@@ -1,11 +1,11 @@
-import { nextui } from "@nextui-org/theme";
+import { heroui } from "@heroui/react";
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
   content: [
     "./src/**/*.tsx",
-    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -14,5 +14,5 @@ export default {
       },
     },
   },
-  plugins: [nextui()],
+  plugins: [heroui()],
 } satisfies Config;

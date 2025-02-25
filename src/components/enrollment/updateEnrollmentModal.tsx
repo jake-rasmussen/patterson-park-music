@@ -1,4 +1,4 @@
-import { Modal, ModalHeader, ModalBody, ModalContent } from "@nextui-org/react";
+import { Modal, ModalHeader, ModalBody, ModalContent } from "@heroui/react";
 import { Enrollment, Section, User } from "@prisma/client";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";

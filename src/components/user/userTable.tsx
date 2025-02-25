@@ -1,8 +1,8 @@
-import { Button } from "@nextui-org/button";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
-import { $Enums, Enrollment, Family, User, USER_TYPE } from "@prisma/client";
+import { Button } from "@heroui/button";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@heroui/react";
+import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconSchool, IconTrash } from "@tabler/icons-react";
-import { useMemo, useState, useEffect, SetStateAction } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
@@ -14,13 +14,14 @@ type PropType = {
     family: Family | null;
     enrollment: Enrollment[];
   })[];
-  type: USER_TYPE;
   select?: boolean;
   onSelectionChange?: (selectedUsers: User[]) => void; // Callback for selection change with User objects
+  editable?: boolean;
+  displayEnrollment?: boolean;
 };
 
 const UserTable = (props: PropType) => {
-  const { users, type, select = false, onSelectionChange } = props;
+  const { users, select = false, onSelectionChange, editable = false, displayEnrollment } = props;
 
   const {
     isOpen: isOpenEditUser,
@@ -33,10 +34,6 @@ const UserTable = (props: PropType) => {
     onOpen: onOpenEnrollStudent,
     onOpenChange: onOpenChangeEnrollStudent
   } = useDisclosure();
-
-  const teachers = users?.filter((user) => user.type === USER_TYPE.TEACHER) ?? [];
-  const students = users?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
-  const parents = users?.filter((user) => user.type === USER_TYPE.PARENT) ?? [];
 
   const [selectedUser, setSelectedUser] = useState<(User & {
     family: Family | null;
@@ -90,7 +87,7 @@ const UserTable = (props: PropType) => {
   return (
     <>
       <Table
-        selectionMode={select && type !== USER_TYPE.TEACHER ? "multiple" : "none"}
+        selectionMode={select ? "multiple" : "none"}
         selectedKeys={selectedKeys}
         onSelectionChange={handleSelectionChange}
       >
@@ -99,15 +96,11 @@ const UserTable = (props: PropType) => {
           <TableColumn>LAST NAME</TableColumn>
           <TableColumn>EMAIL</TableColumn>
           <TableColumn>PHONE NUMBER</TableColumn>
-          {type === USER_TYPE.STUDENT ? <TableColumn>ENROLLMENTS</TableColumn> : <TableColumn><></></TableColumn>}
-          {!select ? <TableColumn className="text-end">ACTIONS</TableColumn> : <TableColumn><></></TableColumn>}
+          {displayEnrollment ? <TableColumn>ENROLLMENTS</TableColumn> : <TableColumn><></></TableColumn>}
+          {!select && editable ? <TableColumn className="text-end">ACTIONS</TableColumn> : <TableColumn><></></TableColumn>}
         </TableHeader>
         <TableBody emptyContent={"No rows to display."}>
-          {(
-            (type === USER_TYPE.STUDENT ? students :
-              type === USER_TYPE.PARENT ? parents :
-                teachers) || []
-          ).map((user: User & {
+          {(users).map((user: User & {
             family: Family | null;
             enrollment: Enrollment[];
           }) => (
@@ -116,14 +109,14 @@ const UserTable = (props: PropType) => {
               <TableCell>{user.lastName}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.phoneNumber.substring(2)}</TableCell>
-              {type === USER_TYPE.STUDENT ? (
+              {displayEnrollment ? (
                 <TableCell>
                   <EnrollmentDropdown enrollments={user.enrollment} />
                 </TableCell>
               ) : (
                 <TableCell><></></TableCell>
               )}
-              {!select ? (
+              {!select && editable ? (
                 <TableCell className="flex justify-end">
                   <Dropdown>
                     <DropdownTrigger>
@@ -135,7 +128,7 @@ const UserTable = (props: PropType) => {
                       <DropdownItem
                         key="edit"
                         startContent={<IconEdit />}
-                        onClick={() => {
+                        onPress={() => {
                           setSelectedUser(user);
                           onOpenEditUser();
                         }}
@@ -143,11 +136,11 @@ const UserTable = (props: PropType) => {
                         Edit User
                       </DropdownItem>
                       {
-                        type === USER_TYPE.STUDENT ? (
+                        displayEnrollment ? (
                           <DropdownItem
                             key="enroll"
                             startContent={<IconSchool />}
-                            onClick={() => {
+                            onPress={() => {
                               setSelectedUser(user);
                               onOpenEnrollStudent();
                             }}

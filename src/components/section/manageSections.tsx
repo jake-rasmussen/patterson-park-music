@@ -1,13 +1,14 @@
-import { Button } from "@nextui-org/button";
-import { Divider, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Divider, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@heroui/react";
 import { Section, User } from "@prisma/client";
-import { IconDotsVertical, IconEdit, IconSchool, IconTrash } from "@tabler/icons-react";
-import { capitalizeToUppercase, joinEnums, formatTime } from "~/utils/helper";
+import { IconDotsVertical, IconEdit, IconPlus, IconSchool, IconTrash } from "@tabler/icons-react";
+import { enumToStr, joinEnums, formatTime } from "~/utils/helper";
 import EditSectionModal from "./editSectionModal";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 import EnrollStudents from "./enrollment/enrollStudents";
+import CreateSectionModal from "./createSectionModal";
 
 type PropType = {
   sections: (Section & {
@@ -55,6 +56,12 @@ const ManageSections = (props: PropType) => {
           </div>
         ) : (
           <div className="flex flex-wrap gap-4 items-center justify-center">
+            <div className="grow flex justify-end gap-4">
+              <Button color="primary" endContent={<IconPlus />} onPress={onOpenChangeCreate}>
+                Create New
+              </Button>
+            </div>
+
             <Table>
               <TableHeader>
                 <TableColumn>COURSE</TableColumn>
@@ -69,7 +76,7 @@ const ManageSections = (props: PropType) => {
                   teacher: User
                 }), index: number) => (
                   <TableRow key={index}>
-                    <TableCell>{capitalizeToUppercase(section.course)}</TableCell>
+                    <TableCell>{enumToStr(section.course)}</TableCell>
                     <TableCell>{section.teacher.firstName} {section.teacher.lastName}</TableCell>
                     <TableCell>{joinEnums(section.semesters)}</TableCell>
                     <TableCell>{joinEnums(section.weekdays)}</TableCell>
@@ -85,7 +92,7 @@ const ManageSections = (props: PropType) => {
                           <DropdownItem
                             key="add-students"
                             startContent={<IconSchool />}
-                            onClick={() => {
+                            onPress={() => {
                               setSelectedSection(section);
                               onOpenCreate();
                             }}
@@ -95,7 +102,7 @@ const ManageSections = (props: PropType) => {
                           <DropdownItem
                             key="edit"
                             startContent={<IconEdit />}
-                            onClick={() => {
+                            onPress={() => {
                               setSelectedSection(section);
                               onOpenEdit();
                             }}
@@ -107,7 +114,7 @@ const ManageSections = (props: PropType) => {
                             className="text-danger"
                             color="danger"
                             startContent={<IconTrash />}
-                            onClick={() => {
+                            onPress={() => {
                               toast.loading("Deleting section...");
                               deleteSection.mutate({
                                 id: section.id
@@ -126,6 +133,13 @@ const ManageSections = (props: PropType) => {
           </div>
         )}
       </div>
+
+
+      <CreateSectionModal
+        isOpen={isOpenCreate}
+        onOpenChange={onOpenChangeCreate}
+        teachers={teachers}
+      />
 
       {
         selectedSection && (

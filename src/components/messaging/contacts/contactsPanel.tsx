@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Input, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Input, Spinner, Tab, Tabs } from "@heroui/react";
 import { Family, User } from "@prisma/client";
 import { IconSearch } from "@tabler/icons-react";
 import ContactCard from "./contactCard";

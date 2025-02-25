@@ -1,9 +1,9 @@
-import { Button } from "@nextui-org/button";
-import { Select, SelectItem, TimeInput, TimeInputValue, Input } from "@nextui-org/react";
-import { COURSE, SEMESTER, User, WEEKDAY } from "@prisma/client";
+import { Button } from "@heroui/button";
+import { Select, SelectItem, TimeInput, TimeInputValue, Input } from "@heroui/react";
+import { CAMPUS, COURSE, SEMESTER, User, WEEKDAY } from "@prisma/client";
 import { Field, Form } from "houseform";
 import { z } from "zod";
-import { capitalizeToUppercase, parseTimeInputValue, formatTimeInputValue } from "~/utils/helper";
+import { enumToStr, parseTimeInputValue, formatTimeInputValue } from "~/utils/helper";
 
 type PropType = {
   handleSubmit: (values: Record<string, any>) => Promise<void>;
@@ -48,7 +48,7 @@ const SectionForm = (props: PropType) => {
                   }
                 >
                   {teachers.map((teacher) => (
-                    <SelectItem key={teacher.id} value={teacher.id}>
+                    <SelectItem key={teacher.id}>
                       {teacher.firstName} {teacher.lastName}
                     </SelectItem>
                   ))}
@@ -72,8 +72,8 @@ const SectionForm = (props: PropType) => {
                 isRequired
               >
                 {Object.values(COURSE).map((course) => (
-                  <SelectItem key={course} value={course}>
-                    {capitalizeToUppercase(course)}
+                  <SelectItem key={course}>
+                    {enumToStr(course)}
                   </SelectItem>
                 ))}
               </Select>
@@ -96,8 +96,8 @@ const SectionForm = (props: PropType) => {
                 isRequired
               >
                 {Object.values(SEMESTER).map((semester) => (
-                  <SelectItem key={semester} value={semester}>
-                    {capitalizeToUppercase(semester)}
+                  <SelectItem key={semester}>
+                    {enumToStr(semester)}
                   </SelectItem>
                 ))}
               </Select>
@@ -120,15 +120,31 @@ const SectionForm = (props: PropType) => {
                 isRequired
               >
                 {Object.values(WEEKDAY).map((day) => (
-                  <SelectItem key={day} value={day}>
-                    {capitalizeToUppercase(day)}
+                  <SelectItem key={day}>
+                    {enumToStr(day)}
                   </SelectItem>
                 ))}
               </Select>
             )}
           </Field>
 
-          <Field<string>
+          <Field<CAMPUS> name="campus" initialValue={initialValues.campus || undefined}>
+            {({ value, setValue }) => (
+              <Select
+                label="School"
+                selectedKeys={value ? new Set([value]) : new Set()}
+                onSelectionChange={(keys) => setValue(Array.from(keys).pop() as CAMPUS)}
+              >
+                {Object.values(CAMPUS).map((campus) => (
+                  <SelectItem key={campus}>
+                    {campus}
+                  </SelectItem>
+                ))}
+              </Select>
+            )}
+          </Field>
+
+          <Field<string | null>
             name="startTime"
             initialValue={initialValues.startTime || ""} // Set default value
             onChangeValidate={z.string().min(1, "Start time is required")}
@@ -137,7 +153,7 @@ const SectionForm = (props: PropType) => {
               <TimeInput
                 label="Start Time"
                 value={value ? parseTimeInputValue(value) : null}
-                onChange={(time: TimeInputValue) => setValue(formatTimeInputValue(time))}
+                onChange={(time: TimeInputValue | null) => time ? setValue(formatTimeInputValue(time)) : setValue("")}
                 onBlur={onBlur}
                 isInvalid={!isValid}
                 errorMessage={errors[0]}

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { COURSE, WEEKDAY, SEMESTER } from "@prisma/client";
+import { COURSE, WEEKDAY, SEMESTER, CAMPUS } from "@prisma/client";
 
 export const sectionRouter = createTRPCRouter({
   createSection: protectedProcedure
@@ -10,6 +10,7 @@ export const sectionRouter = createTRPCRouter({
         course: z.nativeEnum(COURSE),
         semesters: z.array(z.nativeEnum(SEMESTER)),
         weekdays: z.array(z.nativeEnum(WEEKDAY)),
+        campus: z.nativeEnum(CAMPUS),
         startTime: z.date(),
       })
     )
@@ -51,11 +52,12 @@ export const sectionRouter = createTRPCRouter({
         course: z.nativeEnum(COURSE).optional(),
         semesters: z.array(z.nativeEnum(SEMESTER)).optional(),
         weekdays: z.array(z.nativeEnum(WEEKDAY)).optional(),
+        campus: z.nativeEnum(CAMPUS).optional(),
         startTime: z.date().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, course, semesters, weekdays, startTime } = input;
+      const { id, course, semesters, weekdays, campus, startTime } = input;
 
       return await ctx.db.section.update({
         where: { id },
@@ -63,6 +65,7 @@ export const sectionRouter = createTRPCRouter({
           course,
           semesters,
           weekdays,
+          campus,
           startTime
         },
       });
