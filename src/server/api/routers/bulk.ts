@@ -140,26 +140,24 @@ export const bulkRouter = createTRPCRouter({
 
                 // 🧑‍🏫 Teachers: Must Match Section Filters, Excluding Enrollment Status
                 input.userType.includes(USER_TYPE.TEACHER) &&
-                  input.enrollmentStatus.length === 0 &&
-                  (input.semester.length > 0 || input.course.length > 0 || input.weekday.length > 0)
-                  ? {
-                    type: USER_TYPE.TEACHER,
-                    section: {
-                      some: {
-                        AND: [
-                          ...(input.semester.length > 0
-                            ? [{ semesters: { hasSome: input.semester } }]
-                            : []),
-                          ...(input.course.length > 0
-                            ? [{ course: { in: input.course } }]
-                            : []),
-                          ...(input.weekday.length > 0
-                            ? [{ weekdays: { hasSome: input.weekday } }]
-                            : []),
-                        ],
-                      },
+                  input.enrollmentStatus.length === 0 ? {
+                  type: USER_TYPE.TEACHER,
+                  section: {
+                    some: {
+                      AND: [
+                        ...(input.semester.length > 0
+                          ? [{ semesters: { hasSome: input.semester } }]
+                          : []),
+                        ...(input.course.length > 0
+                          ? [{ course: { in: input.course } }]
+                          : []),
+                        ...(input.weekday.length > 0
+                          ? [{ weekdays: { hasSome: input.weekday } }]
+                          : []),
+                      ],
                     },
-                  }
+                  },
+                }
                   : {},
               ],
             },

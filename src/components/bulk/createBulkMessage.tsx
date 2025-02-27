@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Divider, Textarea, Accordion, AccordionItem, Button, useDisclosure } from "@heroui/react";
+import { Divider, Accordion, AccordionItem, Button, useDisclosure, Tabs, Tab } from "@heroui/react";
 import ToggleButton from "../toggleButton";
 import { CAMPUS, COURSE, ENROLLMENT_STATUS, SEMESTER, USER_TYPE, WEEKDAY } from "@prisma/client";
 import { enumToStr, strToEnum } from "~/utils/helper";
 import BulkListModal from "./bulkListModal";
+import SMSMessageBar from "./messaging/sms/smsBarBulk";
+import EmailMessageBar from "./messaging/email/emailBarBulk";
 
 const filters = {
   "User Type": Object.values(USER_TYPE)
@@ -19,9 +21,10 @@ const filters = {
 const placeholders = [
   { key: "{{firstName}}", label: "First Name" },
   { key: "{{lastName}}", label: "Last Name" },
-  { key: "{{course}}", label: "Course" },
-  { key: "{{semester}}", label: "Semester" },
-  { key: "{{location}}", label: "Location" },
+  { key: "{{familyName}}", label: "Family Name"},
+  // { key: "{{course}}", label: "Course" },
+  // { key: "{{semester}}", label: "Semester" },
+  // { key: "{{location}}", label: "Location" },
 ];
 
 const CreateBulkMessage = () => {
@@ -29,6 +32,10 @@ const CreateBulkMessage = () => {
 
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
   const [message, setMessage] = useState("");
+  const [subject, setSubject] = useState("");
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+
+  const [type, setType] = useState<"sms" | "email">("sms");
 
   const toggleFilter = (category: string, option: string) => {
     setSelectedFilters((prev) => ({
@@ -39,45 +46,38 @@ const CreateBulkMessage = () => {
     }));
   };
 
-  console.log(selectedFilters)
-
-  const insertPlaceholder = (placeholder: { key: string; label: string }) => {
-    setMessage((prev) => prev + ` [${placeholder.label}] `);
-  };
-
-  const processBulkMessages = (recipients: { firstName: string; lastName: string; course: string }[]) => {
-    return recipients.map((recipient) => {
-      return message
-        .replace(/\[First Name\]/g, recipient.firstName)
-        .replace(/\[Last Name\]/g, recipient.lastName)
-        .replace(/\[Course\]/g, recipient.course);
-    });
-  };
-
   return (
     <>
-      <h2 className="text-2xl font-semibold text-center">Create Bulk Message</h2>
+      <h2 className="text-center text-2xl">Create Bulk Message</h2>
       <Divider />
 
       <div className="flex flex-row gap-8">
-        <div className="flex flex-col flex-grow gap-4">
+        <div className="flex flex-col flex-grow gap-4 items-center">
           <h2 className="text-xl text-center">Enter Bulk Message</h2>
           <Divider />
 
-          <div className="flex flex-wrap gap-2">
-            {placeholders.map((placeholder) => (
-              <Button key={placeholder.key} size="sm" onPress={() => insertPlaceholder(placeholder)}>
-                {placeholder.label}
-              </Button>
-            ))}
-          </div>
-
-          <Textarea
-            label="Enter bulk message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            minRows={10}
-          />
+          <Tabs aria-label="Options" onSelectionChange={(e) => setType(e as "sms" | "email")}>
+            <Tab key="sms" title="SMS" className="w-full">
+              <SMSMessageBar
+                attachedImages={attachedFiles}
+                setAttachedImages={setAttachedFiles}
+                message={message}
+                setMessage={setMessage}
+                placeholders={placeholders}
+              />
+            </Tab>
+            <Tab key="email" title="Email" className="w-full">
+              <EmailMessageBar
+                attachedFiles={attachedFiles}
+                setAttachedFiles={setAttachedFiles}
+                body={message}
+                setBody={setMessage}
+                subject={subject}
+                setSubject={setSubject}
+                placeholders={placeholders}
+              />
+            </Tab>
+          </Tabs>
         </div>
 
         <Divider orientation="vertical" />
@@ -94,10 +94,8 @@ const CreateBulkMessage = () => {
                       <ToggleButton
                         key={option}
                         name={option}
-                        onClick={() => {
-                          toggleFilter(category, option)
-                          console.log(category, option)
-                        }}
+                        onClick={() => toggleFilter(category, option)
+                        }
                         isSelected={selectedFilters[category]?.includes(option) || false}
                       />
                     ))}
@@ -126,6 +124,10 @@ const CreateBulkMessage = () => {
           course: (selectedFilters["Course"] || []).map(strToEnum) as COURSE[] || undefined,
           weekday: (selectedFilters["Weekday"] || []).map(strToEnum) as WEEKDAY[] || undefined,
         }}
+        subject={subject}
+        message={message}
+        type={type}
+        attachedFiles={attachedFiles}
       />
     </>
   );
