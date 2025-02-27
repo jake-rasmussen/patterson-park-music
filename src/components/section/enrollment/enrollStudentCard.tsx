@@ -6,9 +6,9 @@ import {
   DateRangePicker,
   Select,
   SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { ENROLLMENT_STATUS, User } from "@prisma/client";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 import { parseDate } from "@internationalized/date";
 import { EnrollmentData } from "./enrollStudents";
 
@@ -71,7 +71,7 @@ const EnrollStudentCard: React.FC<PropType> = ({ user, enrollmentData, updateEnr
         >
           {Object.values(ENROLLMENT_STATUS).map((enrollmentStatus) => (
             <SelectItem key={enrollmentStatus} value={enrollmentStatus}>
-              {capitalizeToUppercase(enrollmentStatus)}
+              {enumToStr(enrollmentStatus)}
             </SelectItem>
           ))}
         </Select>

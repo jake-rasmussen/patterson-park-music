@@ -1,8 +1,8 @@
-import { Modal, ModalBody, ModalContent, ModalHeader } from "@nextui-org/react";
+import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
 import UserForm from "./userForm";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 import { USER_TYPE } from "@prisma/client";
 
 type PropType = {
@@ -51,7 +51,7 @@ const CreateUserModal = (props: PropType) => {
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader>Create {capitalizeToUppercase(type)}</ModalHeader>
+            <ModalHeader>Create {enumToStr(type)}</ModalHeader>
             <ModalBody>
               <UserForm
                 handleSubmit={async (values: Record<string, any>) => {

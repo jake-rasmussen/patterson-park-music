@@ -1,4 +1,4 @@
-import { ButtonGroup } from "@nextui-org/button";
+import { ButtonGroup } from "@heroui/button";
 import { Family, User, USER_TYPE } from "@prisma/client";
 import { IconSchool, IconUser, IconApple, IconPin, IconArchive, IconPinFilled } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";

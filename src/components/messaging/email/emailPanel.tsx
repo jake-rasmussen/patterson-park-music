@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import EmailView from "./emailView";
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@heroui/react";
 import EmailMessageBar from "./emailBar";
 import { IconMailX } from "@tabler/icons-react";
 import { useState } from "react";

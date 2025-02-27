@@ -1,8 +1,8 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@nextui-org/modal";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import { USER_TYPE, Family, Enrollment, User } from "@prisma/client";
 import { Dispatch, SetStateAction, useState } from "react";
-import { capitalizeToUppercase } from "~/utils/helper";
-import { Button, Card, CardBody, CardFooter, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@nextui-org/react";
+import { enumToStr } from "~/utils/helper";
+import { Button, Card, CardBody, CardFooter, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner } from "@heroui/react";
 import { api } from "~/utils/api";
 import CreateEnrollmentModal from "./createEnrollmentModal";
 import UpdateEnrollmentModal from "./updateEnrollmentModal";
@@ -82,7 +82,7 @@ const ManageStudentEnrollmentsModal = ({ selectedUser, isOpen, onOpenChange, set
                             <CardBody className="flex flex-row items-center justify-between truncate">
                               <div className="flex flex-col">
                                 <span className="font-semibold text-md">
-                                  {capitalizeToUppercase(section?.course || "Unknown Course")} with{" "}
+                                  {enumToStr(section?.course || "Unknown Course")} with{" "}
                                   {section?.teacher?.firstName || "Unknown"}
                                 </span>
                                 <span className="text-sm text-gray-500">
@@ -90,7 +90,7 @@ const ManageStudentEnrollmentsModal = ({ selectedUser, isOpen, onOpenChange, set
                                   {formatUTCDate(new Date(enrollment.endDate))}
                                 </span>
                                 <span className="text-sm font-semibold text-gray-500">
-                                  {capitalizeToUppercase(enrollment.status)}
+                                  {enumToStr(enrollment.status)}
                                 </span>
                               </div>
 

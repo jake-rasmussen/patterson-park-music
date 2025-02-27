@@ -1,4 +1,4 @@
-import { NextUIProvider, Spinner } from "@nextui-org/react";
+import { HeroUIProvider, Spinner } from "@heroui/react";
 import { Poppins } from "@next/font/google";
 import { Toaster } from "react-hot-toast";
 import "~/styles/globals.css";
@@ -34,13 +34,13 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         }
       `}</style>
       <Toaster />
-      <NextUIProvider>
+      <HeroUIProvider>
         <AuthProvider>
           <AuthConsumer>
             {getLayout(<Component {...pageProps} />)}
           </AuthConsumer>
         </AuthProvider>
-      </NextUIProvider>
+      </HeroUIProvider>
     </div>
   );
 }

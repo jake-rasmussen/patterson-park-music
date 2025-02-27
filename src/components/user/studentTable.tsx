@@ -1,12 +1,12 @@
-import { Button } from "@nextui-org/button";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@heroui/react";
 import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconEye, IconSchool, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 import EnrollmentDropdown from "../enrollment/enrollmentDropdown";
 import ManageStudentEnrollmentsModal from "../enrollment/manageEnrollmentsModal";
 
@@ -77,7 +77,7 @@ const UserTable = (props: PropType) => {
             <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
-              <TableCell>{user.interests?.map(capitalizeToUppercase).join(", ") || "-"}</TableCell>
+              <TableCell>{user.interests?.map(enumToStr).join(", ") || "-"}</TableCell>
               <TableCell>{user.pronouns || "-"}</TableCell>
               <TableCell>{user.birthday ? new Date(user.birthday).toLocaleDateString() : "-"}</TableCell>
               <TableCell>{user.school || "-"}</TableCell>

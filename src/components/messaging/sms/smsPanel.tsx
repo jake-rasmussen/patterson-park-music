@@ -1,4 +1,4 @@
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@heroui/react";
 import { IconMessageX } from "@tabler/icons-react";
 import SMSView from "./smsView";
 import SMSMessageBar from "./smsBar";

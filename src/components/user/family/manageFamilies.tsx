@@ -1,5 +1,5 @@
-import { Button } from "@nextui-org/button";
-import { Card, CardBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Divider, Spinner } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Card, CardBody, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Divider, Spinner } from "@heroui/react";
 import { Family, User } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";

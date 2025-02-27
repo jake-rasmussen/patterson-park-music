@@ -1,8 +1,8 @@
-import { Spinner, Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@nextui-org/react";
+import { Spinner, Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
 import { api } from "~/utils/api";
 import { Section, Enrollment, ENROLLMENT_STATUS } from "@prisma/client";
 import { IconEye } from "@tabler/icons-react";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 
 const EnrollmentDropdown = ({ enrollments }: { enrollments: Enrollment[] }) => {
   const sectionIds = enrollments.map((enrollment) => enrollment.sectionId);
@@ -59,12 +59,12 @@ const EnrollmentDropdown = ({ enrollments }: { enrollments: Enrollment[] }) => {
           mergedEnrollments.map((item, index) => (
             <DropdownItem key={item.key} className="py-2" isReadOnly showDivider={index !== mergedEnrollments.length - 1}>
               <div className="flex flex-col text-sm">
-                <span className="font-semibold text-md">{capitalizeToUppercase(item.course)} with {item.teacher?.firstName}</span>
+                <span className="font-semibold text-md">{enumToStr(item.course)} with {item.teacher?.firstName}</span>
                 <span className="text-sm text-gray-500">
                   {formatUTCDate(item.startDate)} → {formatUTCDate(item.endDate)}
                 </span>
                 <span className="text-sm font-semibold text-gray-500">
-                  {capitalizeToUppercase(item.status)}
+                  {enumToStr(item.status)}
                 </span>
               </div>
             </DropdownItem>

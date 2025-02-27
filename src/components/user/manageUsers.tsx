@@ -1,13 +1,13 @@
 import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import UserTable from "./userTable";
 import CreateUserModal from "./createUserModal";
-import { useDisclosure } from "@nextui-org/modal";
+import { useDisclosure } from "@heroui/modal";
 import { useState } from "react";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Divider, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Divider, Spinner, Tab, Tabs } from "@heroui/react";
 import { IconSearch, IconPlus, IconSchool, IconUser, IconApple, IconUsersGroup } from "@tabler/icons-react";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 import CreateFamilyModal from "./family/createFamilyModal";
 import UserIcon from "./userIcon";
 
@@ -29,6 +29,10 @@ const ManageUsers = (props: PropType) => {
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [selectedType, setSelectedType] = useState<USER_TYPE>(USER_TYPE.STUDENT);
   const [query, setQuery] = useState("");
+
+  const teachers = users?.filter((user) => user.type === USER_TYPE.TEACHER) ?? [];
+  const students = users?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
+  const parents = users?.filter((user) => user.type === USER_TYPE.PARENT) ?? [];
 
   const handleSelection = (newSelectedUsers: User[]) => {
     setSelectedUsers((prevSelectedUsers) => {
@@ -119,7 +123,7 @@ const ManageUsers = (props: PropType) => {
                           onClick={onOpenCreateUser}
                           endContent={<UserIcon userType={selectedType} />}
                         >
-                          Create {capitalizeToUppercase(selectedType)}
+                          Create {enumToStr(selectedType)}
                         </DropdownItem>
                         <DropdownItem
                           key="family"
@@ -140,10 +144,15 @@ const ManageUsers = (props: PropType) => {
                 {!isLoading && (
                   <>
                     <UserTable
-                      users={users}
-                      type={selectedType}
-                      select={select}
+                      users={selectedType === USER_TYPE.STUDENT ? students :
+                        selectedType === USER_TYPE.PARENT ? parents :
+                          selectedType === USER_TYPE.TEACHER ? teachers :
+                            []
+                      }
+                      select={select && selectedType !== USER_TYPE.TEACHER}
                       onSelectionChange={handleSelection}
+                      displayEnrollment={selectedType === USER_TYPE.STUDENT}
+                      editable
                     />
 
                     {

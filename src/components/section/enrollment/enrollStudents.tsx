@@ -4,10 +4,10 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from "@nextui-org/modal";
+} from "@heroui/modal";
 import UserTable from "../../user/userTable";
 import { api } from "~/utils/api";
-import { Button, Spinner } from "@nextui-org/react";
+import { Button, Spinner } from "@heroui/react";
 import { ENROLLMENT_STATUS, User, USER_TYPE } from "@prisma/client";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -122,7 +122,6 @@ const EnrollStudents = (props: PropType) => {
                       users={users || []}
                       select
                       onSelectionChange={handleSelection}
-                      type={USER_TYPE.STUDENT}
                     />
                   ) : (
                     <>

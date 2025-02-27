@@ -1,4 +1,4 @@
-import { Card } from "@nextui-org/react";
+import { Card } from "@heroui/react";
 import type { User } from "@prisma/client";
 import { IconUser } from "@tabler/icons-react";
 

@@ -1,5 +1,5 @@
 import { CalendarDate, Time, ZonedDateTime } from "@internationalized/date";
-import { TimeInputValue } from "@nextui-org/react";
+import { TimeInputValue } from "@heroui/react";
 
 export const formatDate = (date: Date): string => {
   if (!(date instanceof Date) || isNaN(date.getTime())) {
@@ -42,13 +42,22 @@ export const dateToDateValue = (date: Date) => {
   return null;
 };
 
-export const capitalizeToUppercase = (str: string): string => {
+export const enumToStr = (str: string): string => {
   if (!str) return "";
   return str
     .split("_") // Split by underscore
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
     .join(" "); // Join with spaces
 };
+
+export const strToEnum = (str: string): string => {
+  if (!str) return "";
+  return str
+    .split(" ")
+    .map(word => word.toUpperCase())
+    .join("_");
+};
+
 
 export const formatTimeInputValue = (time: TimeInputValue): string => {
   if (time === null) {
@@ -83,7 +92,7 @@ export const joinEnums = (enums: string[]): string => {
     return "";
   }
 
-  const capitalizedEnums = enums.map(capitalizeToUppercase);
+  const capitalizedEnums = enums.map(enumToStr);
 
   if (capitalizedEnums.length === 1) {
     return capitalizedEnums[0]!;

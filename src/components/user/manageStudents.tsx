@@ -1,5 +1,5 @@
 import { Family, User } from "@prisma/client";
-import { Divider, Spinner } from "@nextui-org/react";
+import { Divider, Spinner } from "@heroui/react";
 import StudentTable from "./studentTable";
 
 type PropType = {

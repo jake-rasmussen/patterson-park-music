@@ -1,8 +1,8 @@
-import { Divider, Spinner } from "@nextui-org/react";
+import { Divider, Spinner } from "@heroui/react";
 import { Family, User, USER_TYPE } from "@prisma/client";
 import { IconSchool, IconUser } from "@tabler/icons-react";
 import { api } from "~/utils/api";
-import { capitalizeToUppercase, formatTime, joinEnums } from "~/utils/helper";
+import { enumToStr, formatTime, joinEnums } from "~/utils/helper";
 
 type PropType = {
   selectedUser: (User & {
@@ -37,7 +37,7 @@ const TeacherInfo = (props: PropType) => {
                       sections?.map((section) => (
                         <div className="flex flex-col gap-2">
                           <div key={section.id} className="flex flex-row items-center gap-2">
-                            <span className="text-lg">{capitalizeToUppercase(section.course)}</span>
+                            <span className="text-lg">{enumToStr(section.course)}</span>
                           </div>
 
                           <p className="text-gray-500 text-xs">

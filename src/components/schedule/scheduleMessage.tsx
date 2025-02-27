@@ -1,10 +1,10 @@
-import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/modal";
-import { DatePicker, Divider, Spinner, RadioGroup, Radio, Checkbox, CheckboxGroup, Tab, Tabs } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@heroui/modal";
+import { DatePicker, Divider, Spinner, RadioGroup, Radio, Checkbox, CheckboxGroup, Tab, Tabs } from "@heroui/react";
 import { User, WEEKDAY } from "@prisma/client";
 import { useState } from "react";
 import { api } from "~/utils/api";
 import ContactCard from "../user/contactCard";
-import { capitalizeToUppercase, dateToDateValue } from "~/utils/helper";
+import { enumToStr, dateToDateValue } from "~/utils/helper";
 import SMSMessageBar from "../messaging/sms/smsBar";
 import EmailMessageBar from "../messaging/email/emailBar";
 import toast from "react-hot-toast";
@@ -173,7 +173,7 @@ const ScheduleMessage = (props: PropType) => {
                           key={key}
                           value={value}
                         >
-                          {capitalizeToUppercase(value)}
+                          {enumToStr(value)}
                         </Checkbox>
                       ))}
                     </CheckboxGroup>

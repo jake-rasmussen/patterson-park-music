@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "~/utils/api";
 import { User, EmailMessage, Status } from "@prisma/client";
 import Error from "next/error";
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@heroui/react";
 import MessageBubble from "../messageBubble";
 import { formatDate } from "~/utils/helper";
 import { IconMessageDown } from "@tabler/icons-react";

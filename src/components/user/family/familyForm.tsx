@@ -1,9 +1,9 @@
-import { Button } from "@nextui-org/button";
-import { Input, Select, SelectSection, SelectItem } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Input, Select, SelectSection, SelectItem } from "@heroui/react";
 import { Field, Form } from "houseform";
 import { z } from "zod";
 import { CAMPUS, Family, User } from "@prisma/client";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 
 type PropType = {
   handleSubmit: (values: Record<string, any>) => Promise<void>;

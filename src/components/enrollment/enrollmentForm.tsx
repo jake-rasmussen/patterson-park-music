@@ -1,9 +1,9 @@
-import { Button } from "@nextui-org/button";
-import { Select, SelectItem, DateRangePicker, ModalFooter } from "@nextui-org/react";
+import { Button } from "@heroui/button";
+import { Select, SelectItem, DateRangePicker, ModalFooter } from "@heroui/react";
 import { ENROLLMENT_STATUS, Section, User } from "@prisma/client";
 import { Field, Form } from "houseform";
 import { z } from "zod";
-import { capitalizeToUppercase } from "~/utils/helper";
+import { enumToStr } from "~/utils/helper";
 import { parseDate } from "@internationalized/date";
 
 type PropType = {
@@ -42,13 +42,13 @@ const EnrollmentForm = (props: PropType) => {
                   isRequired
                   renderValue={() =>
                     selectedSection
-                      ? `${capitalizeToUppercase(selectedSection.course)} with ${selectedSection.teacher.firstName}`
+                      ? `${enumToStr(selectedSection.course)} with ${selectedSection.teacher.firstName}`
                       : "Select a section˝"
                   }
                 >
                   {sections.map((section) => (
                     <SelectItem key={section.id} value={section.id}>
-                      {capitalizeToUppercase(section.course)} with {section.teacher.firstName}
+                      {enumToStr(section.course)} with {section.teacher.firstName}
                     </SelectItem>
                   ))}
                 </Select>
@@ -109,7 +109,7 @@ const EnrollmentForm = (props: PropType) => {
                 >
                   {Object.values(ENROLLMENT_STATUS).map((status) => (
                     <SelectItem key={status} value={status}>
-                      {capitalizeToUppercase(status)}
+                      {enumToStr(status)}
                     </SelectItem>
                   ))}
                 </Select>

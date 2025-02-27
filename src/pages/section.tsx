@@ -1,4 +1,4 @@
-import CreateSection from "~/components/section/createSection";
+import CreateSectionModal from "~/components/section/createSectionModal";
 import ManageSections from "~/components/section/manageSections";
 import { api } from "~/utils/api";
 import Error from "next/error";
@@ -26,11 +26,11 @@ const SectionPage = () => {
           />
         </section>
 
-        <div className="flex flex-col gap-8">
+        {/* <div className="flex flex-col gap-8">
           <section className="bg-white rounded-xl h-fit flex flex-col gap-8 p-8 min-w-96">
             <CreateSection teachers={teachers || []} />
           </section>
-        </div>
+        </div> */}
       </main>
     );
   }

@@ -1,4 +1,4 @@
-import { Input } from "@heroui/react";
+import { Button, Input } from "@heroui/react";
 import { IconPaperclip, IconSend, IconX } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useRef } from "react";
 
@@ -7,8 +7,10 @@ type PropType = {
   setAttachedImages: Dispatch<SetStateAction<File[]>>;
   message: string;
   setMessage: Dispatch<SetStateAction<string>>;
-  isSendDisabled: boolean;
-  handleSendMessage: () => void;
+  placeholders: {
+    key: string;
+    label: string;
+  }[];
 };
 
 const SMSMessageBar = (props: PropType) => {
@@ -16,12 +18,15 @@ const SMSMessageBar = (props: PropType) => {
     attachedImages,
     setAttachedImages,
     message,
-    isSendDisabled,
     setMessage,
-    handleSendMessage
+    placeholders,
   } = props;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const insertPlaceholder = (placeholder: { key: string; label: string }) => {
+    setMessage((prev) => prev + ` [${placeholder.label}] `);
+  };
 
   const handleFileAttach = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files: File[] = Array.from(event.target.files || []);
@@ -29,7 +34,15 @@ const SMSMessageBar = (props: PropType) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap gap-2">
+        {placeholders.map((placeholder) => (
+          <Button key={placeholder.key} size="sm" onPress={() => insertPlaceholder(placeholder)}>
+            {placeholder.label}
+          </Button>
+        ))}
+      </div>
+
       <div className="flex flex-row gap-2">
         {attachedImages.map((file, index) => (
           <div key={index} className="relative group">
@@ -70,17 +83,9 @@ const SMSMessageBar = (props: PropType) => {
           >
             <IconPaperclip />
           </button>
-
-          <button
-            className="transition duration-300 ease-in-out hover:bg-gray-800 p-2 hover:text-white rounded-xl disabled:opacity-50 disabled:bg-transparent disabled:text-gray-800"
-            onClick={handleSendMessage}
-            disabled={isSendDisabled}
-          >
-            <IconSend />
-          </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
