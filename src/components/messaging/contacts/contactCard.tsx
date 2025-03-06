@@ -1,15 +1,16 @@
 import { ButtonGroup } from "@heroui/button";
-import { Family, User, USER_TYPE } from "@prisma/client";
-import { IconSchool, IconUser, IconApple, IconPin, IconArchive, IconPinFilled } from "@tabler/icons-react";
+import { Enrollment, Family, User } from "@prisma/client";
+import { IconPin, IconArchive } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
 import UserIcon from "~/components/user/userIcon";
 import { api } from "~/utils/api";
 
 type PropType = {
   user: (User & {
-    family: Family | null
+    family: Family | null; 
+    enrollment: Enrollment[]
   });
-  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null }) | undefined>>;
+  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null; enrollment: Enrollment[] }) | undefined>>;
   updateUserState: (updatedUser: User) => void;
 };
 

@@ -70,7 +70,7 @@ const EnrollStudentCard: React.FC<PropType> = ({ user, enrollmentData, updateEnr
           variant="underlined"
         >
           {Object.values(ENROLLMENT_STATUS).map((enrollmentStatus) => (
-            <SelectItem key={enrollmentStatus} value={enrollmentStatus}>
+            <SelectItem key={enrollmentStatus}>
               {enumToStr(enrollmentStatus)}
             </SelectItem>
           ))}

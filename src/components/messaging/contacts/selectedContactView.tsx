@@ -1,6 +1,6 @@
 import { Button } from "@heroui/button";
 import { Divider, useDisclosure } from "@heroui/react";
-import { $Enums, Family, User, USER_TYPE } from "@prisma/client";
+import { $Enums, Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import { IconArrowBack, IconEdit } from "@tabler/icons-react";
 import ParentInfo from "./info/parentInfo";
 import StudentInfo from "./info/studentInfo";
@@ -11,12 +11,14 @@ import EditUserModal from "~/components/user/editUserModal";
 
 type PropType = {
   users: (User & {
-    family: Family | null
+    family: Family | null; 
+    enrollment: Enrollment[]
   })[];
   selectedUser: (User & {
-    family: Family | null
+    family: Family | null; 
+    enrollment: Enrollment[]
   });
-  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null }) | undefined>>;
+  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null; enrollment: Enrollment[] }) | undefined>>;
 };
 
 const SelectedContactView = (props: PropType) => {

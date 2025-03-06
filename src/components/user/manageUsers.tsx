@@ -30,9 +30,15 @@ const ManageUsers = (props: PropType) => {
   const [selectedType, setSelectedType] = useState<USER_TYPE>(USER_TYPE.STUDENT);
   const [query, setQuery] = useState("");
 
-  const teachers = users?.filter((user) => user.type === USER_TYPE.TEACHER) ?? [];
-  const students = users?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
-  const parents = users?.filter((user) => user.type === USER_TYPE.PARENT) ?? [];
+  const filteredUsers = query.trim().length > 0 
+  ? users.filter(user =>
+      `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase())
+    )
+  : users;
+
+  const teachers = filteredUsers?.filter((user) => user.type === USER_TYPE.TEACHER) ?? [];
+  const students = filteredUsers?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
+  const parents = filteredUsers?.filter((user) => user.type === USER_TYPE.PARENT) ?? [];
 
   const handleSelection = (newSelectedUsers: User[]) => {
     setSelectedUsers((prevSelectedUsers) => {

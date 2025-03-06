@@ -47,7 +47,7 @@ const EnrollmentForm = (props: PropType) => {
                   }
                 >
                   {sections.map((section) => (
-                    <SelectItem key={section.id} value={section.id}>
+                    <SelectItem key={section.id}>
                       {enumToStr(section.course)} with {section.teacher.firstName}
                     </SelectItem>
                   ))}
@@ -108,7 +108,7 @@ const EnrollmentForm = (props: PropType) => {
                   isRequired
                 >
                   {Object.values(ENROLLMENT_STATUS).map((status) => (
-                    <SelectItem key={status} value={status}>
+                    <SelectItem key={status}>
                       {enumToStr(status)}
                     </SelectItem>
                   ))}

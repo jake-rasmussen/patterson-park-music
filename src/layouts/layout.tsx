@@ -2,7 +2,7 @@ import Navbar from "../components/navbar";
 
 const Layout = ({ children }: { children: JSX.Element }) => {
   return (
-    <main className="bg-gray-900 flex flex-row h-screen overflow-auto">
+    <main className="bg-[#101C1B] flex flex-row h-screen overflow-auto">
       <div className="min-w-fit h-screen flex flex-col gap-8 justify-center items-center py-10">
         <Navbar />
       </div>

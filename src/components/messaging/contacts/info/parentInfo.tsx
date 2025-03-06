@@ -1,12 +1,12 @@
 import { Divider } from "@heroui/react";
-import { Family, User, USER_TYPE } from "@prisma/client";
+import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
 import { IconSchool, IconUser } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
 
 type PropType = {
-  users: (User & { family: Family | null })[];
-  selectedUser: User & { family: Family | null };
-  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null }) | undefined>>;
+  users: (User & { family: Family | null; enrollment: Enrollment[] })[];
+  selectedUser: User & { family: Family | null; enrollment: Enrollment[] };
+  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null; enrollment: Enrollment[] }) | undefined>>;
 };
 
 const ParentInfo = (props: PropType) => {

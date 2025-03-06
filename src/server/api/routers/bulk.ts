@@ -14,179 +14,167 @@ export const bulkRouter = createTRPCRouter({
         semester: z.nativeEnum(SEMESTER).array(),
         course: z.nativeEnum(COURSE).array(),
         weekday: z.nativeEnum(WEEKDAY).array(),
+        teacherId: z.string().array(),
       })
     )
     .query(async ({ input }) => {
-      console.log("INPUT:", input);
-
-      // If no filters are selected, return an empty array
+      // If no filters (besides userType) are selected, return an empty array.
       if (
         input.userType.length === 0 &&
         input.enrollmentStatus.length === 0 &&
         input.location.length === 0 &&
         input.semester.length === 0 &&
         input.course.length === 0 &&
-        input.weekday.length === 0
+        input.weekday.length === 0 &&
+        input.teacherId.length === 0
       ) {
         return [];
       }
 
-      const users = await db.user.findMany({
-        where: {
-          // User Type Filtering
-          ...(input.userType.length > 0 && { type: { in: input.userType } }),
+      // Build an array of AND conditions for all parameters (except userType)
+      const andConditions: any[] = [];
 
-          // Location Filtering
-          ...(input.location.length > 0 && {
-            OR: [
-              { school: { in: input.location } },
-              { family: { campus: { in: input.location } } },
-              { section: { some: { campus: { in: input.location } } } },
-              {
-                enrollment: {
-                  some: {
-                    section: { campus: { in: input.location } },
-                  },
-                },
-              },
-              {
-                family: {
-                  users: {
-                    some: {
-                      type: USER_TYPE.STUDENT,
-                      enrollment: {
-                        some: {
-                          section: { campus: { in: input.location } },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            ],
-          }),
-
-          // Role-Specific Filtering (only applied if applicable filters are provided)
-          AND: [
+      if (input.location.length > 0) {
+        andConditions.push({
+          OR: [
+            { school: { in: input.location } },
+            { family: { campus: { in: input.location } } },
+            { section: { some: { campus: { in: input.location } } } },
+            { enrollment: { some: { section: { campus: { in: input.location } } } } },
             {
-              OR: [
-                // 🎓 Students: Must Match Enrollment & Additional Filters
-                input.userType.includes(USER_TYPE.STUDENT)
-                  ? {
+              family: {
+                users: {
+                  some: {
                     type: USER_TYPE.STUDENT,
-                    ...(input.enrollmentStatus.length > 0 ||
-                      input.semester.length > 0 ||
-                      input.course.length > 0 ||
-                      input.weekday.length > 0
-                      ? {
-                        enrollment: {
-                          some: {
-                            AND: [
-                              ...(input.enrollmentStatus.length > 0
-                                ? [{ status: { in: input.enrollmentStatus } }]
-                                : []),
-                              ...(input.semester.length > 0
-                                ? [{ section: { semesters: { hasSome: input.semester } } }]
-                                : []),
-                              ...(input.course.length > 0
-                                ? [{ section: { course: { in: input.course } } }]
-                                : []),
-                              ...(input.weekday.length > 0
-                                ? [{ section: { weekdays: { hasSome: input.weekday } } }]
-                                : []),
-                            ],
-                          },
-                        },
-                      }
-                      : {}),
-                  }
-                  : {},
-
-                // 👨‍👩‍👧 Parents: Must Have a Student in Their Family Matching Filters
-                input.userType.includes(USER_TYPE.PARENT)
-                  ? {
-                    type: USER_TYPE.PARENT,
-                    family: {
-                      users: {
-                        some: {
-                          type: USER_TYPE.STUDENT,
-                          AND: [
-                            {
-                              enrollment: {
-                                some: {
-                                  AND: [
-                                    ...(input.enrollmentStatus.length > 0
-                                      ? [{ status: { in: input.enrollmentStatus } }]
-                                      : []),
-                                    ...(input.semester.length > 0
-                                      ? [{ section: { semesters: { hasSome: input.semester } } }]
-                                      : []),
-                                    ...(input.course.length > 0
-                                      ? [{ section: { course: { in: input.course } } }]
-                                      : []),
-                                    ...(input.weekday.length > 0
-                                      ? [{ section: { weekdays: { hasSome: input.weekday } } }]
-                                      : []),
-                                  ],
-                                },
-                              },
-                            },
-                          ],
-                        },
-                      },
-                    },
-                  }
-                  : {},
-
-                // 🧑‍🏫 Teachers: Must Match Section Filters, Excluding Enrollment Status
-                input.userType.includes(USER_TYPE.TEACHER) &&
-                  input.enrollmentStatus.length === 0 ? {
-                  type: USER_TYPE.TEACHER,
-                  section: {
-                    some: {
-                      AND: [
-                        ...(input.semester.length > 0
-                          ? [{ semesters: { hasSome: input.semester } }]
-                          : []),
-                        ...(input.course.length > 0
-                          ? [{ course: { in: input.course } }]
-                          : []),
-                        ...(input.weekday.length > 0
-                          ? [{ weekdays: { hasSome: input.weekday } }]
-                          : []),
-                      ],
-                    },
+                    enrollment: { some: { section: { campus: { in: input.location } } } },
                   },
-                }
-                  : {},
-              ],
+                },
+              },
             },
           ],
-        },
+        });
+      }
 
-        include: {
-          enrollment: {
-            include: {
-              section: true,
+      if (input.enrollmentStatus.length > 0) {
+        andConditions.push({
+          OR: [
+            {
+              type: USER_TYPE.STUDENT,
+              enrollment: { some: { status: { in: input.enrollmentStatus } } },
             },
-          },
+            {
+              type: USER_TYPE.PARENT,
+              family: {
+                users: {
+                  some: {
+                    type: USER_TYPE.STUDENT,
+                    enrollment: { some: { status: { in: input.enrollmentStatus } } },
+                  },
+                },
+              },
+            },
+          ],
+        });
+      }
+
+      if (input.semester.length > 0) {
+        andConditions.push({
+          OR: [
+            { enrollment: { some: { section: { semesters: { hasSome: input.semester } } } } },
+            {
+              family: {
+                users: {
+                  some: {
+                    type: USER_TYPE.STUDENT,
+                    enrollment: { some: { section: { semesters: { hasSome: input.semester } } } },
+                  },
+                },
+              },
+            },
+            { section: { some: { semesters: { hasSome: input.semester } } } },
+          ],
+        });
+      }
+
+      if (input.course.length > 0) {
+        andConditions.push({
+          OR: [
+            { enrollment: { some: { section: { course: { in: input.course } } } } },
+            {
+              family: {
+                users: {
+                  some: {
+                    type: USER_TYPE.STUDENT,
+                    enrollment: { some: { section: { course: { in: input.course } } } },
+                  },
+                },
+              },
+            },
+            { section: { some: { course: { in: input.course } } } },
+          ],
+        });
+      }
+
+      if (input.weekday.length > 0) {
+        andConditions.push({
+          OR: [
+            { enrollment: { some: { section: { weekdays: { hasSome: input.weekday } } } } },
+            {
+              family: {
+                users: {
+                  some: {
+                    type: USER_TYPE.STUDENT,
+                    enrollment: { some: { section: { weekdays: { hasSome: input.weekday } } } },
+                  },
+                },
+              },
+            },
+            { section: { some: { weekdays: { hasSome: input.weekday } } } },
+          ],
+        });
+      }
+
+      if (input.teacherId.length > 0) {
+        andConditions.push({
+          OR: [
+            { enrollment: { some: { section: { teacherId: { in: input.teacherId } } } } },
+            {
+              family: {
+                users: {
+                  some: {
+                    type: USER_TYPE.STUDENT,
+                    enrollment: { some: { section: { teacherId: { in: input.teacherId } } } },
+                  },
+                },
+              },
+            },
+            { section: { some: { teacherId: { in: input.teacherId } } } },
+          ],
+        });
+      }
+
+      // Build the final where clause.
+      // The userType filter is applied globally, and all other filters (if any) must all be satisfied.
+      const whereClause: any = {
+        ...(input.userType.length > 0 && { type: { in: input.userType } }),
+        ...(andConditions.length > 0 && { AND: andConditions }),
+      };
+
+      console.log("WHERE CLAUSE", JSON.stringify(whereClause, null, 2));
+
+      const usersResult = await db.user.findMany({
+        where: whereClause,
+        include: {
+          enrollment: { include: { section: true } },
           section: true,
           family: {
             include: {
-              users: {
-                include: {
-                  enrollment: {
-                    include: {
-                      section: true,
-                    },
-                  },
-                },
-              },
+              users: { include: { enrollment: { include: { section: true } } } },
             },
           },
         },
       });
 
-      return users;
+      return usersResult;
     }),
 });

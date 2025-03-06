@@ -28,15 +28,20 @@ type PropType = {
     semester: SEMESTER[];
     course: COURSE[];
     weekday: WEEKDAY[];
+    teacherId: string[];
   };
   type: "email" | "sms";
   subject?: string;
   message: string;
   attachedFiles: File[];
+  allUsers: (User & {
+    family: Family | null;
+    enrollment: Enrollment[];
+  })[];
 };
 
 const BulkListModal = (props: PropType) => {
-  const { isOpen, onOpenChange, filters, type, subject, message, attachedFiles } = props;
+  const { isOpen, onOpenChange, filters, type, subject, message, attachedFiles, allUsers } = props;
 
   const [selectedUsers, setSelectedUsers] = useState<(User & {
     family: Family | null;
@@ -45,8 +50,7 @@ const BulkListModal = (props: PropType) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSending, setIsSending] = useState(false);
 
-  const { data: allUsers, isLoading: isLoadingAllUsers } = api.user.getAllUsers.useQuery();
-  const { data: users, isLoading: isLoadingUsers, refetch } = api.bulk.getFilteredUsers.useQuery(filters, {
+  const { data: users, isLoading, refetch } = api.bulk.getFilteredUsers.useQuery(filters, {
     enabled: false,
     staleTime: 0,
     refetchOnMount: true,
@@ -135,13 +139,13 @@ const BulkListModal = (props: PropType) => {
   const parents = filteredUsers?.filter((user) => user.type === USER_TYPE.PARENT) ?? [];
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="4xl" className="h-[50vh]">
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="4xl">
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader>Create Bulk Message</ModalHeader>
             <ModalBody className="overflow-y-scroll">
-              {isLoadingUsers || isLoadingAllUsers ? (
+              {isLoading ? (
                 <div className="w-full h-full flex justify-center items-center py-2">
                   <Spinner size="sm" color="primary" label="Loading..." />
                 </div>
