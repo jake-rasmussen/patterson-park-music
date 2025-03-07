@@ -1,10 +1,11 @@
-import { Family, User } from "@prisma/client";
+import { Enrollment, Family, User } from "@prisma/client";
 import { Divider, Spinner } from "@heroui/react";
 import StudentTable from "./studentTable";
 
 type PropType = {
   users: (User & {
-    family: Family | null
+    family: Family | null;
+    enrollment: Enrollment[]
   })[];
   isLoading: boolean;
 }

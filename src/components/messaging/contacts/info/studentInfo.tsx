@@ -1,19 +1,19 @@
 import { Divider } from "@heroui/react";
-import { Family, User, USER_TYPE, COURSE, CAMPUS } from "@prisma/client";
+import { Family, User, USER_TYPE, COURSE, CAMPUS, Enrollment } from "@prisma/client";
 import { IconSchool, IconUser, IconBook, IconCake, IconTextSize, IconMessageCircleUser } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
 import { enumToStr } from "~/utils/helper";
 
 type PropType = {
-  users: (User & { family: Family | null })[];
-  selectedUser: User & { family: Family | null };
-  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null }) | undefined>>;
+  users: (User & { family: Family | null; enrollment: Enrollment[] })[];
+  selectedUser: User & { family: Family | null; enrollment: Enrollment[] };
+  setSelectedUser: Dispatch<SetStateAction<(User & { family: Family | null; enrollment: Enrollment[] }) | undefined>>;
 };
 
 const StudentInfo = (props: PropType) => {
   const { users, selectedUser, setSelectedUser } = props;
 
-  const familyMembers = users.filter((user) => user.familyId === selectedUser.familyId);
+  const familyMembers = users.filter((user) => user.familyId && user.familyId === selectedUser.familyId);
   const parents = familyMembers.filter((user) => user.type !== USER_TYPE.STUDENT && user.id !== selectedUser.id);
   const otherStudents = familyMembers.filter((user) => user.type === USER_TYPE.STUDENT && user.id !== selectedUser.id);
 
@@ -43,21 +43,21 @@ const StudentInfo = (props: PropType) => {
 
         {selectedUser.pronouns && (
           <div className="flex items-center gap-2">
-            <IconMessageCircleUser />
-            <span><strong>Pronouns:</strong> {selectedUser.pronouns}</span>
+            <IconMessageCircleUser className="min-w-6" />
+            <span><strong >Pronouns:</strong> {selectedUser.pronouns}</span>
           </div>
         )}
 
         {selectedUser.birthday && (
           <div className="flex items-center gap-2">
-            <IconCake />
+            <IconCake className="min-w-6" />
             <span><strong>Birthday:</strong> {new Date(selectedUser.birthday).toLocaleDateString()}</span>
           </div>
         )}
 
         {selectedUser.school && (
           <div className="flex items-center gap-2">
-            <IconSchool />
+            <IconSchool className="min-w-6" />
             <span><strong>School:</strong> {selectedUser.school}</span>
           </div>
         )}
@@ -65,7 +65,7 @@ const StudentInfo = (props: PropType) => {
         {selectedUser.interests && selectedUser.interests.length > 0 && (
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <IconBook />
+              <IconBook className="min-w-6" />
               <span><strong>Interests:</strong></span>
             </div>
             <ul className="ml-6 list-disc text-gray-700">

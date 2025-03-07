@@ -50,98 +50,96 @@ const LoginPage = () => {
   };
 
   return (
-    <main>
-      <Modal
-        size="xl"
-        isOpen={true}
-        backdrop="opaque"
-        classNames={{
-          backdrop: "bg-gray-900 h-screen w-screen flex items-center justify-center",
-        }}
-        hideCloseButton
-      >
-        <ModalContent>
-          <ModalHeader>Login</ModalHeader>
-          <Form
-            onSubmit={async (values) => {
-              handleSubmit(values);
-            }}
-          >
-            {({ submit }) => (
-              <>
-                <ModalBody>
-                  <div className="flex flex-col gap-4">
-                    <Field
-                      name="email"
-                      onBlurValidate={z
-                        .string()
-                        .min(1, "Enter an email")
-                        .email("Enter a valid email")}
-                      initialValue=""
-                    >
-                      {({ value, setValue, onBlur, isValid, errors }) => (
-                        <Input
-                          label="Email"
-                          value={value}
-                          onChange={(e) => setValue(e.currentTarget.value)}
-                          onBlur={onBlur}
-                          isInvalid={!isValid}
-                          errorMessage={errors[0]}
-                          isRequired
-                          autoComplete="off"
-                          size="lg"
-                        />
-                      )}
-                    </Field>
+    <Modal
+      size="xl"
+      isOpen={true}
+      backdrop="opaque"
+      classNames={{
+        backdrop: "bg-gray-900 h-screen w-screen flex items-center justify-center",
+      }}
+      hideCloseButton
+    >
+      <ModalContent>
+        <ModalHeader>Login</ModalHeader>
+        <Form
+          onSubmit={async (values) => {
+            handleSubmit(values);
+          }}
+        >
+          {({ submit }) => (
+            <>
+              <ModalBody>
+                <div className="flex flex-col gap-4">
+                  <Field
+                    name="email"
+                    onBlurValidate={z
+                      .string()
+                      .min(1, "Enter an email")
+                      .email("Enter a valid email")}
+                    initialValue=""
+                  >
+                    {({ value, setValue, onBlur, isValid, errors }) => (
+                      <Input
+                        label="Email"
+                        value={value}
+                        onChange={(e) => setValue(e.currentTarget.value)}
+                        onBlur={onBlur}
+                        isInvalid={!isValid}
+                        errorMessage={errors[0]}
+                        isRequired
+                        autoComplete="off"
+                        size="lg"
+                      />
+                    )}
+                  </Field>
 
-                    <Field<string>
-                      name="password"
-                      onChangeValidate={z.string().min(1, "Enter your password")}
-                      initialValue=""
-                    >
-                      {({ value, setValue, onBlur, isValid, errors }) => (
-                        <Input
-                          label="Password"
-                          value={value}
-                          type={isVisible ? "text" : "password"}
-                          onChange={(e) => setValue(e.currentTarget.value)}
-                          onBlur={onBlur}
-                          isInvalid={!isValid}
-                          errorMessage={errors[0]}
-                          isRequired
-                          endContent={
-                            <div className="h-full w-full flex justify-end">
-                              <button
-                                className="focus:outline-none pt-1"
-                                type="button"
-                                onClick={toggleVisibility}
-                              >
-                                {isVisible ? (
-                                  <IconEyeOff className="h-full text-gray-500" />
-                                ) : (
-                                  <IconEye className="h-full text-gray-500" />
-                                )}
-                              </button>
-                            </div>
-                          }
-                          autoComplete="off"
-                          size="lg"
-                        />
-                      )}
-                    </Field>
-                  </div>
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="primary" onPress={submit}>
-                    Submit
-                  </Button>
-                </ModalFooter>
-              </>
-            )}
-          </Form>
-        </ModalContent>
-      </Modal>
-    </main>
+                  <Field<string>
+                    name="password"
+                    onChangeValidate={z.string().min(1, "Enter your password")}
+                    initialValue=""
+                  >
+                    {({ value, setValue, onBlur, isValid, errors }) => (
+                      <Input
+                        label="Password"
+                        value={value}
+                        type={isVisible ? "text" : "password"}
+                        onChange={(e) => setValue(e.currentTarget.value)}
+                        onBlur={onBlur}
+                        isInvalid={!isValid}
+                        errorMessage={errors[0]}
+                        isRequired
+                        endContent={
+                          <div className="h-full w-full flex justify-end">
+                            <button
+                              className="focus:outline-none pt-1"
+                              type="button"
+                              onClick={toggleVisibility}
+                            >
+                              {isVisible ? (
+                                <IconEyeOff className="h-full text-gray-500" />
+                              ) : (
+                                <IconEye className="h-full text-gray-500" />
+                              )}
+                            </button>
+                          </div>
+                        }
+                        autoComplete="off"
+                        size="lg"
+                      />
+                    )}
+                  </Field>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={submit}>
+                  Submit
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </Form>
+      </ModalContent>
+    </Modal>
   );
 }
 

@@ -7,7 +7,6 @@ import Layout from "~/layouts/layout";
 const ScheduleMessagePage = () => {
   const { data: users, isLoading: isLoadingUsers, error } = api.user.getAllUsers.useQuery();
 
-
   const { data: emailMessages, isLoading: loadingEmails } = api.futureEmail.getAllUpcomingEmailMessages.useQuery();
   const { data: smsMessages, isLoading: loadingSMS } = api.futureSMS.getAllUpcomingSMSMessages.useQuery();
 
@@ -33,6 +32,7 @@ const ScheduleMessagePage = () => {
           <ManageUpcomingMessages
             emailMessages={emailMessages || []}
             smsMessages={smsMessages || []}
+            users={users || []}
             isLoading={isLoadingMessages}
           />
         </section>

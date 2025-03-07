@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Input, Spinner, Tab, Tabs } from "@heroui/react";
-import { Family, User } from "@prisma/client";
+import { Enrollment, Family, User } from "@prisma/client";
 import { IconSearch } from "@tabler/icons-react";
 import ContactCard from "./contactCard";
 import SelectedContactView from "./selectedContactView";
@@ -18,10 +18,10 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 type PropType = {
-  users: (User & { family: Family | null })[];
+  users: (User & { family: Family | null; enrollment: Enrollment[] })[];
   isLoading: boolean;
-  selectedUser?: User & { family: Family | null };
-  setSelectedUser: Dispatch<SetStateAction<User & { family: Family | null } | undefined>>;
+  selectedUser?: User & { family: Family | null; enrollment: Enrollment[] };
+  setSelectedUser: Dispatch<SetStateAction<User & { family: Family | null; enrollment: Enrollment[] } | undefined>>;
 };
 
 const ContactsPanel = ({ users: initialUsers, isLoading, selectedUser, setSelectedUser }: PropType) => {
@@ -49,7 +49,7 @@ const ContactsPanel = ({ users: initialUsers, isLoading, selectedUser, setSelect
     setUsers(searchedUsers || initialUsers || []);
   }, [searchedUsers, initialUsers]);
 
-  const sortUsers = (userList: (User & { family: Family | null })[]) => {
+  const sortUsers = (userList: (User & { family: Family | null; enrollment: Enrollment[] })[]) => {
     return userList.sort((a, b) => {
       if (a.isPinned !== b.isPinned) return b.isPinned ? 1 : -1;
       if (a.unreadMessage !== b.unreadMessage) return b.unreadMessage ? 1 : -1;

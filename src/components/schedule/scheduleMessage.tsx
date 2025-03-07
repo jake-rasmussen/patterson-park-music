@@ -87,7 +87,7 @@ const ScheduleMessage = (props: PropType) => {
 
   const handleSendSMSMessage = async () => {
     setIsSending(true);
-    toast.loading("Creating future message...");
+    toast.loading("Creating scheduled message...");
 
     const mediaUrls = await handleFileUploadSMS(attachedFiles);
 
@@ -102,7 +102,7 @@ const ScheduleMessage = (props: PropType) => {
 
   const handleSendEmailMessage = async () => {
     setIsSending(true);
-    toast.loading("Creating future message...");
+    toast.loading("Creating scheduled message...");
 
     const attachments = await handleFileUploadEmail(attachedFiles);
     const formattedBody = emailMessage.replace(/\n/g, "<br>");

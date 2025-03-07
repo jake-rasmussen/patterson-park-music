@@ -304,6 +304,7 @@ export const userRouter = createTRPCRouter({
             family: true,
             smsMessages: true, // Include SMS messages in the response
             emailMessages: true, // Include email messages in the response
+            enrollment: true,
           },
         });
       } catch (error) {

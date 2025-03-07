@@ -2,13 +2,17 @@ import { api } from "~/utils/api";
 import { Button, Card, CardBody, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Spinner, useDisclosure } from "@heroui/react";
 import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
-import { FutureEmailMessage, FutureSMSMessage } from "@prisma/client";
+import { Enrollment, Family, FutureEmailMessage, FutureSMSMessage, User } from "@prisma/client";
 import toast from "react-hot-toast";
 import EditScheduleMessage from "./editScheduleMessage";
 
 type PropType = {
   emailMessages: FutureEmailMessage[];
   smsMessages: FutureSMSMessage[];
+  users: (User & {
+    family: Family | null;
+    enrollment: Enrollment[];
+  })[];
   isLoading: boolean;
 }
 
@@ -16,6 +20,7 @@ const ManageUpcomingMessages = (props: PropType) => {
   const {
     emailMessages,
     smsMessages,
+    users,
     isLoading
   } = props;
 
@@ -29,7 +34,6 @@ const ManageUpcomingMessages = (props: PropType) => {
     onSuccess() {
       toast.dismiss();
       toast.success("Successfully deleted message!");
-
       utils.futureEmail.getAllUpcomingEmailMessages.invalidate();
     },
     onError() {
@@ -42,7 +46,6 @@ const ManageUpcomingMessages = (props: PropType) => {
     onSuccess() {
       toast.dismiss();
       toast.success("Successfully deleted message!");
-
       utils.futureSMS.getAllUpcomingSMSMessages.invalidate();
     },
     onError() {
@@ -51,6 +54,7 @@ const ManageUpcomingMessages = (props: PropType) => {
     },
   });
 
+  // Merge and sort upcoming messages by date
   const upcomingMessages = [
     ...(emailMessages || []),
     ...(smsMessages || []),
@@ -60,9 +64,20 @@ const ManageUpcomingMessages = (props: PropType) => {
     return dateA - dateB;
   });
 
+  const getRecipientName = (message: FutureEmailMessage | FutureSMSMessage) => {
+    if ("subject" in message) {
+      const email = message.to[0];
+      const user = users.find((u) => u.email === email);
+      return user ? `${user.firstName} ${user.lastName}` : email;
+    } else {
+      const phone = message.to;
+      const user = users.find((u) => u.phoneNumber === phone);
+      return user ? `${user.firstName} ${user.lastName}` : phone;
+    }
+  };
+
   const handleDelete = async (message: FutureEmailMessage | FutureSMSMessage) => {
     toast.loading("Deleting message...");
-
     try {
       if ("subject" in message) {
         await deleteEmailMessage.mutateAsync({ id: message.id });
@@ -92,7 +107,8 @@ const ManageUpcomingMessages = (props: PropType) => {
                     <Card key={message.id}>
                       <CardBody className="flex flex-row items-center justify-between truncate">
                         <div className="max-w-full grow flex flex-col gap-2 p-4 truncate">
-                          <p className="text-md truncate">{message.to}</p>
+                          {/* Display first and last name instead of message.to */}
+                          <p className="text-md truncate">{getRecipientName(message)}</p>
 
                           <p className="text-sm text-default-500 truncate">
                             {message.date
@@ -116,7 +132,7 @@ const ManageUpcomingMessages = (props: PropType) => {
                             <DropdownItem
                               key="edit"
                               startContent={<IconEdit />}
-                              onClick={() => {
+                              onPress={() => {
                                 setSelectedMessage(message);
                                 onOpen();
                               }}
@@ -128,7 +144,7 @@ const ManageUpcomingMessages = (props: PropType) => {
                               className="text-danger"
                               color="danger"
                               startContent={<IconTrash />}
-                              onClick={() => {
+                              onPress={() => {
                                 handleDelete(message);
                               }}
                             >
@@ -141,21 +157,17 @@ const ManageUpcomingMessages = (props: PropType) => {
                   ))}
                 </ul>
               ) : (
-                <>
-                  <p className="text-center text-gray-500">No upcoming messages scheduled.</p>
-                </>
+                <p className="text-center text-gray-500">No upcoming messages scheduled.</p>
               )
             }
 
-            {
-              selectedMessage && (
-                <EditScheduleMessage
-                  selectedMessage={selectedMessage}
-                  isOpen={isOpen}
-                  onOpenChange={onOpenChange}
-                />
-              )
-            }
+            {selectedMessage && (
+              <EditScheduleMessage
+                selectedMessage={selectedMessage}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+              />
+            )}
           </>
         )
       }

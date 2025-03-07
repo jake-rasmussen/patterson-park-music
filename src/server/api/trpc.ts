@@ -142,10 +142,6 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 const requireAuthMiddleware = t.middleware(async ({ ctx, next }) => {
   const user = ctx.user;
 
-  if (!user) {
-    throw new Error("Unauthorized: User must be signed in");
-  }
-
   return next({
     ctx: {
       ...ctx,

@@ -12,6 +12,11 @@ export default {
       fontFamily: {
         sans: ["var(--font-poppins)", ...fontFamily.sans],
       },
+      colors: {
+        black: "#101C1B",
+        primary: "#0D4EE8",
+        secondary: "#02B8F8"
+      }
     },
   },
   plugins: [heroui()],

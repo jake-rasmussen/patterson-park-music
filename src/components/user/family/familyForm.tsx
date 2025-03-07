@@ -63,7 +63,7 @@ const FamilyForm = (props: PropType) => {
                   onSelectionChange={(keys) => setValue(Array.from(keys).pop() as CAMPUS)}
                 >
                   {Object.values(CAMPUS).map((campus) => (
-                    <SelectItem key={campus} value={campus}>
+                    <SelectItem key={campus}>
                       {campus}
                     </SelectItem>
                   ))}
@@ -117,7 +117,7 @@ const FamilyForm = (props: PropType) => {
                   {Object.entries(usersByType).map(([type, users]) => (
                     <SelectSection key={type} title={type}>
                       {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
+                        <SelectItem key={user.id}>
                           {user.firstName} {user.lastName}
                         </SelectItem>
                       ))}
