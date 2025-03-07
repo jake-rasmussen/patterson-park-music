@@ -12,6 +12,7 @@ const placeholders = [
   { key: "{{firstName}}", label: "First Name" },
   { key: "{{lastName}}", label: "Last Name" },
   { key: "{{familyName}}", label: "Family Name" },
+  { key: "{{doorCode}}", label: "Door Code" },
 ];
 
 const CreateBulkMessage = () => {
