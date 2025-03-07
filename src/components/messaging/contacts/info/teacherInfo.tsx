@@ -29,7 +29,7 @@ const TeacherInfo = (props: PropType) => {
               <Spinner label="Loading..." className="m-auto" />
             </div>
           ) : (
-            <div className="p-2">
+            <>
               {
                 (sections || []).length > 0 ? (
                   <div className="flex flex-col gap-4">
@@ -42,15 +42,17 @@ const TeacherInfo = (props: PropType) => {
 
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center gap-2">
-                              <IconCalendar className="min-w-8" />
-                              <span><strong>Day(s):</strong> {joinEnums(section.weekdays)}</span>
+                              <IconCalendar className="min-w-6" />
+                              <span>
+                                <strong>Day(s):</strong> {joinEnums(section.weekdays)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <IconClock className="min-w-8" />
+                              <IconClock className="min-w-6" />
                               <span><strong>Start Time:</strong> {formatTime(section.startTime)}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <IconTimelineEventText className="min-w-8" />
+                              <IconTimelineEventText className="min-w-6" />
                               <span><strong>Semester(s):</strong> {joinEnums(section.semesters)}</span>
                             </div>
                           </div>
@@ -63,7 +65,7 @@ const TeacherInfo = (props: PropType) => {
                   <p className="text-gray-500">No sections found.</p>
                 )
               }
-            </div>
+            </>
           )
         }
       </div>
