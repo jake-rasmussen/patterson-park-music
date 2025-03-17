@@ -25,7 +25,7 @@ const ContactCard = (props: PropType) => {
       variant="light"
     >
       <button
-        className="w-full h-full min-h-[4rem] min-w-[8rem] py-4 flex justify-start bg-transparent"
+        className="md:w-full h-full min-h-[4rem] w-[4rem] py-4 flex justify-start bg-transparent"
         onClick={() => {
           setSelectedUser(user);
 
@@ -37,7 +37,7 @@ const ContactCard = (props: PropType) => {
         }}
       >
         <div className="flex flex-row h-full items-center gap-2">
-          <UserIcon userType={user.type} />
+          <UserIcon userType={user.type} className="lg:flex hidden w-10 h-10" />
 
           <div className="flex flex-col items-start text-black">
             <span className="text-small">{user.firstName}</span>

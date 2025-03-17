@@ -1,16 +1,16 @@
-import { user } from "@heroui/theme";
 import { USER_TYPE } from "@prisma/client";
 import { IconSchool, IconUser, IconApple, IconQuestionMark } from "@tabler/icons-react";
 
 type PropType = {
   userType: USER_TYPE;
+  className?: string;
 }
 
 const UserIcon = (props: PropType) => {
-  const { userType } = props;
+  const { userType, className } = props;
 
   return (
-    <>
+    <div className={`${className}`}>
       {
         userType === USER_TYPE.STUDENT ? (
           <IconSchool className="rounded-full h-full w-auto" />
@@ -22,7 +22,7 @@ const UserIcon = (props: PropType) => {
           <IconQuestionMark className="rounded-full h-full w-auto" />
         )
       }
-    </>
+    </div>
   )
 }
 

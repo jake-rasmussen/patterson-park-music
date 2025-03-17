@@ -28,7 +28,7 @@ const MessagePage = () => {
     />
   } else {
     return (
-      <main className="flex flex-row w-full h-full bg-white rounded-2xl">
+      <main className="flex flex-row w-full h-full bg-white rounded-2xl overflow-auto">
         <section className="w-80 overflow-y-auto h-full">
           <ContactsPanel
             isLoading={isLoading}
@@ -41,29 +41,32 @@ const MessagePage = () => {
         <Divider orientation="vertical" />
 
         <section className="flex flex-col w-full h-full min-h-0">
-          <div className="w-full flex flex-row items-center text-center min-h-10">
-            <div className="w-1/2">Text</div>
-            <div className="w-1/2">Email</div>
-          </div>
-
-          <Divider />
 
           {selectedUser ? (
-            <div className="flex flex-row h-full min-h-0">
-
-              <div className="w-1/2 flex flex-col h-full">
-                <SMSPanel selectedUser={selectedUser} />
+            <>
+              <div className="w-full flex flex-row items-center text-center min-h-10">
+                <div className="w-1/2">Text</div>
+                <div className="w-1/2">Email</div>
               </div>
 
-              <Divider orientation="vertical" />
+              <Divider />
 
-              <div className="w-1/2 flex flex-col h-full">
-                <EmailPanel selectedUser={selectedUser} />
+              <div className="flex flex-row h-full min-h-0">
+
+                <div className="w-1/2 flex flex-col h-full">
+                  <SMSPanel selectedUser={selectedUser} />
+                </div>
+
+                <Divider orientation="vertical" />
+
+                <div className="w-1/2 flex flex-col h-full">
+                  <EmailPanel selectedUser={selectedUser} />
+                </div>
               </div>
-            </div>
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <h1 className="text-xl">Select a user to view conversation</h1>
+              <h1 className="text-xl text-center">Select a user to view conversation</h1>
             </div>
           )}
         </section>

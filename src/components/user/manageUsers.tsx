@@ -126,14 +126,14 @@ const ManageUsers = (props: PropType) => {
                       <DropdownMenu>
                         <DropdownItem
                           key="user"
-                          onClick={onOpenCreateUser}
+                          onPress={onOpenCreateUser}
                           endContent={<UserIcon userType={selectedType} />}
                         >
                           Create {enumToStr(selectedType)}
                         </DropdownItem>
                         <DropdownItem
                           key="family"
-                          onClick={() => {
+                          onPress={() => {
                             if (setSelect) {
                               setSelect(true);
                             }
@@ -167,7 +167,7 @@ const ManageUsers = (props: PropType) => {
                           <Button
                             variant="light"
                             color="danger"
-                            onClick={() => {
+                            onPress={() => {
                               setSelect(false);
                             }}
                           >

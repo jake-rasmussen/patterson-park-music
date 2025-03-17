@@ -1,5 +1,5 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@heroui/modal";
-import { DatePicker, Divider, Spinner, RadioGroup, Radio, Checkbox, CheckboxGroup, Tab, Tabs } from "@heroui/react";
+import { DatePicker, Divider, Spinner, RadioGroup, Radio, Checkbox, CheckboxGroup, Tab, Tabs, Input } from "@heroui/react";
 import { User, WEEKDAY } from "@prisma/client";
 import { useState } from "react";
 import { api } from "~/utils/api";
@@ -9,6 +9,7 @@ import SMSMessageBar from "../messaging/sms/smsBar";
 import EmailMessageBar from "../messaging/email/emailBar";
 import toast from "react-hot-toast";
 import { useFileUpload } from "~/hooks/fileUpload";
+import { IconSearch } from "@tabler/icons-react";
 
 type PropType = {
   users: User[];
@@ -21,6 +22,14 @@ const ScheduleMessage = (props: PropType) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const { handleFileUploadEmail, handleFileUploadSMS } = useFileUpload();
+
+  const [query, setQuery] = useState("");
+
+  const filteredUsers = users.filter((user) =>
+    `${user.firstName} ${user.lastName}`
+      .toLowerCase()
+      .includes(query.toLowerCase())
+  );
 
   const utils = api.useUtils();
 
@@ -127,18 +136,29 @@ const ScheduleMessage = (props: PropType) => {
             <Spinner label="Loading..." />
           </div>
         ) : (
-          <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
-            {users?.map((contact: User) => (
-              <button
-                key={contact.id}
-                onClick={() => {
-                  setSelectedUser(contact);
-                  onOpen();
-                }}
-              >
-                <ContactCard contact={contact} />
-              </button>
-            ))}
+          <div className="flex flex-col items-center gap-8">
+            <Input
+              isClearable
+              className="max-w-xs"
+              placeholder="Search by name"
+              startContent={<IconSearch />}
+              value={query}
+              onChange={(e) => setQuery(e.currentTarget.value)}
+              onClear={() => setQuery("")}
+            />
+            <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
+              {filteredUsers?.map((contact: User) => (
+                <button
+                  key={contact.id}
+                  onClick={() => {
+                    setSelectedUser(contact);
+                    onOpen();
+                  }}
+                >
+                  <ContactCard contact={contact} />
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>

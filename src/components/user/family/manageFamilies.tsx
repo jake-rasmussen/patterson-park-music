@@ -73,7 +73,7 @@ const ManageFamilies = (props: PropType) => {
                           <DropdownItem
                             key="edit"
                             startContent={<IconEdit />}
-                            onClick={() => {
+                            onPress={() => {
                               setSelectedFamily(family);
                               onOpen();
                             }}
@@ -85,7 +85,7 @@ const ManageFamilies = (props: PropType) => {
                             className="text-danger"
                             color="danger"
                             startContent={<IconTrash />}
-                            onClick={() => {
+                            onPress={() => {
                               toast.loading("Deleting section...");
                               deleteFamily.mutate({
                                 id: family.id

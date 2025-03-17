@@ -13,7 +13,7 @@ const ContactCard = (props: PropType) => {
 
   return (
     <Card
-      className="p-8 px-16 transition duration-300 ease-in-out hover:bg-gray-200 hover:cursor-pointer w-72"
+      className="p-8 transition duration-300 ease-in-out hover:bg-gray-200 hover:cursor-pointer w-60"
     >
       <div className="flex flex-row h-full items-center gap-2">
         <UserIcon userType={contact.type} />
