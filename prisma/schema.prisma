@@ -82,7 +82,7 @@ model User {
     firstName     String
     lastName      String
     email         String?        @unique // TODO: change this to non-option
-    phoneNumber   String         @unique
+    phoneNumber   String?        @unique
     type          USER_TYPE
     enrollment    Enrollment[]
     section       Section[] // Only for teachers
@@ -93,6 +93,7 @@ model User {
     smsMessages   SMSMessage[]
     emailMessages EmailMessage[]
     unreadMessage Boolean        @default(false)
+    hasMessage    Boolean        @default(false)
     interests     COURSE[]
     pronouns      String?
     birthday      DateTime?
@@ -191,20 +192,3 @@ model FutureEmailMessage {
     days WEEKDAY[] // If it is a recurring messages
     date DateTime? // If it is a one time messages
 }
-
-// model BulkSMSMessage {
-//     id        String   @id @default(cuid())
-//     from      String
-//     to        String[]
-//     body      String[]
-//     mediaUrls String[]
-// }
-
-// model BulkEmailMessage {
-//     id          String   @id @default(cuid())
-//     from        String
-//     to          String[]
-//     subject     String
-//     body        String
-//     attachments String[] // TODO: Decide if we should add attachments
-// }

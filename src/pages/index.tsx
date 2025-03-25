@@ -1,10 +1,11 @@
 import Layout from "~/layouts/layout";
 import Image from "next/image";
+import { BackgroundLines } from "~/components/aceternity/backgroundLines";
 
 const HomePage = () => {
   return (
-    <main className="w-full h-full bg-white rounded-2xl shadow-xl">
-      <div className="py-32 px-32 flex flex-col items-center gap-8">
+    <main className="w-full h-full bg-white rounded-2xl shadow-xl relative">
+      <BackgroundLines className="flex flex-col items-center justify-center gap-8">
         <div className="relative w-2/3 h-52 mx-auto">
           <Image
             src="/PPAM Logo.png"
@@ -21,7 +22,7 @@ const HomePage = () => {
             <div className="text-black text-5xl underline decoration-secondary">Patterson Park <br />Music Academy</div>
           </h1>
         </div>
-      </div>
+      </BackgroundLines>
     </main>
   );
 };

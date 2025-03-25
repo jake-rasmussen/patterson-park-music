@@ -13,11 +13,11 @@ const ContactCard = (props: PropType) => {
 
   return (
     <Card
-      className="p-8 px-16 transition duration-300 ease-in-out hover:bg-gray-200 hover:cursor-pointer w-72"
+      className="p-8 transition duration-300 ease-in-out hover:bg-gray-200 hover:cursor-pointer w-60"
     >
-      <div className="flex flex-row h-full items-center gap-2">
-        <UserIcon userType={contact.type} />
-        <div className="flex flex-col items-start text-black">
+      <div className="flex flex-col h-full items-center gap-2">
+        <UserIcon userType={contact.type} className="w-10 h-10" />
+        <div className="flex flex-col items-center text-black text-center">
           <span className="text-lg">{contact.firstName}</span>
           <span className="text-md text-default-500">{contact.lastName}</span>
         </div>

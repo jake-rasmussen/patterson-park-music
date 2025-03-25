@@ -23,7 +23,8 @@ const PreviewBulkMessageModal = (props: PropType) => {
     const processedMessage = message
       .replace(/\[First Name\]/g, user.firstName)
       .replace(/\[Last Name\]/g, user.lastName)
-      .replace(/\[Family Name\]/g, user.family ? user.family.familyName : "N/A");
+      .replace(/\[Family Name\]/g, user.family ? user.family.familyName : "N/A")
+      .replace(/\[Door Code\]/g, user.family ? user.family.doorCode : "N/A");
     setPreviewMessage(processedMessage);
   }, [user, message]);
 

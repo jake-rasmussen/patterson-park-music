@@ -102,12 +102,11 @@ const ManageUpcomingMessages = (props: PropType) => {
           <>
             {
               upcomingMessages.length !== 0 ? (
-                <ul className="list-none space-y-4">
+                <div className="flex flex-col gap-4 overflow-y-auto">
                   {upcomingMessages.map((message) => (
                     <Card key={message.id}>
                       <CardBody className="flex flex-row items-center justify-between truncate">
                         <div className="max-w-full grow flex flex-col gap-2 p-4 truncate">
-                          {/* Display first and last name instead of message.to */}
                           <p className="text-md truncate">{getRecipientName(message)}</p>
 
                           <p className="text-sm text-default-500 truncate">
@@ -155,7 +154,7 @@ const ManageUpcomingMessages = (props: PropType) => {
                       </CardBody>
                     </Card>
                   ))}
-                </ul>
+                </div>
               ) : (
                 <p className="text-center text-gray-500">No upcoming messages scheduled.</p>
               )

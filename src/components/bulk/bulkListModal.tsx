@@ -52,8 +52,7 @@ const BulkListModal = (props: PropType) => {
 
   const { data: users, isLoading, refetch } = api.bulk.getFilteredUsers.useQuery(filters, {
     enabled: false,
-    staleTime: 0,
-    refetchOnMount: true,
+    refetchOnMount: false,
     refetchOnWindowFocus: false,
     refetchInterval: false,
   });
@@ -68,10 +67,12 @@ const BulkListModal = (props: PropType) => {
   }, [isOpen, refetch]);
 
   useEffect(() => {
-    if (users) {
-      setSelectedUsers(users);
+    if (isOpen && users) {
+      if (selectedUsers.length === 0) {
+        setSelectedUsers(users);
+      }
     }
-  }, [users]);
+  }, [isOpen, users]);
 
   const addUser = (user: any, e?: PressEvent) => {
     if (!selectedUsers.find((u) => u.id === user.id)) {
@@ -93,8 +94,8 @@ const BulkListModal = (props: PropType) => {
         const processedMessage = message
           .replace(/\[First Name\]/g, user.firstName)
           .replace(/\[Last Name\]/g, user.lastName)
-          .replace(/\[Family Name\]/g, user.family ? user.family.familyName : "N/A");
-
+          .replace(/\[Family Name\]/g, user.family ? user.family.familyName : "N/A")
+          .replace(/\[Door Code\]/g, user.family ? user.family.doorCode : "N/A");
         if (type === "email" && user.email) {
           return sendEmail.mutateAsync({
             to: user.email,
@@ -146,7 +147,7 @@ const BulkListModal = (props: PropType) => {
             <ModalHeader>Create Bulk Message</ModalHeader>
             <ModalBody className="overflow-y-scroll">
               {isLoading ? (
-                <div className="w-full h-full flex justify-center items-center py-2">
+                <div className="w-full h-full flex justify-center items-center py-10">
                   <Spinner size="sm" color="primary" label="Loading..." />
                 </div>
               ) : (

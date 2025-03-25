@@ -12,6 +12,7 @@ const placeholders = [
   { key: "{{firstName}}", label: "First Name" },
   { key: "{{lastName}}", label: "Last Name" },
   { key: "{{familyName}}", label: "Family Name" },
+  { key: "{{doorCode}}", label: "Door Code" },
 ];
 
 const CreateBulkMessage = () => {
@@ -67,7 +68,7 @@ const CreateBulkMessage = () => {
         ) : (
           <>
             <div className="flex flex-row gap-8">
-              <div className="flex flex-col flex-grow gap-4 items-center">
+              <div className="flex flex-col flex-grow gap-4 items-center min-w-96">
                 <h2 className="text-xl text-center">Enter Bulk Message</h2>
                 <Divider />
 

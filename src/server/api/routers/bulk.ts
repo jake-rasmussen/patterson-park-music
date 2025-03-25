@@ -2,7 +2,6 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { USER_TYPE, ENROLLMENT_STATUS, CAMPUS, SEMESTER, COURSE, WEEKDAY } from "@prisma/client";
 import { db } from "~/server/db";
-import { enrollmentRouter } from "./enrollment";
 
 export const bulkRouter = createTRPCRouter({
   getFilteredUsers: publicProcedure
