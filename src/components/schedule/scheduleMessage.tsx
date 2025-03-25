@@ -102,7 +102,7 @@ const ScheduleMessage = (props: PropType) => {
 
     createFutureSMSMessage.mutate({
       message: smsMessage,
-      to: selectedUser!.phoneNumber,
+      to: selectedUser!.phoneNumber!,
       days: isRecurring ? selectedDays : [],
       date: isRecurring ? undefined : selectedDate,
       mediaUrls,
@@ -136,7 +136,7 @@ const ScheduleMessage = (props: PropType) => {
             <Spinner label="Loading..." />
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-8">
+          <div className="h-full flex flex-col items-center">
             <Input
               isClearable
               className="max-w-xs"
@@ -146,18 +146,24 @@ const ScheduleMessage = (props: PropType) => {
               onChange={(e) => setQuery(e.currentTarget.value)}
               onClear={() => setQuery("")}
             />
-            <div className="flex flex-wrap gap-4 px-20 items-center justify-center">
-              {filteredUsers?.map((contact: User) => (
-                <button
-                  key={contact.id}
-                  onClick={() => {
-                    setSelectedUser(contact);
-                    onOpen();
-                  }}
-                >
-                  <ContactCard contact={contact} />
-                </button>
-              ))}
+
+            <Divider className="mt-8" />
+            
+            <div className="flex-grow w-full overflow-y-auto">
+              <div className="flex flex-wrap gap-4 px-20 pb-20 items-center justify-center m-8">
+                {filteredUsers?.map((contact: User) => (
+                  <button
+                    key={contact.id}
+                    onClick={() => {
+                      setSelectedUser(contact);
+                      onOpen();
+                    }}
+                    className="overflow-visible"
+                  >
+                    <ContactCard contact={contact} />
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

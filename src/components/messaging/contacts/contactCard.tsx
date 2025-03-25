@@ -21,7 +21,7 @@ const ContactCard = (props: PropType) => {
 
   return (
     <ButtonGroup
-      className="w-full hover:bg-[#EEEEEF] px-4 rounded-xl transition duration-300 ease-in-out group"
+      className="w-full hover:bg-[#EEEEEF] px-4 rounded-xl transition duration-300 ease-in-out group w-60"
       variant="light"
     >
       <button
@@ -39,7 +39,7 @@ const ContactCard = (props: PropType) => {
         <div className="flex flex-row h-full items-center gap-2">
           <UserIcon userType={user.type} className="lg:flex hidden w-10 h-10" />
 
-          <div className="flex flex-col items-start text-black">
+          <div className="flex flex-col items-start text-black text-left">
             <span className="text-small">{user.firstName}</span>
             <span className="text-tiny text-default-500">{user.lastName}</span>
           </div>

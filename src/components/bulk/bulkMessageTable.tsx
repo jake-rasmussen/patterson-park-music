@@ -42,7 +42,7 @@ const UserTable = (props: PropType) => {
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
               <TableCell>{user.email}</TableCell>
-              <TableCell>{user.phoneNumber?.substring(2)}</TableCell>
+              <TableCell>{user.phoneNumber ? user.phoneNumber?.substring(2) : ""}</TableCell>
               <TableCell>
                 <Button variant="flat" endContent={<IconEye />} onPress={() => {
                   setSelectedUser(user);

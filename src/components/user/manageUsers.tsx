@@ -30,11 +30,11 @@ const ManageUsers = (props: PropType) => {
   const [selectedType, setSelectedType] = useState<USER_TYPE>(USER_TYPE.STUDENT);
   const [query, setQuery] = useState("");
 
-  const filteredUsers = query.trim().length > 0 
-  ? users.filter(user =>
+  const filteredUsers = query.trim().length > 0
+    ? users.filter(user =>
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(query.toLowerCase())
     )
-  : users;
+    : users;
 
   const teachers = filteredUsers?.filter((user) => user.type === USER_TYPE.TEACHER) ?? [];
   const students = filteredUsers?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
@@ -66,7 +66,7 @@ const ManageUsers = (props: PropType) => {
               <Spinner label="Loading..." className="m-auto" />
             </div>
           ) : (
-            <div className="flex flex-col gap-8 items-center w-full justify-center">
+            <div className="flex flex-col gap-8 items-center w-full justify-center pb-8">
               <Tabs onSelectionChange={(e) => {
                 if (e === "students") setSelectedType(USER_TYPE.STUDENT);
                 else if (e === "parents") setSelectedType(USER_TYPE.PARENT);
@@ -104,7 +104,7 @@ const ManageUsers = (props: PropType) => {
                 />
               </Tabs>
 
-              <div className="w-full flex flex-col gap-4">
+              <div className="w-full h-full flex flex-col gap-4">
                 <div className="flex flex-row">
                   <Input
                     isClearable
@@ -147,46 +147,48 @@ const ManageUsers = (props: PropType) => {
                   </div>
                 </div>
 
-                {!isLoading && (
-                  <>
-                    <UserTable
-                      users={selectedType === USER_TYPE.STUDENT ? students :
-                        selectedType === USER_TYPE.PARENT ? parents :
-                          selectedType === USER_TYPE.TEACHER ? teachers :
-                            []
-                      }
-                      select={select && selectedType !== USER_TYPE.TEACHER}
-                      onSelectionChange={handleSelection}
-                      displayEnrollment={selectedType === USER_TYPE.STUDENT}
-                      editable
-                    />
+                <div className="flex flex-col h-full">
+                  <div className="flex-grow max-h-fit overflow-y-auto">
+                    <div className="flex p-1">
+                      <UserTable
+                        users={selectedType === USER_TYPE.STUDENT ? students :
+                          selectedType === USER_TYPE.PARENT ? parents :
+                            selectedType === USER_TYPE.TEACHER ? teachers :
+                              []
+                        }
+                        select={select && selectedType !== USER_TYPE.TEACHER}
+                        onSelectionChange={handleSelection}
+                        displayEnrollment={selectedType === USER_TYPE.STUDENT}
+                        editable
+                      />
+                    </div>
+                  </div>
 
-                    {
-                      select && (
-                        <div className="flex flex-row gap-4 w-full justify-end">
-                          <Button
-                            variant="light"
-                            color="danger"
-                            onPress={() => {
-                              setSelect(false);
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            color="primary"
-                            onClick={() => {
-                              onOpenCreateFamily();
-                            }}
-                            isDisabled={selectedUsers.length === 0}
-                          >
-                            Submit
-                          </Button>
-                        </div>
-                      )
-                    }
-                  </>
-                )}
+                  {
+                    select && (
+                      <div className="flex flex-row gap-4 w-full justify-end">
+                        <Button
+                          variant="light"
+                          color="danger"
+                          onPress={() => {
+                            setSelect(false);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          color="primary"
+                          onPress={() => {
+                            onOpenCreateFamily();
+                          }}
+                          isDisabled={selectedUsers.length === 0}
+                        >
+                          Submit
+                        </Button>
+                      </div>
+                    )
+                  }
+                </div>
 
                 <CreateUserModal
                   isOpen={isOpenCreateUser}
