@@ -177,7 +177,6 @@ const UserTable = (props: PropType) => {
                         >
                           Edit User
                         </DropdownItem>
-                        {displayEnrollment ? <TableColumn>ENROLLMENTS</TableColumn> : <TableColumn><></></TableColumn>}
                         <DropdownItem
                           key="delete"
                           className="text-danger"
