@@ -46,6 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const cc = rawCc.map((email: string) => extractEmail(email)).filter(Boolean) as string[];
       const bcc = rawBcc.map((email: string) => extractEmail(email)).filter(Boolean) as string[];
 
+      console.log("TO FIELD", to);
+
       if (!to.length) {
         throw new Error("The 'to' field must contain at least one recipient");
       }
@@ -54,7 +56,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         throw new Error("Invalid 'from' field");
       }
 
-      const caller = createCaller({ db });
+      const caller = createCaller({ db, user: null });
+      
       await caller.email.storeEmail({
         from,
         to,

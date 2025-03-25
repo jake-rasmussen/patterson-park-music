@@ -6,12 +6,14 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
+import { User } from "@supabase/supabase-js";
 import { initTRPC } from "@trpc/server";
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
+import createClient from "~/utils/supabase/client/api";
 
 /**
  * 1. CONTEXT
@@ -33,9 +35,10 @@ type CreateContextOptions = Record<string, never>;
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (_opts: CreateContextOptions) => {
+const createInnerTRPCContext = (user: User | null) => {
   return {
     db,
+    user
   };
 };
 
@@ -45,8 +48,17 @@ const createInnerTRPCContext = (_opts: CreateContextOptions) => {
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+export const createTRPCContext = async (_opts: CreateNextContextOptions) => {
+  const supabaseClient = createClient(
+    _opts.req, _opts.res,
+  );
+
+  const { data: user, error } = await supabaseClient.auth.getUser();
+
+  return {
+    db,
+    user: error ? null : user,
+  };
 };
 
 /**
@@ -123,3 +135,26 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+/**
+ * Middleware for checking authentication and creating protected procedures.
+ */
+const requireAuthMiddleware = t.middleware(async ({ ctx, next }) => {
+  const user = ctx.user;
+
+  return next({
+    ctx: {
+      ...ctx,
+      user, // Add user to context for downstream use
+    },
+  });
+});
+
+/**
+ * Protected (authenticated) procedure
+ *
+ * Use this to create queries or mutations that require a logged-in user.
+ */
+export const protectedProcedure = t.procedure
+  .use(timingMiddleware) // Optional: Add timing middleware
+  .use(requireAuthMiddleware);

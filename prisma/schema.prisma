@@ -16,6 +16,13 @@ enum ENROLLMENT_STATUS {
     PAID
 }
 
+enum USER_TYPE {
+    PARENT
+    STUDENT
+    TEACHER
+    UNKNOWN
+}
+
 enum WEEKDAY {
     SUNDAY
     MONDAY
@@ -24,6 +31,13 @@ enum WEEKDAY {
     THURSDAY
     FRIDAY
     SATURDAY
+}
+
+enum SEMESTER {
+    SPRING
+    SUMMER
+    FALL
+    WINTER
 }
 
 enum COURSE {
@@ -45,20 +59,15 @@ enum TAG {
     CURRENT
 }
 
+enum CAMPUS {
+    PPAM
+    SOBO
+}
+
 enum Status {
     RECEIVED
     SENT
     PENDING
-}
-
-// TODO: Remove
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@index([name])
 }
 
 model TagPerson {
@@ -68,59 +77,64 @@ model TagPerson {
     updatedAt DateTime @updatedAt
 }
 
-model Contact {
-    id          String  @id @default(cuid())
-    firstName   String
-    lastName    String
-    email       String? @unique // TODO: change this to non-option
-    phoneNumber String  @unique
-    person      Person? @relation(fields: [personId], references: [id])
-    personId    String? @unique
+model User {
+    id            String         @id @default(cuid())
+    firstName     String
+    lastName      String
+    email         String?        @unique // TODO: change this to non-option
+    phoneNumber   String?        @unique
+    type          USER_TYPE
+    enrollment    Enrollment[]
+    section       Section[] // Only for teachers
+    family        Family?        @relation(fields: [familyId], references: [id])
+    familyId      String?
+    isPinned      Boolean        @default(false)
+    isArchived    Boolean        @default(false)
+    smsMessages   SMSMessage[]
+    emailMessages EmailMessage[]
+    unreadMessage Boolean        @default(false)
+    hasMessage    Boolean        @default(false)
+    interests     COURSE[]
+    pronouns      String?
+    birthday      DateTime?
+    school        CAMPUS?
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
 }
 
-model Person {
-    id         String       @id @default(cuid())
-    family     Family?      @relation(fields: [familyId], references: [id])
-    familyId   String?
-    contact    Contact?
-    userName   String
-    lastLogin  DateTime?
-    enrollment Enrollment[]
-    section    Section[]
-    createdAt  DateTime     @default(now())
-    updatedAt  DateTime     @updatedAt
+model Family {
+    id         String   @id @default(cuid())
+    familyName String
+    campus     CAMPUS
+    doorCode   String
+    users      User[]
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }
 
 model Enrollment {
     id        String            @id @default(cuid())
-    person    Person            @relation(fields: [personId], references: [id])
-    personId  String
     section   Section           @relation(fields: [sectionId], references: [id])
     sectionId String
     startDate DateTime
     endDate   DateTime
     status    ENROLLMENT_STATUS
+    user      User?             @relation(fields: [userId], references: [id])
+    userId    String?
     createdAt DateTime          @default(now())
     updatedAt DateTime          @updatedAt
 }
 
 model Section {
     id         String       @id @default(cuid())
-    teacher    Person       @relation(fields: [teacherId], references: [id])
+    teacher    User         @relation(fields: [teacherId], references: [id])
     teacherId  String
     course     COURSE
-    semester   String
-    weekday    WEEKDAY
+    semesters  SEMESTER[]
+    weekdays   WEEKDAY[] // Retain the new array column
+    campus     CAMPUS
     startTime  DateTime
     enrollment Enrollment[]
-}
-
-model Family {
-    id        String   @id @default(cuid())
-    people    Person[]
-    doorCode  String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 model SMSMessage {
@@ -130,7 +144,10 @@ model SMSMessage {
     body      String
     mediaUrls String[]
     status    Status
+    errorCode Int?
     date      DateTime @default(now())
+    user      User?    @relation(fields: [userId], references: [id])
+    userId    String?
 }
 
 model EmailMessage {
@@ -143,7 +160,10 @@ model EmailMessage {
     bcc         String[]
     attachments String[] // TODO: Decide if we should add attachments
     status      Status
+    errorCode   Int?
     date        DateTime @default(now())
+    user        User?    @relation(fields: [userId], references: [id])
+    userId      String?
 }
 
 model FutureSMSMessage {

@@ -1,11 +1,12 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { Status, WEEKDAY } from "@prisma/client";
+import { createCaller } from "../root";
 
 const myEmail = process.env.SENDGRID_SENDER_EMAIL!;
 
 export const futureEmailRouter = createTRPCRouter({
-  createFutureEmailMessage: publicProcedure
+  createFutureEmailMessage: protectedProcedure
     .input(
       z.object({
         to: z.array(z.string().email()),
@@ -13,42 +14,74 @@ export const futureEmailRouter = createTRPCRouter({
         body: z.string().min(1),
         cc: z.array(z.string().email()).optional(),
         bcc: z.array(z.string().email()).optional(),
-        attachments: z.array(z.string()).optional(),
         headers: z.record(z.string(), z.any()).optional(),
         days: z.array(z.enum(Object.values(WEEKDAY) as [WEEKDAY, ...WEEKDAY[]])),
         date: z.date().optional(),
+        attachments: z
+          .array(
+            z.object({
+              filename: z.string(),
+              type: z.string(),
+              content: z.string(),
+              url: z.string().url(),
+            })
+          )
+          .optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const {
+        to,
+        subject,
+        body,
+        cc,
+        bcc,
+        headers,
+        days,
+        date,
+        attachments,
+      } = input;
+
       try {
+        // Adjust the date to 7:30 PM if provided
+        const adjustedDate = date
+          ? new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            19, // Set hours to 19 (7 PM)
+            30 // Set minutes to 30
+          )
+          : null;
+
         const newMessage = await ctx.db.futureEmailMessage.create({
           data: {
             from: myEmail,
-            to: input.to,
-            subject: input.subject,
-            body: input.body,
-            cc: input.cc || [],
-            bcc: input.bcc || [],
-            attachments: input.attachments || [],
+            to: to,
+            subject: subject,
+            body: body,
+            cc: cc || [],
+            bcc: bcc || [],
+            attachments: attachments?.map((attachment) => attachment.url) || [],
             status: Status.PENDING,
-            days: input.days,
-            date: input.date,
+            days: days,
+            date: adjustedDate, // Save the adjusted date
           },
         });
 
         return { success: true, message: newMessage };
       } catch (error) {
-        console.error("Error saving SMS message:", error);
-        throw new Error("Failed to save SMS message");
+        console.error("Error saving email message:", error);
+        throw new Error("Failed to save email message");
       }
     }),
-  getAllUpcomingEmailMessages: publicProcedure.query(async ({ ctx }) => {
+  getAllUpcomingEmailMessages: protectedProcedure.query(async ({ ctx }) => {
     try {
       const now = new Date();
       const upcomingMessages = await ctx.db.futureEmailMessage.findMany({
         where: {
           OR: [
-            { date: { gte: now } },
+            { date: { not: null } },
             { days: { isEmpty: false } },
           ],
         },
@@ -61,7 +94,7 @@ export const futureEmailRouter = createTRPCRouter({
       throw new Error("Failed to fetch upcoming email messages");
     }
   }),
-  updateFutureEmailMessage: publicProcedure
+  updateFutureEmailMessage: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -71,12 +104,25 @@ export const futureEmailRouter = createTRPCRouter({
         cc: z.array(z.string().email()).optional(),
         bcc: z.array(z.string().email()).optional(),
         attachments: z.array(z.string()).optional(),
-        days: z.array(z.enum(Object.values(WEEKDAY) as [WEEKDAY, ...WEEKDAY[]])).nullable(),
+        days: z
+          .array(z.enum(Object.values(WEEKDAY) as [WEEKDAY, ...WEEKDAY[]]))
+          .nullable(),
         date: z.date().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       try {
+        // Adjust the date to 7:30 PM if provided
+        const adjustedDate = input.date
+          ? new Date(
+            input.date.getFullYear(),
+            input.date.getMonth(),
+            input.date.getDate(),
+            19, // Set hours to 19 (7 PM)
+            30 // Set minutes to 30
+          )
+          : null;
+
         const updatedMessage = await ctx.db.futureEmailMessage.update({
           where: { id: input.id },
           data: {
@@ -87,7 +133,7 @@ export const futureEmailRouter = createTRPCRouter({
             bcc: input.bcc || [],
             attachments: input.attachments || [],
             days: input.days || [],
-            date: input.date,
+            date: adjustedDate, // Save the adjusted date
           },
         });
 
@@ -97,14 +143,32 @@ export const futureEmailRouter = createTRPCRouter({
         throw new Error("Failed to update email message");
       }
     }),
-  deleteFutureEmailMessage: publicProcedure
+
+  deleteFutureEmailMessage: protectedProcedure
     .input(
       z.object({
-        id: z.string(), // ID of the message to delete
+        id: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const message = await ctx.db.futureEmailMessage.findUnique({
+          where: { id: input.id },
+        });
+
+        if (!message) {
+          throw new Error("Message not found");
+        }
+
+        if (message.attachments.length > 0) {
+          const fileRouterCaller = createCaller(ctx).file;
+
+          await fileRouterCaller.deleteFiles({
+            bucket: "media",
+            filePaths: message.attachments,
+          });
+        }
+
         const deletedMessage = await ctx.db.futureEmailMessage.delete({
           where: { id: input.id },
         });
@@ -115,4 +179,5 @@ export const futureEmailRouter = createTRPCRouter({
         throw new Error("Failed to delete email message");
       }
     }),
+
 });

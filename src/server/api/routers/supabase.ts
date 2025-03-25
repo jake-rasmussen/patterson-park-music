@@ -1,10 +1,12 @@
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { supabase } from "~/server/supabase/supabaseClient";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createClient } from "~/utils/supabase/client/component";
+
+const supabaseClient = createClient();
 
 export const supabaseRouter = createTRPCRouter({
-  onSMSInsert: publicProcedure.subscription(async function* ({ ctx }) {
+  onSMSInsert: protectedProcedure.subscription(async function* () {
     const channelKey = "smsMessages";
-    const channel = supabase.channel(channelKey);
+    const channel = supabaseClient.channel(channelKey);
 
     try {
       const eventStream = new ReadableStream({
@@ -20,15 +22,10 @@ export const supabaseRouter = createTRPCRouter({
             }
           );
 
-          channel.subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              console.log("Realtime channel subscribed successfully");
-            }
-          });
+          channel.subscribe();
         },
         cancel() {
           channel.unsubscribe();
-          console.log("Unsubscribed from SMSMessage Realtime channel");
         },
       });
 
@@ -44,13 +41,11 @@ export const supabaseRouter = createTRPCRouter({
       throw error;
     } finally {
       channel.unsubscribe();
-      console.log("Cleaned up the channel subscription.");
     }
   }),
-
-  onEmailInsert: publicProcedure.subscription(async function* ({ ctx }) {
+  onEmailInsert: protectedProcedure.subscription(async function* () {
     const channelKey = "emailMessages";
-    const channel = supabase.channel(channelKey);
+    const channel = supabaseClient.channel(channelKey);
 
     try {
       const eventStream = new ReadableStream({
@@ -66,15 +61,10 @@ export const supabaseRouter = createTRPCRouter({
             }
           );
 
-          channel.subscribe((status) => {
-            if (status === "SUBSCRIBED") {
-              console.log("Realtime channel subscribed successfully for EmailMessage");
-            }
-          });
+          channel.subscribe();
         },
         cancel() {
           channel.unsubscribe();
-          console.log("Unsubscribed from EmailMessage Realtime channel");
         },
       });
 
@@ -90,7 +80,45 @@ export const supabaseRouter = createTRPCRouter({
       throw error;
     } finally {
       channel.unsubscribe();
-      console.log("Cleaned up the channel subscription for EmailMessage.");
+    }
+  }),
+  onUnreadMessage: protectedProcedure.subscription(async function* () {
+    const channelKey = "userUpdates";
+    const channel = supabaseClient.channel(channelKey);
+
+    try {
+      const eventStream = new ReadableStream({
+        start(controller) {
+          channel.on(
+            "postgres_changes",
+            { event: "UPDATE", schema: "public", table: "User" },
+            (payload) => {
+              const updatedUser = payload.new;
+              if (updatedUser?.unreadMessage) {
+                controller.enqueue(updatedUser);
+              }
+            }
+          );
+
+          channel.subscribe();
+        },
+        cancel() {
+          channel.unsubscribe();
+        },
+      });
+
+      const reader = eventStream.getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        yield value;
+      }
+    } catch (error) {
+      console.error("Error in subscription:", error);
+      throw error;
+    } finally {
+      channel.unsubscribe();
     }
   }),
 });
