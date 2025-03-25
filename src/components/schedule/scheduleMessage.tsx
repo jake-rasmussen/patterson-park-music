@@ -102,7 +102,7 @@ const ScheduleMessage = (props: PropType) => {
 
     createFutureSMSMessage.mutate({
       message: smsMessage,
-      to: selectedUser!.phoneNumber,
+      to: selectedUser!.phoneNumber || "",
       days: isRecurring ? selectedDays : [],
       date: isRecurring ? undefined : selectedDate,
       mediaUrls,
@@ -117,7 +117,7 @@ const ScheduleMessage = (props: PropType) => {
     const formattedBody = emailMessage.replace(/\n/g, "<br>");
 
     createFutureEmailMessage.mutate({
-      to: [selectedUser?.email!],
+      to: [selectedUser?.email || ""],
       body: formattedBody,
       subject: emailSubject,
       days: isRecurring ? selectedDays : [],

@@ -23,7 +23,7 @@ const SMSView = (props: PropType) => {
   const [newMessageAlert, setNewMessageAlert] = useState(false);
 
   const { data: initialMessages, isLoading, isError, error } = api.sms.getSMSConversations.useQuery({
-    phoneNumber: selectedUser.phoneNumber,
+    phoneNumber: selectedUser.phoneNumber || "",
   });
 
   api.supabase.onSMSInsert.useSubscription(undefined, {
