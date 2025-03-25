@@ -51,7 +51,7 @@ const SMSPanel = (props: PropType) => {
 
       sendSMS.mutate({
         message,
-        to: selectedUser.phoneNumber,
+        to: selectedUser.phoneNumber || "",
         mediaUrls,
       });
     } catch (error) {
