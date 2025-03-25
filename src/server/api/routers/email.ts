@@ -37,6 +37,7 @@ export const emailRouter = createTRPCRouter({
           where: { email: to },
           data: {
             isArchived: false,
+            hasMessage: true,
           }
         });
 
@@ -108,6 +109,7 @@ export const emailRouter = createTRPCRouter({
             },
             data: {
               unreadMessage: true,
+              hasMessage: true,
             }
           });
 
@@ -131,7 +133,6 @@ export const emailRouter = createTRPCRouter({
         throw new Error("Failed to store email");
       }
     }),
-
   getEmailConversations: protectedProcedure
     .input(
       z.object({

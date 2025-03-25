@@ -28,7 +28,8 @@ export const smsRouter = createTRPCRouter({
         const user = await ctx.db.user.update({
           where: { phoneNumber: to },
           data: {
-            isArchived: false
+            isArchived: false,
+            hasMessage: true,
           }
         });
 
@@ -102,12 +103,10 @@ export const smsRouter = createTRPCRouter({
         // Update sender as having unread messages
         await ctx.db.user.update({
           where: { id: sender.id },
-          data: { unreadMessage: true },
-        });
-
-        // Find recipient
-        const recipient = await ctx.db.user.findFirst({
-          where: { phoneNumber: to },
+          data: {
+            unreadMessage: true,
+            hasMessage: true,
+          },
         });
 
         return await ctx.db.sMSMessage.create({

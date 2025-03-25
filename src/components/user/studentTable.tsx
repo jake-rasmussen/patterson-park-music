@@ -1,8 +1,21 @@
 import { Button } from "@heroui/button";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@heroui/react";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Pagination,
+  useDisclosure
+} from "@heroui/react";
 import { Enrollment, Family, User, USER_TYPE } from "@prisma/client";
-import { IconDotsVertical, IconEdit, IconEye, IconSchool, IconTrash } from "@tabler/icons-react";
-import { useMemo, useState, useEffect } from "react";
+import { IconDotsVertical, IconEdit, IconSchool, IconTrash } from "@tabler/icons-react";
+import { useState, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
 import EditUserModal from "./editUserModal";
 import { api } from "~/utils/api";
@@ -17,7 +30,7 @@ type PropType = {
   })[];
 };
 
-const UserTable = (props: PropType) => {
+const StudentTable = (props: PropType) => {
   const { users } = props;
 
   const {
@@ -34,11 +47,11 @@ const UserTable = (props: PropType) => {
 
   const students = users?.filter((user) => user.type === USER_TYPE.STUDENT) ?? [];
 
-  const [selectedUser, setSelectedUser] = useState<(User & { family: Family | null; enrollment: Enrollment[] })>();
+  const [selectedUser, setSelectedUser] = useState<User & { family: Family | null; enrollment: Enrollment[] }>();
 
   useEffect(() => {
     if (users && selectedUser) {
-      setSelectedUser(users.find((user) => user.id === selectedUser.id)); // Make sure data is updated
+      setSelectedUser(users.find((user) => user.id === selectedUser.id));
     }
   }, [users]);
 
@@ -48,7 +61,6 @@ const UserTable = (props: PropType) => {
     onSuccess: () => {
       toast.dismiss();
       toast.success("Successfully deleted user!");
-
       utils.section.getAllSections.invalidate();
       utils.user.getAllStudents.invalidate();
       utils.user.getAllUsers.invalidate();
@@ -59,9 +71,33 @@ const UserTable = (props: PropType) => {
     },
   });
 
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 15;
+  const totalPages = Math.ceil(students.length / rowsPerPage);
+
+  const paginatedStudents = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return students.slice(start, end);
+  }, [page, students]);
+
   return (
     <>
-      <Table>
+      <Table
+        bottomContent={
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={totalPages}
+              onChange={(newPage) => setPage(newPage)}
+            />
+          </div>
+        }
+      >
         <TableHeader>
           <TableColumn>FIRST NAME</TableColumn>
           <TableColumn>LAST NAME</TableColumn>
@@ -73,7 +109,7 @@ const UserTable = (props: PropType) => {
           <TableColumn className="text-end">ACTIONS</TableColumn>
         </TableHeader>
         <TableBody emptyContent={"No rows to display."}>
-          {students.map((user: User & { family: Family | null; enrollment: Enrollment[] }) => (
+          {paginatedStudents.map((user: User & { family: Family | null; enrollment: Enrollment[] }) => (
             <TableRow key={user.id} className="h-16">
               <TableCell>{user.firstName}</TableCell>
               <TableCell>{user.lastName}</TableCell>
@@ -154,4 +190,4 @@ const UserTable = (props: PropType) => {
   );
 };
 
-export default UserTable;
+export default StudentTable;

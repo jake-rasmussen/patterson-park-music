@@ -131,6 +131,35 @@ export const userRouter = createTRPCRouter({
           include: {
             family: true,
             enrollment: true,
+          },
+        });
+
+        return users;
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        throw new Error("Failed to retrieve users");
+      }
+    }),
+  getAllUsersWithMessages: protectedProcedure
+    .input(
+      z.object({
+        skip: z.number().optional(),
+        take: z.number().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const { skip, take } = input || {};
+
+      try {
+        const users = await ctx.db.user.findMany({
+          skip,
+          take,
+          orderBy: { lastName: "asc" },
+          include: {
+            family: true,
+            enrollment: true,
+            smsMessages: true,
+            emailMessages: true,
           }
         });
 
@@ -258,8 +287,8 @@ export const userRouter = createTRPCRouter({
   searchUsers: protectedProcedure
     .input(
       z.object({
-        query: z.string().optional(), // The search query (optional)
-        skip: z.number().optional(), // Pagination support
+        query: z.string().optional(),
+        skip: z.number().optional(),
         take: z.number().optional(),
       })
     )

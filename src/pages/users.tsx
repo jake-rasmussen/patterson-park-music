@@ -24,7 +24,7 @@ const ManageUsersPage = () => {
           <ManageUsers users={users || []} isLoading={isLoadingUsers} />
         </section>
 
-        <section className="w-1/4 bg-white rounded-xl flex flex-col gap-8 p-8 overflow-auto max-h-full min-w-96">
+        <section className="w-1/4 bg-white rounded-xl flex flex-col gap-8 p-8 overflow-hidden max-h-full min-w-96">
           <ManageFamilies families={families || []} users={users || []} isLoading={isLoadingFamilies} />
         </section>
       </main>

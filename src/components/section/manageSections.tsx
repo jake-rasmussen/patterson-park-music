@@ -1,10 +1,10 @@
 import { Button } from "@heroui/button";
-import { Divider, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@heroui/react";
+import { Divider, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Pagination } from "@heroui/react";
 import { Section, User } from "@prisma/client";
 import { IconDotsVertical, IconEdit, IconPlus, IconSchool, IconTrash } from "@tabler/icons-react";
 import { enumToStr, joinEnums, formatTime } from "~/utils/helper";
 import EditSectionModal from "./editSectionModal";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { api } from "~/utils/api";
 import toast from "react-hot-toast";
 import EnrollStudents from "./enrollment/enrollStudents";
@@ -19,11 +19,7 @@ type PropType = {
 }
 
 const ManageSections = (props: PropType) => {
-  const {
-    sections,
-    teachers,
-    isLoading
-  } = props;
+  const { sections, teachers, isLoading } = props;
 
   const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit } = useDisclosure();
   const { isOpen: isOpenCreate, onOpen: onOpenCreate, onOpenChange: onOpenChangeCreate } = useDisclosure();
@@ -36,7 +32,6 @@ const ManageSections = (props: PropType) => {
     onSuccess() {
       toast.dismiss();
       toast.success("Successfully deleted section!");
-
       utils.section.getAllSections.invalidate();
     },
     onError() {
@@ -44,6 +39,14 @@ const ManageSections = (props: PropType) => {
       toast.error("Error...");
     },
   });
+
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
+  const totalPages = Math.ceil((sections?.length || 0) / rowsPerPage);
+
+  const paginatedSections = useMemo(() => {
+    return (sections || []).slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  }, [sections, page]);
 
   return (
     <section className="flex flex-col gap-8 p-8 h-full">
@@ -55,14 +58,28 @@ const ManageSections = (props: PropType) => {
             <Spinner label="Loading..." className="m-auto" />
           </div>
         ) : (
-          <div className="flex flex-wrap gap-4 items-center justify-center">
+          <div className="flex flex-col gap-4 items-center justify-center">
             <div className="grow flex justify-end gap-4">
               <Button color="primary" endContent={<IconPlus />} onPress={onOpenChangeCreate}>
                 Create New
               </Button>
             </div>
 
-            <Table>
+            <Table
+              bottomContent={
+                <div className="flex w-full justify-center">
+                  <Pagination
+                    isCompact
+                    showControls
+                    showShadow
+                    color="primary"
+                    page={page}
+                    total={totalPages}
+                    onChange={(newPage) => setPage(newPage)}
+                  />
+                </div>
+              }
+            >
               <TableHeader>
                 <TableColumn>COURSE</TableColumn>
                 <TableColumn>TEACHER</TableColumn>
@@ -72,13 +89,11 @@ const ManageSections = (props: PropType) => {
                 <TableColumn className="text-end">ACTIONS</TableColumn>
               </TableHeader>
               <TableBody emptyContent={"No rows to display."}>
-                {(sections || []).map((section: (Section & {
-                  teacher: User
-                }), index: number) => (
+                {paginatedSections.map((section: Section & { teacher: User }, index: number) => (
                   <TableRow key={index}>
                     <TableCell>{enumToStr(section.course)}</TableCell>
                     <TableCell>{section.teacher.firstName} {section.teacher.lastName}</TableCell>
-                    <TableCell>{joinEnums(section.semesters)}</TableCell>
+                    <TableCell>{section.semesters.length > 0 ? joinEnums(section.semesters) : "-"}</TableCell>
                     <TableCell>{joinEnums(section.weekdays)}</TableCell>
                     <TableCell>{formatTime(section.startTime)}</TableCell>
                     <TableCell className="flex justify-end">
@@ -116,9 +131,7 @@ const ManageSections = (props: PropType) => {
                             startContent={<IconTrash />}
                             onPress={() => {
                               toast.loading("Deleting section...");
-                              deleteSection.mutate({
-                                id: section.id
-                              });
+                              deleteSection.mutate({ id: section.id });
                             }}
                           >
                             Delete Section
@@ -134,30 +147,27 @@ const ManageSections = (props: PropType) => {
         )}
       </div>
 
-
       <CreateSectionModal
         isOpen={isOpenCreate}
         onOpenChange={onOpenChangeCreate}
         teachers={teachers}
       />
 
-      {
-        selectedSection && (
-          <>
-            <EditSectionModal
-              selectedSection={selectedSection}
-              isOpen={isOpenEdit}
-              onOpenChange={onOpenChangeEdit}
-              teachers={teachers}
-            />
-            <EnrollStudents
-              sectionId={selectedSection.id}
-              isOpen={isOpenCreate}
-              onOpenChange={onOpenChangeCreate}
-            />
-          </>
-        )
-      }
+      {selectedSection && (
+        <>
+          <EditSectionModal
+            selectedSection={selectedSection}
+            isOpen={isOpenEdit}
+            onOpenChange={onOpenChangeEdit}
+            teachers={teachers}
+          />
+          <EnrollStudents
+            sectionId={selectedSection.id}
+            isOpen={isOpenCreate}
+            onOpenChange={onOpenChangeCreate}
+          />
+        </>
+      )}
     </section>
   );
 }
