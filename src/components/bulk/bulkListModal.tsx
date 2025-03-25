@@ -110,7 +110,7 @@ const BulkListModal = (props: PropType) => {
           });
         } else if (type === "sms") {
           return sendSMS.mutateAsync({
-            to: user.phoneNumber,
+            to: user.phoneNumber || "",
             message: processedMessage,
             mediaUrls: attachedFiles.map((file) => URL.createObjectURL(file)),
           });
