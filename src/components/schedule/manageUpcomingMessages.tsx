@@ -54,7 +54,6 @@ const ManageUpcomingMessages = (props: PropType) => {
     },
   });
 
-  // Merge and sort upcoming messages by date
   const upcomingMessages = [
     ...(emailMessages || []),
     ...(smsMessages || []),
@@ -92,17 +91,17 @@ const ManageUpcomingMessages = (props: PropType) => {
   return (
     <>
       <h2 className="text-xl text-center">Manage Messages</h2>
-      <Divider />
+      <Divider className="mt-8" />
       {
         isLoading ? (
           <div className="w-full h-full flex justify-center items-center">
             <Spinner label="Loading..." />
           </div>
         ) : (
-          <>
+          <div className="overflow-y-auto p-8">
             {
               upcomingMessages.length !== 0 ? (
-                <div className="flex flex-col gap-4 overflow-y-auto">
+                <div className="flex flex-col gap-4">
                   {upcomingMessages.map((message) => (
                     <Card key={message.id}>
                       <CardBody className="flex flex-row items-center justify-between truncate">
@@ -167,7 +166,7 @@ const ManageUpcomingMessages = (props: PropType) => {
                 onOpenChange={onOpenChange}
               />
             )}
-          </>
+          </div>
         )
       }
     </>

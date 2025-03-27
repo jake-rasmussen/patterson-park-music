@@ -16,7 +16,6 @@ const extractFilePathFromSignedUrl = (url: string) => {
 const supabaseClient = createClient();
 
 export const fileRouter = createTRPCRouter({
-  // TODO: double check access rights for bucket, right now its public
   getPresignedUrl: protectedProcedure
     .input(
       z.object({

@@ -27,7 +27,7 @@ const ScheduleMessagePage = () => {
         </section>
 
         <section
-          className="bg-white h-full rounded-xl p-8 gap-8 flex flex-col min-w-96 overflow-hidden"
+          className="bg-white h-full rounded-xl p-8 flex flex-col min-w-96 overflow-hidden"
         >
           <ManageUpcomingMessages
             emailMessages={emailMessages || []}
