@@ -58,7 +58,7 @@ export const emailRouter = createTRPCRouter({
         const storedEmail = await ctx.db.emailMessage.create({
           data: {
             from: myEmail,
-            to: [to], // TODO: see if we want to handle multiple emails
+            to: [to],
             subject,
             body,
             cc: cc || [],

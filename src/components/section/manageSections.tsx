@@ -49,7 +49,7 @@ const ManageSections = (props: PropType) => {
   }, [sections, page]);
 
   return (
-    <section className="flex flex-col gap-8 p-8 h-full">
+    <section className="flex flex-col gap-8 p-8 h-full ">
       <h2 className="text-xl text-center">Section List</h2>
       <Divider />
       <div className="h-full">
@@ -59,7 +59,7 @@ const ManageSections = (props: PropType) => {
           </div>
         ) : (
           <div className="flex flex-col gap-4 items-center justify-center">
-            <div className="grow flex justify-end gap-4">
+            <div className="grow flex w-full justify-end gap-4">
               <Button color="primary" endContent={<IconPlus />} onPress={onOpenChangeCreate}>
                 Create New
               </Button>
