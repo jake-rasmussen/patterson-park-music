@@ -8,13 +8,13 @@ export default async function handler(req: any, res: any) {
   try {
     const now = new Date();
     const weekdayNames = [
-      "SUNDAY",
       "MONDAY",
       "TUESDAY",
       "WEDNESDAY",
       "THURSDAY",
       "FRIDAY",
-      "SATURDAY"
+      "SATURDAY",
+      "SUNDAY",
     ];
     const currentWeekday = weekdayNames[now.getDay()];
 
