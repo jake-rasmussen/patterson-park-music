@@ -148,7 +148,7 @@ const ScheduleMessage = (props: PropType) => {
             />
 
             <Divider className="mt-8" />
-            
+
             <div className="flex-grow w-full overflow-y-auto">
               <div className="flex flex-wrap gap-4 px-20 pb-20 items-center justify-center m-8">
                 {filteredUsers?.map((contact: User) => (
@@ -181,9 +181,15 @@ const ScheduleMessage = (props: PropType) => {
             <ModalBody>
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <RadioGroup label="What type of message would you like to send?" value={isRecurring ? "recurring" : "once"}>
-                    <Radio value="once" onClick={() => setIsRecurring(false)}>One time message</Radio>
-                    <Radio value="recurring" onClick={() => setIsRecurring(true)}>Recurring message</Radio>
+                  <RadioGroup
+                    label="What type of message would you like to send?"
+                    value={isRecurring ? "recurring" : "once"}
+                    onValueChange={(e) => {
+                      setIsRecurring(e === "recurring");
+                    }}
+                  >
+                    <Radio value="once">One time message</Radio>
+                    <Radio value="recurring">Recurring message</Radio>
                   </RadioGroup>
                 </div>
 
