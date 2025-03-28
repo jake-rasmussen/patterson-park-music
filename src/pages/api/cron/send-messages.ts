@@ -7,7 +7,16 @@ export default async function handler(req: any, res: any) {
 
   try {
     const now = new Date();
-    const currentWeekday = Object.values(WEEKDAY)[now.getDay()];
+    const weekdayNames = [
+      "SUNDAY",
+      "MONDAY",
+      "TUESDAY",
+      "WEDNESDAY",
+      "THURSDAY",
+      "FRIDAY",
+      "SATURDAY"
+    ];
+    const currentWeekday = weekdayNames[now.getDay()];
 
     // Fetch SMS messages
     const smsMessages = await db.futureSMSMessage.findMany({
@@ -18,7 +27,7 @@ export default async function handler(req: any, res: any) {
 
     const recurringSMSMessages = await db.futureSMSMessage.findMany({
       where: {
-        days: { has: currentWeekday },
+        days: { has: currentWeekday as WEEKDAY },
       },
     });
 
@@ -31,7 +40,7 @@ export default async function handler(req: any, res: any) {
 
     const recurringEmailMessages = await db.futureEmailMessage.findMany({
       where: {
-        days: { has: currentWeekday },
+        days: { has: currentWeekday as WEEKDAY },
       },
     });
 
@@ -59,7 +68,8 @@ export default async function handler(req: any, res: any) {
         filename: string;
         content: string;
         url: string;
-      }[] = [] = [];
+      }[] = [];
+
       if (email.attachments && email.attachments.length > 0) {
         processedAttachments = await Promise.all(
           email.attachments.map(async (attachmentUrl) => {

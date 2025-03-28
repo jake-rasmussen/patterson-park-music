@@ -26,16 +26,16 @@ const MessagePage = () => {
         {selectedUser ? (
           <>
             <div className="w-full flex flex-row items-center text-center min-h-10">
-              <div className="w-1/2">Text</div>
-              <div className="w-1/2">Email</div>
+              <div className="w-2/5">Text</div>
+              <div className="w-3/5">Email</div>
             </div>
             <Divider />
             <div className="flex flex-row h-full min-h-0">
-              <div className="w-1/2 flex flex-col h-full">
+              <div className="w-2/5 flex flex-col h-full">
                 <SMSPanel selectedUser={selectedUser} />
               </div>
               <Divider orientation="vertical" />
-              <div className="w-1/2 flex flex-col h-full">
+              <div className="w-3/5 flex flex-col h-full">
                 <EmailPanel selectedUser={selectedUser} />
               </div>
             </div>

@@ -111,7 +111,7 @@ const ContactsPanel = ({ selectedUser, setSelectedUser }: PropType) => {
               {isFetching ? (
                 <Spinner label="Loading..." className="m-auto py-4" />
               ) : (
-                <div className="overflow-y-scroll">
+                <div className="overflow-y-scroll flex flex-col items-center">
                   {sortedInboxWithMessages.length > 0 && (
                     <div className="flex flex-col gap-2">
                       {sortedInboxWithMessages.map(user => (
