@@ -227,33 +227,34 @@ const ScheduleMessage = (props: PropType) => {
                 }
 
                 {
-                  selectedUser && selectedUser.email && <div className="my-8">
-                    <Tabs isVertical>
-                      <Tab key="sms" title="SMS" className="w-full">
-                        <SMSMessageBar
-                          message={smsMessage}
-                          setMessage={setSMSMessage}
-                          attachedImages={attachedFiles}
-                          setAttachedImages={setAttachedFiles}
-                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!smsMessage && attachedFiles.length === 0) || isSending}
-                          handleSendMessage={handleSendSMSMessage}
-                        />
-                      </Tab>
-                      <Tab key="email" title="Email" className="w-full">
-                        <EmailMessageBar
-                          attachedFiles={attachedFiles}
-                          setAttachedFiles={setAttachedFiles}
-                          body={emailMessage}
-                          setBody={setEmailMessage}
-                          subject={emailSubject}
-                          setSubject={setEmailSubject}
-                          isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!emailMessage && attachedFiles.length === 0) || !emailSubject || isSending}
-                          handleSendMessage={handleSendEmailMessage}
-                        />
-                      </Tab>
-                    </Tabs>
-                  </div>
-                }
+                  selectedUser && (
+                    <div className="my-8">
+                      <Tabs isVertical>
+                        <Tab key="sms" title="SMS" className="w-full">
+                          <SMSMessageBar
+                            message={smsMessage}
+                            setMessage={setSMSMessage}
+                            attachedImages={attachedFiles}
+                            setAttachedImages={setAttachedFiles}
+                            isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!smsMessage && attachedFiles.length === 0) || isSending}
+                            handleSendMessage={handleSendSMSMessage}
+                          />
+                        </Tab>
+                        <Tab key="email" title="Email" className="w-full">
+                          <EmailMessageBar
+                            attachedFiles={attachedFiles}
+                            setAttachedFiles={setAttachedFiles}
+                            body={emailMessage}
+                            setBody={setEmailMessage}
+                            subject={emailSubject}
+                            setSubject={setEmailSubject}
+                            isSendDisabled={(isRecurring ? selectedDays.length === 0 : !selectedDate) || (!emailMessage && attachedFiles.length === 0) || !emailSubject || isSending}
+                            handleSendMessage={handleSendEmailMessage}
+                          />
+                        </Tab>
+                      </Tabs>
+                    </div>
+                  )}
               </div>
             </ModalBody>
           </>
