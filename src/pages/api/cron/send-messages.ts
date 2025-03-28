@@ -8,15 +8,15 @@ export default async function handler(req: any, res: any) {
   try {
     const now = new Date();
     const weekdayNames = [
+      "SUNDAY",
       "MONDAY",
       "TUESDAY",
       "WEDNESDAY",
       "THURSDAY",
       "FRIDAY",
       "SATURDAY",
-      "SUNDAY",
     ];
-    const currentWeekday = weekdayNames[now.getDay()];
+    const currentWeekday = weekdayNames[now.getDay()-1];
 
     // Fetch SMS messages
     const smsMessages = await db.futureSMSMessage.findMany({
