@@ -35,6 +35,16 @@ const EditUserModal = (props: PropType) => {
   const handleSubmit = async (values: Record<string, any>) => {
     toast.loading("Updating user...");
 
+    let birthday, school = undefined
+    
+    if (values.birthday && typeof(values.birthday) !== typeof("str")) {
+      birthday = values.birthday;
+    }
+    
+    if (values.school && values.school.length > 0) {
+      school = values.school
+    }
+
     try {
       const updatedUser = await updateUser.mutateAsync({
         id: selectedUser.id,
@@ -45,8 +55,8 @@ const EditUserModal = (props: PropType) => {
         type: values.type,
         interests: values.interests,
         pronouns: values.pronouns,
-        birthday: values.birthday,
-        school: values.school,
+        birthday,
+        school,
       });
 
       setSelectedUser(updatedUser);
