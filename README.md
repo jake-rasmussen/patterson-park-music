@@ -26,21 +26,21 @@ Before you begin, ensure you have installed the following:
 
    Create a `.env` file in the project root and add your configuration details. For example:
 
-   ```env
-  HOST_PORT=
-  NODE_ENV=
+```env
+HOST_PORT=
+NODE_ENV=
 
-  DATABASE_URL=
-  NEXT_PUBLIC_SUPABASE_URL=
-  NEXT_PUBLIC_SUPABASE_API_KEY=
-  
-  TWILIO_ACCOUNT_SID=
-  TWILIO_AUTH_TOKEN=
-  TWILIO_PHONE_NUMBER=
+DATABASE_URL=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_API_KEY=
 
-  SENDGRID_API_KEY=
-  SENDGRID_SENDER_EMAIL=
-   ```
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+TWILIO_PHONE_NUMBER=
+
+SENDGRID_API_KEY=
+SENDGRID_SENDER_EMAIL=
+```
 
 ---
 

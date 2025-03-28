@@ -115,42 +115,40 @@ const EmailView = (props: PropType) => {
                   <Spinner label="Loading..." className="m-auto" />
                 </div>
                 :
-                <div className="w-full h-full flex flex-col">
-                  <div className="flex h-full flex-col gap-2 pb-4">
-                    {
-                      messages.length > 0 ? (
-                        <>
-                          {messages.map((message: EmailMessage, index: number) => {
-                            const previousMessage = messages[index - 1];
-                            const showDate =
-                              !previousMessage ||
-                              new Date(message.date).getTime() - new Date(previousMessage.date).getTime() > 60 * 60 * 1000;
+                <div className="w-full h-full">
+                  {
+                    messages.length > 0 ? (
+                      <div className="flex flex-col gap-2 pb-4">
+                        {messages.map((message: EmailMessage, index: number) => {
+                          const previousMessage = messages[index - 1];
+                          const showDate =
+                            !previousMessage ||
+                            new Date(message.date).getTime() - new Date(previousMessage.date).getTime() > 60 * 60 * 1000;
 
-                            return (
-                              <div className="px-4" key={message.id}>
-                                {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
-                                <MessageBubble
-                                  status={message.to.includes(email!) ? Status.SENT : Status.RECEIVED}
-                                  body={message.body}
-                                  subject={message.subject}
-                                  dateSent={message.date}
-                                  contact={selectedUser}
-                                  imageUrls={message.attachments || null} // Pass the first media URL as the image
-                                  type="email"
-                                  errorCode={message.errorCode || undefined}
-                                />
-                              </div>
-                            );
-                          })}
-                          <div ref={bottomRef} />
-                        </>
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center">
-                          <IconMessage2X className="w-20 h-20 text-primary" />
-                        </div>
-                      )
-                    }
-                  </div>
+                          return (
+                            <div className="px-4" key={message.id}>
+                              {showDate && <p className="w-full text-center py-2">{formatDate(message.date)}</p>}
+                              <MessageBubble
+                                status={message.to.includes(email!) ? Status.SENT : Status.RECEIVED}
+                                body={message.body}
+                                subject={message.subject}
+                                dateSent={message.date}
+                                contact={selectedUser}
+                                imageUrls={message.attachments || null} // Pass the first media URL as the image
+                                type="email"
+                                errorCode={message.errorCode || undefined}
+                              />
+                            </div>
+                          );
+                        })}
+                        <div ref={bottomRef} />
+                      </div>
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center">
+                        <IconMessage2X className="w-20 h-20 text-primary" />
+                      </div>
+                    )
+                  }
                 </div>
             }
           </div>
